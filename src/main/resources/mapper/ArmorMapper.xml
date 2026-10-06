@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.mhsunbreaksimulator.mapper.ArmorMapper">
+
+    <select id="findAll"
+            resultType="com.example.mhsunbreaksimulator.entity.Armor">
+
+        SELECT
+            a.*,
+
+            s1.skill_name AS skill1_name,
+            s1.max_level AS skill1_max_level,
+
+            s2.skill_name AS skill2_name,
+            s2.max_level AS skill2_max_level,
+
+            s3.skill_name AS skill3_name,
+            s3.max_level AS skill3_max_level,
+
+            s4.skill_name AS skill4_name,
+            s4.max_level AS skill4_max_level
+
+        FROM armor a
+
+        LEFT JOIN skill s1
+            ON a.skill1_id = s1.skill_id
+
+        LEFT JOIN skill s2
+            ON a.skill2_id = s2.skill_id
+
+        LEFT JOIN skill s3
+            ON a.skill3_id = s3.skill_id
+
+        LEFT JOIN skill s4
+            ON a.skill4_id = s4.skill_id
+
+        ORDER BY a.part, a.armor_name
+
+    </select>
+
+
+    <select id="findByPart"
+            resultType="com.example.mhsunbreaksimulator.entity.Armor">
+
+        SELECT
+            a.*,
+
+            s1.skill_name AS skill1_name,
+            s1.max_level AS skill1_max_level,
+
+            s2.skill_name AS skill2_name,
+            s2.max_level AS skill2_max_level,
+
+            s3.skill_name AS skill3_name,
+            s3.max_level AS skill3_max_level,
+
+            s4.skill_name AS skill4_name,
+            s4.max_level AS skill4_max_level
+
+        FROM armor a
+
+        LEFT JOIN skill s1
+            ON a.skill1_id = s1.skill_id
+
+        LEFT JOIN skill s2
+            ON a.skill2_id = s2.skill_id
+
+        LEFT JOIN skill s3
+            ON a.skill3_id = s3.skill_id
+
+        LEFT JOIN skill s4
+            ON a.skill4_id = s4.skill_id
+
+        WHERE a.part = #{part}
+
+        ORDER BY a.armor_name
+
+    </select>
+
+
+    <select id="findById"
+            resultType="com.example.mhsunbreaksimulator.entity.Armor">
+
+        SELECT
+            a.*,
+
+            s1.skill_name AS skill1_name,
+            s1.max_level AS skill1_max_level,
+
+            s2.skill_name AS skill2_name,
+            s2.max_level AS skill2_max_level,
+
+            s3.skill_name AS skill3_name,
+            s3.max_level AS skill3_max_level,
+
+            s4.skill_name AS skill4_name,
+            s4.max_level AS skill4_max_level
+
+        FROM armor a
+
+        LEFT JOIN skill s1
+            ON a.skill1_id = s1.skill_id
+
+        LEFT JOIN skill s2
+            ON a.skill2_id = s2.skill_id
+
+        LEFT JOIN skill s3
+            ON a.skill3_id = s3.skill_id
+
+        LEFT JOIN skill s4
+            ON a.skill4_id = s4.skill_id
+
+        WHERE a.armor_id = #{armorId}
+
+    </select>
+
+</mapper>

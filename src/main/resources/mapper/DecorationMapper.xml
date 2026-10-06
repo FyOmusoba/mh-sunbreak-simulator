@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.mhsunbreaksimulator.mapper.DecorationMapper">
+
+    <select id="findAll"
+            resultType="com.example.mhsunbreaksimulator.entity.Decoration">
+
+        SELECT
+            d.decoration_id,
+            d.skill_id,
+            s.skill_name,
+            d.skill_level,
+            s.max_level AS skill_max_level,
+            d.required_slot_size
+
+        FROM decoration d
+
+        INNER JOIN skill s
+            ON d.skill_id = s.skill_id
+
+        ORDER BY
+            d.required_slot_size,
+            s.skill_name,
+            d.decoration_id
+
+    </select>
+
+
+    <select id="findByRequiredSlotSize"
+            resultType="com.example.mhsunbreaksimulator.entity.Decoration">
+
+        SELECT
+            d.decoration_id,
+            d.skill_id,
+            s.skill_name,
+            d.skill_level,
+            s.max_level AS skill_max_level,
+            d.required_slot_size
+
+        FROM decoration d
+
+        INNER JOIN skill s
+            ON d.skill_id = s.skill_id
+
+        WHERE d.required_slot_size = #{requiredSlotSize}
+
+        ORDER BY
+            s.skill_name,
+            d.decoration_id
+
+    </select>
+
+
+    <select id="findUsableBySlotSize"
+            resultType="com.example.mhsunbreaksimulator.entity.Decoration">
+
+        SELECT
+            d.decoration_id,
+            d.skill_id,
+            s.skill_name,
+            d.skill_level,
+            s.max_level AS skill_max_level,
+            d.required_slot_size
+
+        FROM decoration d
+
+        INNER JOIN skill s
+            ON d.skill_id = s.skill_id
+
+        WHERE d.required_slot_size &lt;= #{slotSize}
+
+        ORDER BY
+            d.required_slot_size,
+            s.skill_name,
+            d.decoration_id
+
+    </select>
+
+
+    <select id="findById"
+            resultType="com.example.mhsunbreaksimulator.entity.Decoration">
+
+        SELECT
+            d.decoration_id,
+            d.skill_id,
+            s.skill_name,
+            d.skill_level,
+            s.max_level AS skill_max_level,
+            d.required_slot_size
+
+        FROM decoration d
+
+        INNER JOIN skill s
+            ON d.skill_id = s.skill_id
+
+        WHERE d.decoration_id = #{decorationId}
+
+    </select>
+
+</mapper>

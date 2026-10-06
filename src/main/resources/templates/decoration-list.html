@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>装飾品一覧</title>
+</head>
+<body>
+
+    <h1>装飾品一覧</h1>
+
+    <form th:action="@{/decoration-list}" method="get">
+
+        <label>必要スロットサイズ：</label>
+
+        <select name="requiredSlotSize">
+
+            <option value=""
+                    th:selected="${selectedSlotSize == null}">
+                すべて
+            </option>
+
+            <option value="1"
+                    th:selected="${selectedSlotSize == 1}">
+                1
+            </option>
+
+            <option value="2"
+                    th:selected="${selectedSlotSize == 2}">
+                2
+            </option>
+
+            <option value="3"
+                    th:selected="${selectedSlotSize == 3}">
+                3
+            </option>
+
+            <option value="4"
+                    th:selected="${selectedSlotSize == 4}">
+                4
+            </option>
+
+        </select>
+
+        <button type="submit">
+            絞り込み
+        </button>
+
+    </form>
+
+    <br>
+
+    <table border="1">
+
+        <thead>
+            <tr>
+                <th>スキル名</th>
+                <th>付与Lv</th>
+                <th>必要スロット</th>
+            </tr>
+        </thead>
+
+        <tbody>
+
+            <tr th:each="decoration : ${decorations}">
+
+                <td th:text="${decoration.skillName}"></td>
+
+                <td th:text="${decoration.skillLevel}"></td>
+
+                <td th:text="${decoration.requiredSlotSize}"></td>
+
+            </tr>
+
+        </tbody>
+
+    </table>
+
+</body>
+</html>

@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.mhsunbreaksimulator.mapper.WeaponMapper">
+
+    <select id="findAll"
+            resultType="com.example.mhsunbreaksimulator.entity.Weapon">
+
+        SELECT *
+        FROM weapon
+        ORDER BY weapon_type, weapon_name
+
+    </select>
+    
+    
+    
+<select id="findByWeaponType"
+        resultType="com.example.mhsunbreaksimulator.entity.Weapon">
+
+    SELECT *
+    FROM weapon
+    WHERE weapon_type = #{weaponType}
+    ORDER BY weapon_name
+
+</select>
+
+<select id="findById"
+        resultType="com.example.mhsunbreaksimulator.entity.Weapon">
+
+    SELECT *
+    FROM weapon
+    WHERE weapon_id = #{weaponId}
+
+</select>
+
+</mapper>

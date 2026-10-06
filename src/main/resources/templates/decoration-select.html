@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>装飾品選択</title>
+</head>
+<body>
+
+    <h1>装飾品選択</h1>
+
+    <p>
+        使用できるスロットサイズ：
+        <span th:text="${slotSize}"></span>
+    </p>
+
+    <table border="1">
+
+        <thead>
+            <tr>
+                <th>スキル名</th>
+                <th>付与Lv</th>
+                <th>必要スロット</th>
+                <th>選択</th>
+            </tr>
+        </thead>
+
+        <tbody>
+
+            <tr th:each="decoration : ${decorations}">
+
+                <td th:text="${decoration.skillName}"></td>
+
+                <td th:text="${decoration.skillLevel}"></td>
+
+                <td th:text="${decoration.requiredSlotSize}"></td>
+
+                <td>
+
+                    <form th:action="@{/decoration-apply}"
+                          method="get">
+
+                        <!-- 今回選んだ装飾品 -->
+                        <input type="hidden"
+                               name="decorationId"
+                               th:value="${decoration.decorationId}">
+
+                        <!-- どこのスロットに入れるか -->
+                        <input type="hidden"
+                               name="target"
+                               th:value="${target}">
+
+
+                        <!-- ===================== -->
+                        <!-- 現在の武器 -->
+                        <!-- ===================== -->
+
+                        <input type="hidden"
+                               name="weaponId"
+                               th:value="${simulatorForm.weaponId}">
+
+
+                        <!-- ===================== -->
+                        <!-- 現在の防具 -->
+                        <!-- ===================== -->
+
+                        <input type="hidden"
+                               name="headArmorId"
+                               th:value="${simulatorForm.headArmorId}">
+
+                        <input type="hidden"
+                               name="chestArmorId"
+                               th:value="${simulatorForm.chestArmorId}">
+
+                        <input type="hidden"
+                               name="armArmorId"
+                               th:value="${simulatorForm.armArmorId}">
+
+                        <input type="hidden"
+                               name="waistArmorId"
+                               th:value="${simulatorForm.waistArmorId}">
+
+                        <input type="hidden"
+                               name="legArmorId"
+                               th:value="${simulatorForm.legArmorId}">
+
+
+                        <!-- ===================== -->
+                        <!-- 武器の装飾品 -->
+                        <!-- ===================== -->
+
+                        <input type="hidden"
+                               name="weaponDecoration1Id"
+                               th:value="${simulatorForm.weaponDecoration1Id}">
+
+                        <input type="hidden"
+                               name="weaponDecoration2Id"
+                               th:value="${simulatorForm.weaponDecoration2Id}">
+
+                        <input type="hidden"
+                               name="weaponDecoration3Id"
+                               th:value="${simulatorForm.weaponDecoration3Id}">
+
+
+                        <!-- ===================== -->
+                        <!-- 頭の装飾品 -->
+                        <!-- ===================== -->
+
+                        <input type="hidden"
+                               name="headDecoration1Id"
+                               th:value="${simulatorForm.headDecoration1Id}">
+
+                        <input type="hidden"
+                               name="headDecoration2Id"
+                               th:value="${simulatorForm.headDecoration2Id}">
+
+                        <input type="hidden"
+                               name="headDecoration3Id"
+                               th:value="${simulatorForm.headDecoration3Id}">
+
+
+                        <!-- ===================== -->
+                        <!-- 胴の装飾品 -->
+                        <!-- ===================== -->
+
+                        <input type="hidden"
+                               name="chestDecoration1Id"
+                               th:value="${simulatorForm.chestDecoration1Id}">
+
+                        <input type="hidden"
+                               name="chestDecoration2Id"
+                               th:value="${simulatorForm.chestDecoration2Id}">
+
+                        <input type="hidden"
+                               name="chestDecoration3Id"
+                               th:value="${simulatorForm.chestDecoration3Id}">
+
+
+                        <!-- ===================== -->
+                        <!-- 腕の装飾品 -->
+                        <!-- ===================== -->
+
+                        <input type="hidden"
+                               name="armDecoration1Id"
+                               th:value="${simulatorForm.armDecoration1Id}">
+
+                        <input type="hidden"
+                               name="armDecoration2Id"
+                               th:value="${simulatorForm.armDecoration2Id}">
+
+                        <input type="hidden"
+                               name="armDecoration3Id"
+                               th:value="${simulatorForm.armDecoration3Id}">
+
+
+                        <!-- ===================== -->
+                        <!-- 腰の装飾品 -->
+                        <!-- ===================== -->
+
+                        <input type="hidden"
+                               name="waistDecoration1Id"
+                               th:value="${simulatorForm.waistDecoration1Id}">
+
+                        <input type="hidden"
+                               name="waistDecoration2Id"
+                               th:value="${simulatorForm.waistDecoration2Id}">
+
+                        <input type="hidden"
+                               name="waistDecoration3Id"
+                               th:value="${simulatorForm.waistDecoration3Id}">
+
+
+                        <!-- ===================== -->
+                        <!-- 脚の装飾品 -->
+                        <!-- ===================== -->
+
+                        <input type="hidden"
+                               name="legDecoration1Id"
+                               th:value="${simulatorForm.legDecoration1Id}">
+
+                        <input type="hidden"
+                               name="legDecoration2Id"
+                               th:value="${simulatorForm.legDecoration2Id}">
+
+                        <input type="hidden"
+                               name="legDecoration3Id"
+                               th:value="${simulatorForm.legDecoration3Id}">
+
+
+                        <button type="submit">
+                            選択
+                        </button>
+
+                    </form>
+
+                </td>
+
+            </tr>
+
+        </tbody>
+
+    </table>
+
+</body>
+</html>

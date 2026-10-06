@@ -1,0 +1,1434 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>装備シミュレーター</title>
+</head>
+<body>
+
+    <h1>装備シミュレーター</h1>
+
+
+    <!-- ================================================== -->
+    <!-- 武器 -->
+    <!-- ================================================== -->
+
+    <h2>選択中の武器</h2>
+
+    <table border="1">
+
+        <tr>
+            <th>武器名</th>
+            <td th:text="${weapon.weaponName}"></td>
+        </tr>
+
+        <tr>
+            <th>武器種</th>
+            <td th:text="${weapon.weaponType}"></td>
+        </tr>
+
+        <tr>
+            <th>攻撃力</th>
+            <td th:text="${weapon.attack}"></td>
+        </tr>
+
+        <tr>
+            <th>属性</th>
+            <td th:text="${weapon.elementType}"></td>
+        </tr>
+
+        <tr>
+            <th>属性値</th>
+            <td th:text="${weapon.elementValue}"></td>
+        </tr>
+
+        <tr>
+            <th>会心率</th>
+            <td th:text="${weapon.affinity} + '%'"></td>
+        </tr>
+
+    </table>
+
+
+    <!-- ================================================== -->
+    <!-- 武器装飾品 -->
+    <!-- ================================================== -->
+
+    <h3>武器スロット</h3>
+
+    <table border="1">
+
+        <tr>
+            <th>スロット</th>
+            <th>サイズ</th>
+            <th>装飾品</th>
+            <th>操作</th>
+        </tr>
+
+
+        <!-- 武器スロット1 -->
+        <tr>
+
+            <td>1</td>
+            <td th:text="${weapon.slot1Size}"></td>
+
+            <td>
+                <span th:if="${weapon.slot1Size == 0}">
+                    スロットなし
+                </span>
+
+                <span th:if="${weapon.slot1Size > 0 and weaponDecoration1 == null}">
+                    未選択
+                </span>
+
+                <span th:if="${weaponDecoration1 != null}">
+                    <span th:text="${weaponDecoration1.skillName}"></span>
+                    Lv<span th:text="${weaponDecoration1.skillLevel}"></span>
+                </span>
+            </td>
+
+            <td>
+                <span th:if="${weapon.slot1Size == 0}">-</span>
+
+                <a th:if="${weapon.slot1Size > 0}"
+                   th:href="@{/decoration-select(
+                        slotSize=${weapon.slot1Size},
+                        target='weaponDecoration1Id',
+                        weaponId=${simulatorForm.weaponId},
+                        headArmorId=${simulatorForm.headArmorId},
+                        chestArmorId=${simulatorForm.chestArmorId},
+                        armArmorId=${simulatorForm.armArmorId},
+                        waistArmorId=${simulatorForm.waistArmorId},
+                        legArmorId=${simulatorForm.legArmorId},
+                        weaponDecoration1Id=${simulatorForm.weaponDecoration1Id},
+                        weaponDecoration2Id=${simulatorForm.weaponDecoration2Id},
+                        weaponDecoration3Id=${simulatorForm.weaponDecoration3Id},
+                        headDecoration1Id=${simulatorForm.headDecoration1Id},
+                        headDecoration2Id=${simulatorForm.headDecoration2Id},
+                        headDecoration3Id=${simulatorForm.headDecoration3Id},
+                        chestDecoration1Id=${simulatorForm.chestDecoration1Id},
+                        chestDecoration2Id=${simulatorForm.chestDecoration2Id},
+                        chestDecoration3Id=${simulatorForm.chestDecoration3Id},
+                        armDecoration1Id=${simulatorForm.armDecoration1Id},
+                        armDecoration2Id=${simulatorForm.armDecoration2Id},
+                        armDecoration3Id=${simulatorForm.armDecoration3Id},
+                        waistDecoration1Id=${simulatorForm.waistDecoration1Id},
+                        waistDecoration2Id=${simulatorForm.waistDecoration2Id},
+                        waistDecoration3Id=${simulatorForm.waistDecoration3Id},
+                        legDecoration1Id=${simulatorForm.legDecoration1Id},
+                        legDecoration2Id=${simulatorForm.legDecoration2Id},
+                        legDecoration3Id=${simulatorForm.legDecoration3Id}
+                   )}">
+                    装飾品を選ぶ
+                </a>
+            </td>
+
+        </tr>
+
+
+        <!-- 武器スロット2 -->
+        <tr>
+
+            <td>2</td>
+            <td th:text="${weapon.slot2Size}"></td>
+
+            <td>
+                <span th:if="${weapon.slot2Size == 0}">
+                    スロットなし
+                </span>
+
+                <span th:if="${weapon.slot2Size > 0 and weaponDecoration2 == null}">
+                    未選択
+                </span>
+
+                <span th:if="${weaponDecoration2 != null}">
+                    <span th:text="${weaponDecoration2.skillName}"></span>
+                    Lv<span th:text="${weaponDecoration2.skillLevel}"></span>
+                </span>
+            </td>
+
+            <td>
+                <span th:if="${weapon.slot2Size == 0}">-</span>
+
+                <a th:if="${weapon.slot2Size > 0}"
+                   th:href="@{/decoration-select(
+                        slotSize=${weapon.slot2Size},
+                        target='weaponDecoration2Id',
+                        weaponId=${simulatorForm.weaponId},
+                        headArmorId=${simulatorForm.headArmorId},
+                        chestArmorId=${simulatorForm.chestArmorId},
+                        armArmorId=${simulatorForm.armArmorId},
+                        waistArmorId=${simulatorForm.waistArmorId},
+                        legArmorId=${simulatorForm.legArmorId},
+                        weaponDecoration1Id=${simulatorForm.weaponDecoration1Id},
+                        weaponDecoration2Id=${simulatorForm.weaponDecoration2Id},
+                        weaponDecoration3Id=${simulatorForm.weaponDecoration3Id},
+                        headDecoration1Id=${simulatorForm.headDecoration1Id},
+                        headDecoration2Id=${simulatorForm.headDecoration2Id},
+                        headDecoration3Id=${simulatorForm.headDecoration3Id},
+                        chestDecoration1Id=${simulatorForm.chestDecoration1Id},
+                        chestDecoration2Id=${simulatorForm.chestDecoration2Id},
+                        chestDecoration3Id=${simulatorForm.chestDecoration3Id},
+                        armDecoration1Id=${simulatorForm.armDecoration1Id},
+                        armDecoration2Id=${simulatorForm.armDecoration2Id},
+                        armDecoration3Id=${simulatorForm.armDecoration3Id},
+                        waistDecoration1Id=${simulatorForm.waistDecoration1Id},
+                        waistDecoration2Id=${simulatorForm.waistDecoration2Id},
+                        waistDecoration3Id=${simulatorForm.waistDecoration3Id},
+                        legDecoration1Id=${simulatorForm.legDecoration1Id},
+                        legDecoration2Id=${simulatorForm.legDecoration2Id},
+                        legDecoration3Id=${simulatorForm.legDecoration3Id}
+                   )}">
+                    装飾品を選ぶ
+                </a>
+            </td>
+
+        </tr>
+
+
+        <!-- 武器スロット3 -->
+        <tr>
+
+            <td>3</td>
+            <td th:text="${weapon.slot3Size}"></td>
+
+            <td>
+                <span th:if="${weapon.slot3Size == 0}">
+                    スロットなし
+                </span>
+
+                <span th:if="${weapon.slot3Size > 0 and weaponDecoration3 == null}">
+                    未選択
+                </span>
+
+                <span th:if="${weaponDecoration3 != null}">
+                    <span th:text="${weaponDecoration3.skillName}"></span>
+                    Lv<span th:text="${weaponDecoration3.skillLevel}"></span>
+                </span>
+            </td>
+
+            <td>
+                <span th:if="${weapon.slot3Size == 0}">-</span>
+
+                <a th:if="${weapon.slot3Size > 0}"
+                   th:href="@{/decoration-select(
+                        slotSize=${weapon.slot3Size},
+                        target='weaponDecoration3Id',
+                        weaponId=${simulatorForm.weaponId},
+                        headArmorId=${simulatorForm.headArmorId},
+                        chestArmorId=${simulatorForm.chestArmorId},
+                        armArmorId=${simulatorForm.armArmorId},
+                        waistArmorId=${simulatorForm.waistArmorId},
+                        legArmorId=${simulatorForm.legArmorId},
+                        weaponDecoration1Id=${simulatorForm.weaponDecoration1Id},
+                        weaponDecoration2Id=${simulatorForm.weaponDecoration2Id},
+                        weaponDecoration3Id=${simulatorForm.weaponDecoration3Id},
+                        headDecoration1Id=${simulatorForm.headDecoration1Id},
+                        headDecoration2Id=${simulatorForm.headDecoration2Id},
+                        headDecoration3Id=${simulatorForm.headDecoration3Id},
+                        chestDecoration1Id=${simulatorForm.chestDecoration1Id},
+                        chestDecoration2Id=${simulatorForm.chestDecoration2Id},
+                        chestDecoration3Id=${simulatorForm.chestDecoration3Id},
+                        armDecoration1Id=${simulatorForm.armDecoration1Id},
+                        armDecoration2Id=${simulatorForm.armDecoration2Id},
+                        armDecoration3Id=${simulatorForm.armDecoration3Id},
+                        waistDecoration1Id=${simulatorForm.waistDecoration1Id},
+                        waistDecoration2Id=${simulatorForm.waistDecoration2Id},
+                        waistDecoration3Id=${simulatorForm.waistDecoration3Id},
+                        legDecoration1Id=${simulatorForm.legDecoration1Id},
+                        legDecoration2Id=${simulatorForm.legDecoration2Id},
+                        legDecoration3Id=${simulatorForm.legDecoration3Id}
+                   )}">
+                    装飾品を選ぶ
+                </a>
+            </td>
+
+        </tr>
+
+    </table>
+
+
+    <br>
+
+
+    <!-- ================================================== -->
+    <!-- 防具選択 -->
+    <!-- ================================================== -->
+
+    <h2>選択中の防具</h2>
+
+    <table border="1">
+
+        <tr>
+            <th>部位</th>
+            <th>防具名</th>
+            <th>選択</th>
+        </tr>
+
+
+        <!-- 頭 -->
+        <tr>
+
+            <td>頭</td>
+
+            <td th:if="${headArmor != null}"
+                th:text="${headArmor.armorName}">
+            </td>
+
+            <td th:if="${headArmor == null}">
+                未選択
+            </td>
+
+            <td>
+                <a th:href="@{/armor-list(
+                    part='頭',
+                    weaponId=${simulatorForm.weaponId},
+                    headArmorId=${simulatorForm.headArmorId},
+                    chestArmorId=${simulatorForm.chestArmorId},
+                    armArmorId=${simulatorForm.armArmorId},
+                    waistArmorId=${simulatorForm.waistArmorId},
+                    legArmorId=${simulatorForm.legArmorId},
+                    weaponDecoration1Id=${simulatorForm.weaponDecoration1Id},
+                    weaponDecoration2Id=${simulatorForm.weaponDecoration2Id},
+                    weaponDecoration3Id=${simulatorForm.weaponDecoration3Id},
+                    headDecoration1Id=${simulatorForm.headDecoration1Id},
+                    headDecoration2Id=${simulatorForm.headDecoration2Id},
+                    headDecoration3Id=${simulatorForm.headDecoration3Id},
+                    chestDecoration1Id=${simulatorForm.chestDecoration1Id},
+                    chestDecoration2Id=${simulatorForm.chestDecoration2Id},
+                    chestDecoration3Id=${simulatorForm.chestDecoration3Id},
+                    armDecoration1Id=${simulatorForm.armDecoration1Id},
+                    armDecoration2Id=${simulatorForm.armDecoration2Id},
+                    armDecoration3Id=${simulatorForm.armDecoration3Id},
+                    waistDecoration1Id=${simulatorForm.waistDecoration1Id},
+                    waistDecoration2Id=${simulatorForm.waistDecoration2Id},
+                    waistDecoration3Id=${simulatorForm.waistDecoration3Id},
+                    legDecoration1Id=${simulatorForm.legDecoration1Id},
+                    legDecoration2Id=${simulatorForm.legDecoration2Id},
+                    legDecoration3Id=${simulatorForm.legDecoration3Id}
+                )}">
+                    選ぶ
+                </a>
+            </td>
+
+        </tr>
+
+
+        <!-- 胴 -->
+        <tr>
+
+            <td>胴</td>
+
+            <td th:if="${chestArmor != null}"
+                th:text="${chestArmor.armorName}">
+            </td>
+
+            <td th:if="${chestArmor == null}">
+                未選択
+            </td>
+
+            <td>
+                <a th:href="@{/armor-list(
+                    part='胴',
+                    weaponId=${simulatorForm.weaponId},
+                    headArmorId=${simulatorForm.headArmorId},
+                    chestArmorId=${simulatorForm.chestArmorId},
+                    armArmorId=${simulatorForm.armArmorId},
+                    waistArmorId=${simulatorForm.waistArmorId},
+                    legArmorId=${simulatorForm.legArmorId},
+                    weaponDecoration1Id=${simulatorForm.weaponDecoration1Id},
+                    weaponDecoration2Id=${simulatorForm.weaponDecoration2Id},
+                    weaponDecoration3Id=${simulatorForm.weaponDecoration3Id},
+                    headDecoration1Id=${simulatorForm.headDecoration1Id},
+                    headDecoration2Id=${simulatorForm.headDecoration2Id},
+                    headDecoration3Id=${simulatorForm.headDecoration3Id},
+                    chestDecoration1Id=${simulatorForm.chestDecoration1Id},
+                    chestDecoration2Id=${simulatorForm.chestDecoration2Id},
+                    chestDecoration3Id=${simulatorForm.chestDecoration3Id},
+                    armDecoration1Id=${simulatorForm.armDecoration1Id},
+                    armDecoration2Id=${simulatorForm.armDecoration2Id},
+                    armDecoration3Id=${simulatorForm.armDecoration3Id},
+                    waistDecoration1Id=${simulatorForm.waistDecoration1Id},
+                    waistDecoration2Id=${simulatorForm.waistDecoration2Id},
+                    waistDecoration3Id=${simulatorForm.waistDecoration3Id},
+                    legDecoration1Id=${simulatorForm.legDecoration1Id},
+                    legDecoration2Id=${simulatorForm.legDecoration2Id},
+                    legDecoration3Id=${simulatorForm.legDecoration3Id}
+                )}">
+                    選ぶ
+                </a>
+            </td>
+
+        </tr>
+
+
+        <!-- 腕 -->
+        <tr>
+
+            <td>腕</td>
+
+            <td th:if="${armArmor != null}"
+                th:text="${armArmor.armorName}">
+            </td>
+
+            <td th:if="${armArmor == null}">
+                未選択
+            </td>
+
+            <td>
+                <a th:href="@{/armor-list(
+                    part='腕',
+                    weaponId=${simulatorForm.weaponId},
+                    headArmorId=${simulatorForm.headArmorId},
+                    chestArmorId=${simulatorForm.chestArmorId},
+                    armArmorId=${simulatorForm.armArmorId},
+                    waistArmorId=${simulatorForm.waistArmorId},
+                    legArmorId=${simulatorForm.legArmorId},
+                    weaponDecoration1Id=${simulatorForm.weaponDecoration1Id},
+                    weaponDecoration2Id=${simulatorForm.weaponDecoration2Id},
+                    weaponDecoration3Id=${simulatorForm.weaponDecoration3Id},
+                    headDecoration1Id=${simulatorForm.headDecoration1Id},
+                    headDecoration2Id=${simulatorForm.headDecoration2Id},
+                    headDecoration3Id=${simulatorForm.headDecoration3Id},
+                    chestDecoration1Id=${simulatorForm.chestDecoration1Id},
+                    chestDecoration2Id=${simulatorForm.chestDecoration2Id},
+                    chestDecoration3Id=${simulatorForm.chestDecoration3Id},
+                    armDecoration1Id=${simulatorForm.armDecoration1Id},
+                    armDecoration2Id=${simulatorForm.armDecoration2Id},
+                    armDecoration3Id=${simulatorForm.armDecoration3Id},
+                    waistDecoration1Id=${simulatorForm.waistDecoration1Id},
+                    waistDecoration2Id=${simulatorForm.waistDecoration2Id},
+                    waistDecoration3Id=${simulatorForm.waistDecoration3Id},
+                    legDecoration1Id=${simulatorForm.legDecoration1Id},
+                    legDecoration2Id=${simulatorForm.legDecoration2Id},
+                    legDecoration3Id=${simulatorForm.legDecoration3Id}
+                )}">
+                    選ぶ
+                </a>
+            </td>
+
+        </tr>
+
+
+        <!-- 腰 -->
+        <tr>
+
+            <td>腰</td>
+
+            <td th:if="${waistArmor != null}"
+                th:text="${waistArmor.armorName}">
+            </td>
+
+            <td th:if="${waistArmor == null}">
+                未選択
+            </td>
+
+            <td>
+                <a th:href="@{/armor-list(
+                    part='腰',
+                    weaponId=${simulatorForm.weaponId},
+                    headArmorId=${simulatorForm.headArmorId},
+                    chestArmorId=${simulatorForm.chestArmorId},
+                    armArmorId=${simulatorForm.armArmorId},
+                    waistArmorId=${simulatorForm.waistArmorId},
+                    legArmorId=${simulatorForm.legArmorId},
+                    weaponDecoration1Id=${simulatorForm.weaponDecoration1Id},
+                    weaponDecoration2Id=${simulatorForm.weaponDecoration2Id},
+                    weaponDecoration3Id=${simulatorForm.weaponDecoration3Id},
+                    headDecoration1Id=${simulatorForm.headDecoration1Id},
+                    headDecoration2Id=${simulatorForm.headDecoration2Id},
+                    headDecoration3Id=${simulatorForm.headDecoration3Id},
+                    chestDecoration1Id=${simulatorForm.chestDecoration1Id},
+                    chestDecoration2Id=${simulatorForm.chestDecoration2Id},
+                    chestDecoration3Id=${simulatorForm.chestDecoration3Id},
+                    armDecoration1Id=${simulatorForm.armDecoration1Id},
+                    armDecoration2Id=${simulatorForm.armDecoration2Id},
+                    armDecoration3Id=${simulatorForm.armDecoration3Id},
+                    waistDecoration1Id=${simulatorForm.waistDecoration1Id},
+                    waistDecoration2Id=${simulatorForm.waistDecoration2Id},
+                    waistDecoration3Id=${simulatorForm.waistDecoration3Id},
+                    legDecoration1Id=${simulatorForm.legDecoration1Id},
+                    legDecoration2Id=${simulatorForm.legDecoration2Id},
+                    legDecoration3Id=${simulatorForm.legDecoration3Id}
+                )}">
+                    選ぶ
+                </a>
+            </td>
+
+        </tr>
+
+
+        <!-- 脚 -->
+        <tr>
+
+            <td>脚</td>
+
+            <td th:if="${legArmor != null}"
+                th:text="${legArmor.armorName}">
+            </td>
+
+            <td th:if="${legArmor == null}">
+                未選択
+            </td>
+
+            <td>
+                <a th:href="@{/armor-list(
+                    part='脚',
+                    weaponId=${simulatorForm.weaponId},
+                    headArmorId=${simulatorForm.headArmorId},
+                    chestArmorId=${simulatorForm.chestArmorId},
+                    armArmorId=${simulatorForm.armArmorId},
+                    waistArmorId=${simulatorForm.waistArmorId},
+                    legArmorId=${simulatorForm.legArmorId},
+                    weaponDecoration1Id=${simulatorForm.weaponDecoration1Id},
+                    weaponDecoration2Id=${simulatorForm.weaponDecoration2Id},
+                    weaponDecoration3Id=${simulatorForm.weaponDecoration3Id},
+                    headDecoration1Id=${simulatorForm.headDecoration1Id},
+                    headDecoration2Id=${simulatorForm.headDecoration2Id},
+                    headDecoration3Id=${simulatorForm.headDecoration3Id},
+                    chestDecoration1Id=${simulatorForm.chestDecoration1Id},
+                    chestDecoration2Id=${simulatorForm.chestDecoration2Id},
+                    chestDecoration3Id=${simulatorForm.chestDecoration3Id},
+                    armDecoration1Id=${simulatorForm.armDecoration1Id},
+                    armDecoration2Id=${simulatorForm.armDecoration2Id},
+                    armDecoration3Id=${simulatorForm.armDecoration3Id},
+                    waistDecoration1Id=${simulatorForm.waistDecoration1Id},
+                    waistDecoration2Id=${simulatorForm.waistDecoration2Id},
+                    waistDecoration3Id=${simulatorForm.waistDecoration3Id},
+                    legDecoration1Id=${simulatorForm.legDecoration1Id},
+                    legDecoration2Id=${simulatorForm.legDecoration2Id},
+                    legDecoration3Id=${simulatorForm.legDecoration3Id}
+                )}">
+                    選ぶ
+                </a>
+            </td>
+
+        </tr>
+
+    </table>
+
+
+    <br>
+
+
+    <!-- ================================================== -->
+    <!-- 頭防具スロット -->
+    <!-- ================================================== -->
+
+    <h3>頭防具スロット</h3>
+
+    <p th:if="${headArmor == null}">
+        頭防具が選択されていません。
+    </p>
+
+    <table border="1" th:if="${headArmor != null}">
+
+        <tr>
+            <th>スロット</th>
+            <th>サイズ</th>
+            <th>装飾品</th>
+            <th>操作</th>
+        </tr>
+
+        <tr>
+            <td>1</td>
+            <td th:text="${headArmor.slot1Size}"></td>
+            <td>
+                <span th:if="${headArmor.slot1Size == 0}">スロットなし</span>
+                <span th:if="${headArmor.slot1Size > 0 and headDecoration1 == null}">未選択</span>
+                <span th:if="${headDecoration1 != null}">
+                    <span th:text="${headDecoration1.skillName}"></span>
+                    Lv<span th:text="${headDecoration1.skillLevel}"></span>
+                </span>
+            </td>
+            <td>
+                <span th:if="${headArmor.slot1Size == 0}">-</span>
+                <a th:if="${headArmor.slot1Size > 0}"
+                   th:href="@{/decoration-select(
+                        slotSize=${headArmor.slot1Size},
+                        target='headDecoration1Id',
+                        weaponId=${simulatorForm.weaponId},
+                        headArmorId=${simulatorForm.headArmorId},
+                        chestArmorId=${simulatorForm.chestArmorId},
+                        armArmorId=${simulatorForm.armArmorId},
+                        waistArmorId=${simulatorForm.waistArmorId},
+                        legArmorId=${simulatorForm.legArmorId},
+                        weaponDecoration1Id=${simulatorForm.weaponDecoration1Id},
+                        weaponDecoration2Id=${simulatorForm.weaponDecoration2Id},
+                        weaponDecoration3Id=${simulatorForm.weaponDecoration3Id},
+                        headDecoration1Id=${simulatorForm.headDecoration1Id},
+                        headDecoration2Id=${simulatorForm.headDecoration2Id},
+                        headDecoration3Id=${simulatorForm.headDecoration3Id},
+                        chestDecoration1Id=${simulatorForm.chestDecoration1Id},
+                        chestDecoration2Id=${simulatorForm.chestDecoration2Id},
+                        chestDecoration3Id=${simulatorForm.chestDecoration3Id},
+                        armDecoration1Id=${simulatorForm.armDecoration1Id},
+                        armDecoration2Id=${simulatorForm.armDecoration2Id},
+                        armDecoration3Id=${simulatorForm.armDecoration3Id},
+                        waistDecoration1Id=${simulatorForm.waistDecoration1Id},
+                        waistDecoration2Id=${simulatorForm.waistDecoration2Id},
+                        waistDecoration3Id=${simulatorForm.waistDecoration3Id},
+                        legDecoration1Id=${simulatorForm.legDecoration1Id},
+                        legDecoration2Id=${simulatorForm.legDecoration2Id},
+                        legDecoration3Id=${simulatorForm.legDecoration3Id}
+                   )}">
+                    装飾品を選ぶ
+                </a>
+            </td>
+        </tr>
+
+        <tr>
+            <td>2</td>
+            <td th:text="${headArmor.slot2Size}"></td>
+            <td>
+                <span th:if="${headArmor.slot2Size == 0}">スロットなし</span>
+                <span th:if="${headArmor.slot2Size > 0 and headDecoration2 == null}">未選択</span>
+                <span th:if="${headDecoration2 != null}">
+                    <span th:text="${headDecoration2.skillName}"></span>
+                    Lv<span th:text="${headDecoration2.skillLevel}"></span>
+                </span>
+            </td>
+            <td>
+                <span th:if="${headArmor.slot2Size == 0}">-</span>
+                <a th:if="${headArmor.slot2Size > 0}"
+                   th:href="@{/decoration-select(
+                        slotSize=${headArmor.slot2Size},
+                        target='headDecoration2Id',
+                        weaponId=${simulatorForm.weaponId},
+                        headArmorId=${simulatorForm.headArmorId},
+                        chestArmorId=${simulatorForm.chestArmorId},
+                        armArmorId=${simulatorForm.armArmorId},
+                        waistArmorId=${simulatorForm.waistArmorId},
+                        legArmorId=${simulatorForm.legArmorId},
+                        weaponDecoration1Id=${simulatorForm.weaponDecoration1Id},
+                        weaponDecoration2Id=${simulatorForm.weaponDecoration2Id},
+                        weaponDecoration3Id=${simulatorForm.weaponDecoration3Id},
+                        headDecoration1Id=${simulatorForm.headDecoration1Id},
+                        headDecoration2Id=${simulatorForm.headDecoration2Id},
+                        headDecoration3Id=${simulatorForm.headDecoration3Id},
+                        chestDecoration1Id=${simulatorForm.chestDecoration1Id},
+                        chestDecoration2Id=${simulatorForm.chestDecoration2Id},
+                        chestDecoration3Id=${simulatorForm.chestDecoration3Id},
+                        armDecoration1Id=${simulatorForm.armDecoration1Id},
+                        armDecoration2Id=${simulatorForm.armDecoration2Id},
+                        armDecoration3Id=${simulatorForm.armDecoration3Id},
+                        waistDecoration1Id=${simulatorForm.waistDecoration1Id},
+                        waistDecoration2Id=${simulatorForm.waistDecoration2Id},
+                        waistDecoration3Id=${simulatorForm.waistDecoration3Id},
+                        legDecoration1Id=${simulatorForm.legDecoration1Id},
+                        legDecoration2Id=${simulatorForm.legDecoration2Id},
+                        legDecoration3Id=${simulatorForm.legDecoration3Id}
+                   )}">
+                    装飾品を選ぶ
+                </a>
+            </td>
+        </tr>
+
+        <tr>
+            <td>3</td>
+            <td th:text="${headArmor.slot3Size}"></td>
+            <td>
+                <span th:if="${headArmor.slot3Size == 0}">スロットなし</span>
+                <span th:if="${headArmor.slot3Size > 0 and headDecoration3 == null}">未選択</span>
+                <span th:if="${headDecoration3 != null}">
+                    <span th:text="${headDecoration3.skillName}"></span>
+                    Lv<span th:text="${headDecoration3.skillLevel}"></span>
+                </span>
+            </td>
+            <td>
+                <span th:if="${headArmor.slot3Size == 0}">-</span>
+                <a th:if="${headArmor.slot3Size > 0}"
+                   th:href="@{/decoration-select(
+                        slotSize=${headArmor.slot3Size},
+                        target='headDecoration3Id',
+                        weaponId=${simulatorForm.weaponId},
+                        headArmorId=${simulatorForm.headArmorId},
+                        chestArmorId=${simulatorForm.chestArmorId},
+                        armArmorId=${simulatorForm.armArmorId},
+                        waistArmorId=${simulatorForm.waistArmorId},
+                        legArmorId=${simulatorForm.legArmorId},
+                        weaponDecoration1Id=${simulatorForm.weaponDecoration1Id},
+                        weaponDecoration2Id=${simulatorForm.weaponDecoration2Id},
+                        weaponDecoration3Id=${simulatorForm.weaponDecoration3Id},
+                        headDecoration1Id=${simulatorForm.headDecoration1Id},
+                        headDecoration2Id=${simulatorForm.headDecoration2Id},
+                        headDecoration3Id=${simulatorForm.headDecoration3Id},
+                        chestDecoration1Id=${simulatorForm.chestDecoration1Id},
+                        chestDecoration2Id=${simulatorForm.chestDecoration2Id},
+                        chestDecoration3Id=${simulatorForm.chestDecoration3Id},
+                        armDecoration1Id=${simulatorForm.armDecoration1Id},
+                        armDecoration2Id=${simulatorForm.armDecoration2Id},
+                        armDecoration3Id=${simulatorForm.armDecoration3Id},
+                        waistDecoration1Id=${simulatorForm.waistDecoration1Id},
+                        waistDecoration2Id=${simulatorForm.waistDecoration2Id},
+                        waistDecoration3Id=${simulatorForm.waistDecoration3Id},
+                        legDecoration1Id=${simulatorForm.legDecoration1Id},
+                        legDecoration2Id=${simulatorForm.legDecoration2Id},
+                        legDecoration3Id=${simulatorForm.legDecoration3Id}
+                   )}">
+                    装飾品を選ぶ
+                </a>
+            </td>
+        </tr>
+
+    </table>
+
+
+    <br>
+
+
+    <!-- ================================================== -->
+    <!-- 胴防具スロット -->
+    <!-- ================================================== -->
+
+    <h3>胴防具スロット</h3>
+
+    <p th:if="${chestArmor == null}">
+        胴防具が選択されていません。
+    </p>
+
+    <table border="1" th:if="${chestArmor != null}">
+
+        <tr>
+            <th>スロット</th>
+            <th>サイズ</th>
+            <th>装飾品</th>
+            <th>操作</th>
+        </tr>
+
+        <tr>
+            <td>1</td>
+            <td th:text="${chestArmor.slot1Size}"></td>
+            <td>
+                <span th:if="${chestArmor.slot1Size == 0}">スロットなし</span>
+                <span th:if="${chestArmor.slot1Size > 0 and chestDecoration1 == null}">未選択</span>
+                <span th:if="${chestDecoration1 != null}">
+                    <span th:text="${chestDecoration1.skillName}"></span>
+                    Lv<span th:text="${chestDecoration1.skillLevel}"></span>
+                </span>
+            </td>
+            <td>
+                <span th:if="${chestArmor.slot1Size == 0}">-</span>
+                <a th:if="${chestArmor.slot1Size > 0}"
+                   th:href="@{/decoration-select(
+                        slotSize=${chestArmor.slot1Size},
+                        target='chestDecoration1Id',
+                        weaponId=${simulatorForm.weaponId},
+                        headArmorId=${simulatorForm.headArmorId},
+                        chestArmorId=${simulatorForm.chestArmorId},
+                        armArmorId=${simulatorForm.armArmorId},
+                        waistArmorId=${simulatorForm.waistArmorId},
+                        legArmorId=${simulatorForm.legArmorId},
+                        weaponDecoration1Id=${simulatorForm.weaponDecoration1Id},
+                        weaponDecoration2Id=${simulatorForm.weaponDecoration2Id},
+                        weaponDecoration3Id=${simulatorForm.weaponDecoration3Id},
+                        headDecoration1Id=${simulatorForm.headDecoration1Id},
+                        headDecoration2Id=${simulatorForm.headDecoration2Id},
+                        headDecoration3Id=${simulatorForm.headDecoration3Id},
+                        chestDecoration1Id=${simulatorForm.chestDecoration1Id},
+                        chestDecoration2Id=${simulatorForm.chestDecoration2Id},
+                        chestDecoration3Id=${simulatorForm.chestDecoration3Id},
+                        armDecoration1Id=${simulatorForm.armDecoration1Id},
+                        armDecoration2Id=${simulatorForm.armDecoration2Id},
+                        armDecoration3Id=${simulatorForm.armDecoration3Id},
+                        waistDecoration1Id=${simulatorForm.waistDecoration1Id},
+                        waistDecoration2Id=${simulatorForm.waistDecoration2Id},
+                        waistDecoration3Id=${simulatorForm.waistDecoration3Id},
+                        legDecoration1Id=${simulatorForm.legDecoration1Id},
+                        legDecoration2Id=${simulatorForm.legDecoration2Id},
+                        legDecoration3Id=${simulatorForm.legDecoration3Id}
+                   )}">
+                    装飾品を選ぶ
+                </a>
+            </td>
+        </tr>
+
+        <tr>
+            <td>2</td>
+            <td th:text="${chestArmor.slot2Size}"></td>
+            <td>
+                <span th:if="${chestArmor.slot2Size == 0}">スロットなし</span>
+                <span th:if="${chestArmor.slot2Size > 0 and chestDecoration2 == null}">未選択</span>
+                <span th:if="${chestDecoration2 != null}">
+                    <span th:text="${chestDecoration2.skillName}"></span>
+                    Lv<span th:text="${chestDecoration2.skillLevel}"></span>
+                </span>
+            </td>
+            <td>
+                <span th:if="${chestArmor.slot2Size == 0}">-</span>
+                <a th:if="${chestArmor.slot2Size > 0}"
+                   th:href="@{/decoration-select(
+                        slotSize=${chestArmor.slot2Size},
+                        target='chestDecoration2Id',
+                        weaponId=${simulatorForm.weaponId},
+                        headArmorId=${simulatorForm.headArmorId},
+                        chestArmorId=${simulatorForm.chestArmorId},
+                        armArmorId=${simulatorForm.armArmorId},
+                        waistArmorId=${simulatorForm.waistArmorId},
+                        legArmorId=${simulatorForm.legArmorId},
+                        weaponDecoration1Id=${simulatorForm.weaponDecoration1Id},
+                        weaponDecoration2Id=${simulatorForm.weaponDecoration2Id},
+                        weaponDecoration3Id=${simulatorForm.weaponDecoration3Id},
+                        headDecoration1Id=${simulatorForm.headDecoration1Id},
+                        headDecoration2Id=${simulatorForm.headDecoration2Id},
+                        headDecoration3Id=${simulatorForm.headDecoration3Id},
+                        chestDecoration1Id=${simulatorForm.chestDecoration1Id},
+                        chestDecoration2Id=${simulatorForm.chestDecoration2Id},
+                        chestDecoration3Id=${simulatorForm.chestDecoration3Id},
+                        armDecoration1Id=${simulatorForm.armDecoration1Id},
+                        armDecoration2Id=${simulatorForm.armDecoration2Id},
+                        armDecoration3Id=${simulatorForm.armDecoration3Id},
+                        waistDecoration1Id=${simulatorForm.waistDecoration1Id},
+                        waistDecoration2Id=${simulatorForm.waistDecoration2Id},
+                        waistDecoration3Id=${simulatorForm.waistDecoration3Id},
+                        legDecoration1Id=${simulatorForm.legDecoration1Id},
+                        legDecoration2Id=${simulatorForm.legDecoration2Id},
+                        legDecoration3Id=${simulatorForm.legDecoration3Id}
+                   )}">
+                    装飾品を選ぶ
+                </a>
+            </td>
+        </tr>
+
+        <tr>
+            <td>3</td>
+            <td th:text="${chestArmor.slot3Size}"></td>
+            <td>
+                <span th:if="${chestArmor.slot3Size == 0}">スロットなし</span>
+                <span th:if="${chestArmor.slot3Size > 0 and chestDecoration3 == null}">未選択</span>
+                <span th:if="${chestDecoration3 != null}">
+                    <span th:text="${chestDecoration3.skillName}"></span>
+                    Lv<span th:text="${chestDecoration3.skillLevel}"></span>
+                </span>
+            </td>
+            <td>
+                <span th:if="${chestArmor.slot3Size == 0}">-</span>
+                <a th:if="${chestArmor.slot3Size > 0}"
+                   th:href="@{/decoration-select(
+                        slotSize=${chestArmor.slot3Size},
+                        target='chestDecoration3Id',
+                        weaponId=${simulatorForm.weaponId},
+                        headArmorId=${simulatorForm.headArmorId},
+                        chestArmorId=${simulatorForm.chestArmorId},
+                        armArmorId=${simulatorForm.armArmorId},
+                        waistArmorId=${simulatorForm.waistArmorId},
+                        legArmorId=${simulatorForm.legArmorId},
+                        weaponDecoration1Id=${simulatorForm.weaponDecoration1Id},
+                        weaponDecoration2Id=${simulatorForm.weaponDecoration2Id},
+                        weaponDecoration3Id=${simulatorForm.weaponDecoration3Id},
+                        headDecoration1Id=${simulatorForm.headDecoration1Id},
+                        headDecoration2Id=${simulatorForm.headDecoration2Id},
+                        headDecoration3Id=${simulatorForm.headDecoration3Id},
+                        chestDecoration1Id=${simulatorForm.chestDecoration1Id},
+                        chestDecoration2Id=${simulatorForm.chestDecoration2Id},
+                        chestDecoration3Id=${simulatorForm.chestDecoration3Id},
+                        armDecoration1Id=${simulatorForm.armDecoration1Id},
+                        armDecoration2Id=${simulatorForm.armDecoration2Id},
+                        armDecoration3Id=${simulatorForm.armDecoration3Id},
+                        waistDecoration1Id=${simulatorForm.waistDecoration1Id},
+                        waistDecoration2Id=${simulatorForm.waistDecoration2Id},
+                        waistDecoration3Id=${simulatorForm.waistDecoration3Id},
+                        legDecoration1Id=${simulatorForm.legDecoration1Id},
+                        legDecoration2Id=${simulatorForm.legDecoration2Id},
+                        legDecoration3Id=${simulatorForm.legDecoration3Id}
+                   )}">
+                    装飾品を選ぶ
+                </a>
+            </td>
+        </tr>
+
+    </table>
+
+
+    <br>
+
+
+    <!-- ================================================== -->
+    <!-- 腕防具スロット -->
+    <!-- ================================================== -->
+
+    <h3>腕防具スロット</h3>
+
+    <p th:if="${armArmor == null}">
+        腕防具が選択されていません。
+    </p>
+
+    <table border="1" th:if="${armArmor != null}">
+
+        <tr>
+            <th>スロット</th>
+            <th>サイズ</th>
+            <th>装飾品</th>
+            <th>操作</th>
+        </tr>
+
+        <tr>
+            <td>1</td>
+            <td th:text="${armArmor.slot1Size}"></td>
+            <td>
+                <span th:if="${armArmor.slot1Size == 0}">スロットなし</span>
+                <span th:if="${armArmor.slot1Size > 0 and armDecoration1 == null}">未選択</span>
+                <span th:if="${armDecoration1 != null}">
+                    <span th:text="${armDecoration1.skillName}"></span>
+                    Lv<span th:text="${armDecoration1.skillLevel}"></span>
+                </span>
+            </td>
+            <td>
+                <span th:if="${armArmor.slot1Size == 0}">-</span>
+                <a th:if="${armArmor.slot1Size > 0}"
+                   th:href="@{/decoration-select(
+                        slotSize=${armArmor.slot1Size},
+                        target='armDecoration1Id',
+                        weaponId=${simulatorForm.weaponId},
+                        headArmorId=${simulatorForm.headArmorId},
+                        chestArmorId=${simulatorForm.chestArmorId},
+                        armArmorId=${simulatorForm.armArmorId},
+                        waistArmorId=${simulatorForm.waistArmorId},
+                        legArmorId=${simulatorForm.legArmorId},
+                        weaponDecoration1Id=${simulatorForm.weaponDecoration1Id},
+                        weaponDecoration2Id=${simulatorForm.weaponDecoration2Id},
+                        weaponDecoration3Id=${simulatorForm.weaponDecoration3Id},
+                        headDecoration1Id=${simulatorForm.headDecoration1Id},
+                        headDecoration2Id=${simulatorForm.headDecoration2Id},
+                        headDecoration3Id=${simulatorForm.headDecoration3Id},
+                        chestDecoration1Id=${simulatorForm.chestDecoration1Id},
+                        chestDecoration2Id=${simulatorForm.chestDecoration2Id},
+                        chestDecoration3Id=${simulatorForm.chestDecoration3Id},
+                        armDecoration1Id=${simulatorForm.armDecoration1Id},
+                        armDecoration2Id=${simulatorForm.armDecoration2Id},
+                        armDecoration3Id=${simulatorForm.armDecoration3Id},
+                        waistDecoration1Id=${simulatorForm.waistDecoration1Id},
+                        waistDecoration2Id=${simulatorForm.waistDecoration2Id},
+                        waistDecoration3Id=${simulatorForm.waistDecoration3Id},
+                        legDecoration1Id=${simulatorForm.legDecoration1Id},
+                        legDecoration2Id=${simulatorForm.legDecoration2Id},
+                        legDecoration3Id=${simulatorForm.legDecoration3Id}
+                   )}">
+                    装飾品を選ぶ
+                </a>
+            </td>
+        </tr>
+
+        <tr>
+            <td>2</td>
+            <td th:text="${armArmor.slot2Size}"></td>
+            <td>
+                <span th:if="${armArmor.slot2Size == 0}">スロットなし</span>
+                <span th:if="${armArmor.slot2Size > 0 and armDecoration2 == null}">未選択</span>
+                <span th:if="${armDecoration2 != null}">
+                    <span th:text="${armDecoration2.skillName}"></span>
+                    Lv<span th:text="${armDecoration2.skillLevel}"></span>
+                </span>
+            </td>
+            <td>
+                <span th:if="${armArmor.slot2Size == 0}">-</span>
+                <a th:if="${armArmor.slot2Size > 0}"
+                   th:href="@{/decoration-select(
+                        slotSize=${armArmor.slot2Size},
+                        target='armDecoration2Id',
+                        weaponId=${simulatorForm.weaponId},
+                        headArmorId=${simulatorForm.headArmorId},
+                        chestArmorId=${simulatorForm.chestArmorId},
+                        armArmorId=${simulatorForm.armArmorId},
+                        waistArmorId=${simulatorForm.waistArmorId},
+                        legArmorId=${simulatorForm.legArmorId},
+                        weaponDecoration1Id=${simulatorForm.weaponDecoration1Id},
+                        weaponDecoration2Id=${simulatorForm.weaponDecoration2Id},
+                        weaponDecoration3Id=${simulatorForm.weaponDecoration3Id},
+                        headDecoration1Id=${simulatorForm.headDecoration1Id},
+                        headDecoration2Id=${simulatorForm.headDecoration2Id},
+                        headDecoration3Id=${simulatorForm.headDecoration3Id},
+                        chestDecoration1Id=${simulatorForm.chestDecoration1Id},
+                        chestDecoration2Id=${simulatorForm.chestDecoration2Id},
+                        chestDecoration3Id=${simulatorForm.chestDecoration3Id},
+                        armDecoration1Id=${simulatorForm.armDecoration1Id},
+                        armDecoration2Id=${simulatorForm.armDecoration2Id},
+                        armDecoration3Id=${simulatorForm.armDecoration3Id},
+                        waistDecoration1Id=${simulatorForm.waistDecoration1Id},
+                        waistDecoration2Id=${simulatorForm.waistDecoration2Id},
+                        waistDecoration3Id=${simulatorForm.waistDecoration3Id},
+                        legDecoration1Id=${simulatorForm.legDecoration1Id},
+                        legDecoration2Id=${simulatorForm.legDecoration2Id},
+                        legDecoration3Id=${simulatorForm.legDecoration3Id}
+                   )}">
+                    装飾品を選ぶ
+                </a>
+            </td>
+        </tr>
+
+        <tr>
+            <td>3</td>
+            <td th:text="${armArmor.slot3Size}"></td>
+            <td>
+                <span th:if="${armArmor.slot3Size == 0}">スロットなし</span>
+                <span th:if="${armArmor.slot3Size > 0 and armDecoration3 == null}">未選択</span>
+                <span th:if="${armDecoration3 != null}">
+                    <span th:text="${armDecoration3.skillName}"></span>
+                    Lv<span th:text="${armDecoration3.skillLevel}"></span>
+                </span>
+            </td>
+            <td>
+                <span th:if="${armArmor.slot3Size == 0}">-</span>
+                <a th:if="${armArmor.slot3Size > 0}"
+                   th:href="@{/decoration-select(
+                        slotSize=${armArmor.slot3Size},
+                        target='armDecoration3Id',
+                        weaponId=${simulatorForm.weaponId},
+                        headArmorId=${simulatorForm.headArmorId},
+                        chestArmorId=${simulatorForm.chestArmorId},
+                        armArmorId=${simulatorForm.armArmorId},
+                        waistArmorId=${simulatorForm.waistArmorId},
+                        legArmorId=${simulatorForm.legArmorId},
+                        weaponDecoration1Id=${simulatorForm.weaponDecoration1Id},
+                        weaponDecoration2Id=${simulatorForm.weaponDecoration2Id},
+                        weaponDecoration3Id=${simulatorForm.weaponDecoration3Id},
+                        headDecoration1Id=${simulatorForm.headDecoration1Id},
+                        headDecoration2Id=${simulatorForm.headDecoration2Id},
+                        headDecoration3Id=${simulatorForm.headDecoration3Id},
+                        chestDecoration1Id=${simulatorForm.chestDecoration1Id},
+                        chestDecoration2Id=${simulatorForm.chestDecoration2Id},
+                        chestDecoration3Id=${simulatorForm.chestDecoration3Id},
+                        armDecoration1Id=${simulatorForm.armDecoration1Id},
+                        armDecoration2Id=${simulatorForm.armDecoration2Id},
+                        armDecoration3Id=${simulatorForm.armDecoration3Id},
+                        waistDecoration1Id=${simulatorForm.waistDecoration1Id},
+                        waistDecoration2Id=${simulatorForm.waistDecoration2Id},
+                        waistDecoration3Id=${simulatorForm.waistDecoration3Id},
+                        legDecoration1Id=${simulatorForm.legDecoration1Id},
+                        legDecoration2Id=${simulatorForm.legDecoration2Id},
+                        legDecoration3Id=${simulatorForm.legDecoration3Id}
+                   )}">
+                    装飾品を選ぶ
+                </a>
+            </td>
+        </tr>
+
+    </table>
+
+
+    <br>
+
+
+    <!-- ================================================== -->
+    <!-- 腰防具スロット -->
+    <!-- ================================================== -->
+
+    <h3>腰防具スロット</h3>
+
+    <p th:if="${waistArmor == null}">
+        腰防具が選択されていません。
+    </p>
+
+    <table border="1" th:if="${waistArmor != null}">
+
+        <tr>
+            <th>スロット</th>
+            <th>サイズ</th>
+            <th>装飾品</th>
+            <th>操作</th>
+        </tr>
+
+        <tr>
+            <td>1</td>
+            <td th:text="${waistArmor.slot1Size}"></td>
+            <td>
+                <span th:if="${waistArmor.slot1Size == 0}">スロットなし</span>
+                <span th:if="${waistArmor.slot1Size > 0 and waistDecoration1 == null}">未選択</span>
+                <span th:if="${waistDecoration1 != null}">
+                    <span th:text="${waistDecoration1.skillName}"></span>
+                    Lv<span th:text="${waistDecoration1.skillLevel}"></span>
+                </span>
+            </td>
+            <td>
+                <span th:if="${waistArmor.slot1Size == 0}">-</span>
+                <a th:if="${waistArmor.slot1Size > 0}"
+                   th:href="@{/decoration-select(
+                        slotSize=${waistArmor.slot1Size},
+                        target='waistDecoration1Id',
+                        weaponId=${simulatorForm.weaponId},
+                        headArmorId=${simulatorForm.headArmorId},
+                        chestArmorId=${simulatorForm.chestArmorId},
+                        armArmorId=${simulatorForm.armArmorId},
+                        waistArmorId=${simulatorForm.waistArmorId},
+                        legArmorId=${simulatorForm.legArmorId},
+                        weaponDecoration1Id=${simulatorForm.weaponDecoration1Id},
+                        weaponDecoration2Id=${simulatorForm.weaponDecoration2Id},
+                        weaponDecoration3Id=${simulatorForm.weaponDecoration3Id},
+                        headDecoration1Id=${simulatorForm.headDecoration1Id},
+                        headDecoration2Id=${simulatorForm.headDecoration2Id},
+                        headDecoration3Id=${simulatorForm.headDecoration3Id},
+                        chestDecoration1Id=${simulatorForm.chestDecoration1Id},
+                        chestDecoration2Id=${simulatorForm.chestDecoration2Id},
+                        chestDecoration3Id=${simulatorForm.chestDecoration3Id},
+                        armDecoration1Id=${simulatorForm.armDecoration1Id},
+                        armDecoration2Id=${simulatorForm.armDecoration2Id},
+                        armDecoration3Id=${simulatorForm.armDecoration3Id},
+                        waistDecoration1Id=${simulatorForm.waistDecoration1Id},
+                        waistDecoration2Id=${simulatorForm.waistDecoration2Id},
+                        waistDecoration3Id=${simulatorForm.waistDecoration3Id},
+                        legDecoration1Id=${simulatorForm.legDecoration1Id},
+                        legDecoration2Id=${simulatorForm.legDecoration2Id},
+                        legDecoration3Id=${simulatorForm.legDecoration3Id}
+                   )}">
+                    装飾品を選ぶ
+                </a>
+            </td>
+        </tr>
+
+        <tr>
+            <td>2</td>
+            <td th:text="${waistArmor.slot2Size}"></td>
+            <td>
+                <span th:if="${waistArmor.slot2Size == 0}">スロットなし</span>
+                <span th:if="${waistArmor.slot2Size > 0 and waistDecoration2 == null}">未選択</span>
+                <span th:if="${waistDecoration2 != null}">
+                    <span th:text="${waistDecoration2.skillName}"></span>
+                    Lv<span th:text="${waistDecoration2.skillLevel}"></span>
+                </span>
+            </td>
+            <td>
+                <span th:if="${waistArmor.slot2Size == 0}">-</span>
+                <a th:if="${waistArmor.slot2Size > 0}"
+                   th:href="@{/decoration-select(
+                        slotSize=${waistArmor.slot2Size},
+                        target='waistDecoration2Id',
+                        weaponId=${simulatorForm.weaponId},
+                        headArmorId=${simulatorForm.headArmorId},
+                        chestArmorId=${simulatorForm.chestArmorId},
+                        armArmorId=${simulatorForm.armArmorId},
+                        waistArmorId=${simulatorForm.waistArmorId},
+                        legArmorId=${simulatorForm.legArmorId},
+                        weaponDecoration1Id=${simulatorForm.weaponDecoration1Id},
+                        weaponDecoration2Id=${simulatorForm.weaponDecoration2Id},
+                        weaponDecoration3Id=${simulatorForm.weaponDecoration3Id},
+                        headDecoration1Id=${simulatorForm.headDecoration1Id},
+                        headDecoration2Id=${simulatorForm.headDecoration2Id},
+                        headDecoration3Id=${simulatorForm.headDecoration3Id},
+                        chestDecoration1Id=${simulatorForm.chestDecoration1Id},
+                        chestDecoration2Id=${simulatorForm.chestDecoration2Id},
+                        chestDecoration3Id=${simulatorForm.chestDecoration3Id},
+                        armDecoration1Id=${simulatorForm.armDecoration1Id},
+                        armDecoration2Id=${simulatorForm.armDecoration2Id},
+                        armDecoration3Id=${simulatorForm.armDecoration3Id},
+                        waistDecoration1Id=${simulatorForm.waistDecoration1Id},
+                        waistDecoration2Id=${simulatorForm.waistDecoration2Id},
+                        waistDecoration3Id=${simulatorForm.waistDecoration3Id},
+                        legDecoration1Id=${simulatorForm.legDecoration1Id},
+                        legDecoration2Id=${simulatorForm.legDecoration2Id},
+                        legDecoration3Id=${simulatorForm.legDecoration3Id}
+                   )}">
+                    装飾品を選ぶ
+                </a>
+            </td>
+        </tr>
+
+        <tr>
+            <td>3</td>
+            <td th:text="${waistArmor.slot3Size}"></td>
+            <td>
+                <span th:if="${waistArmor.slot3Size == 0}">スロットなし</span>
+                <span th:if="${waistArmor.slot3Size > 0 and waistDecoration3 == null}">未選択</span>
+                <span th:if="${waistDecoration3 != null}">
+                    <span th:text="${waistDecoration3.skillName}"></span>
+                    Lv<span th:text="${waistDecoration3.skillLevel}"></span>
+                </span>
+            </td>
+            <td>
+                <span th:if="${waistArmor.slot3Size == 0}">-</span>
+                <a th:if="${waistArmor.slot3Size > 0}"
+                   th:href="@{/decoration-select(
+                        slotSize=${waistArmor.slot3Size},
+                        target='waistDecoration3Id',
+                        weaponId=${simulatorForm.weaponId},
+                        headArmorId=${simulatorForm.headArmorId},
+                        chestArmorId=${simulatorForm.chestArmorId},
+                        armArmorId=${simulatorForm.armArmorId},
+                        waistArmorId=${simulatorForm.waistArmorId},
+                        legArmorId=${simulatorForm.legArmorId},
+                        weaponDecoration1Id=${simulatorForm.weaponDecoration1Id},
+                        weaponDecoration2Id=${simulatorForm.weaponDecoration2Id},
+                        weaponDecoration3Id=${simulatorForm.weaponDecoration3Id},
+                        headDecoration1Id=${simulatorForm.headDecoration1Id},
+                        headDecoration2Id=${simulatorForm.headDecoration2Id},
+                        headDecoration3Id=${simulatorForm.headDecoration3Id},
+                        chestDecoration1Id=${simulatorForm.chestDecoration1Id},
+                        chestDecoration2Id=${simulatorForm.chestDecoration2Id},
+                        chestDecoration3Id=${simulatorForm.chestDecoration3Id},
+                        armDecoration1Id=${simulatorForm.armDecoration1Id},
+                        armDecoration2Id=${simulatorForm.armDecoration2Id},
+                        armDecoration3Id=${simulatorForm.armDecoration3Id},
+                        waistDecoration1Id=${simulatorForm.waistDecoration1Id},
+                        waistDecoration2Id=${simulatorForm.waistDecoration2Id},
+                        waistDecoration3Id=${simulatorForm.waistDecoration3Id},
+                        legDecoration1Id=${simulatorForm.legDecoration1Id},
+                        legDecoration2Id=${simulatorForm.legDecoration2Id},
+                        legDecoration3Id=${simulatorForm.legDecoration3Id}
+                   )}">
+                    装飾品を選ぶ
+                </a>
+            </td>
+        </tr>
+
+    </table>
+
+
+    <br>
+
+
+    <!-- ================================================== -->
+    <!-- 脚防具スロット -->
+    <!-- ================================================== -->
+
+    <h3>脚防具スロット</h3>
+
+    <p th:if="${legArmor == null}">
+        脚防具が選択されていません。
+    </p>
+
+    <table border="1" th:if="${legArmor != null}">
+
+        <tr>
+            <th>スロット</th>
+            <th>サイズ</th>
+            <th>装飾品</th>
+            <th>操作</th>
+        </tr>
+
+
+        <!-- 脚スロット1 -->
+        <tr>
+
+            <td>1</td>
+
+            <td th:text="${legArmor.slot1Size}"></td>
+
+            <td>
+                <span th:if="${legArmor.slot1Size == 0}">
+                    スロットなし
+                </span>
+
+                <span th:if="${legArmor.slot1Size > 0 and legDecoration1 == null}">
+                    未選択
+                </span>
+
+                <span th:if="${legDecoration1 != null}">
+                    <span th:text="${legDecoration1.skillName}"></span>
+                    Lv<span th:text="${legDecoration1.skillLevel}"></span>
+                    （必要スロット
+                    <span th:text="${legDecoration1.requiredSlotSize}"></span>
+                    ）
+                </span>
+            </td>
+
+            <td>
+                <span th:if="${legArmor.slot1Size == 0}">
+                    -
+                </span>
+
+                <a th:if="${legArmor.slot1Size > 0}"
+                   th:href="@{/decoration-select(
+                        slotSize=${legArmor.slot1Size},
+                        target='legDecoration1Id',
+                        weaponId=${simulatorForm.weaponId},
+                        headArmorId=${simulatorForm.headArmorId},
+                        chestArmorId=${simulatorForm.chestArmorId},
+                        armArmorId=${simulatorForm.armArmorId},
+                        waistArmorId=${simulatorForm.waistArmorId},
+                        legArmorId=${simulatorForm.legArmorId},
+                        weaponDecoration1Id=${simulatorForm.weaponDecoration1Id},
+                        weaponDecoration2Id=${simulatorForm.weaponDecoration2Id},
+                        weaponDecoration3Id=${simulatorForm.weaponDecoration3Id},
+                        headDecoration1Id=${simulatorForm.headDecoration1Id},
+                        headDecoration2Id=${simulatorForm.headDecoration2Id},
+                        headDecoration3Id=${simulatorForm.headDecoration3Id},
+                        chestDecoration1Id=${simulatorForm.chestDecoration1Id},
+                        chestDecoration2Id=${simulatorForm.chestDecoration2Id},
+                        chestDecoration3Id=${simulatorForm.chestDecoration3Id},
+                        armDecoration1Id=${simulatorForm.armDecoration1Id},
+                        armDecoration2Id=${simulatorForm.armDecoration2Id},
+                        armDecoration3Id=${simulatorForm.armDecoration3Id},
+                        waistDecoration1Id=${simulatorForm.waistDecoration1Id},
+                        waistDecoration2Id=${simulatorForm.waistDecoration2Id},
+                        waistDecoration3Id=${simulatorForm.waistDecoration3Id},
+                        legDecoration1Id=${simulatorForm.legDecoration1Id},
+                        legDecoration2Id=${simulatorForm.legDecoration2Id},
+                        legDecoration3Id=${simulatorForm.legDecoration3Id}
+                   )}">
+                    装飾品を選ぶ
+                </a>
+            </td>
+
+        </tr>
+
+
+        <!-- 脚スロット2 -->
+        <tr>
+
+            <td>2</td>
+
+            <td th:text="${legArmor.slot2Size}"></td>
+
+            <td>
+                <span th:if="${legArmor.slot2Size == 0}">
+                    スロットなし
+                </span>
+
+                <span th:if="${legArmor.slot2Size > 0 and legDecoration2 == null}">
+                    未選択
+                </span>
+
+                <span th:if="${legDecoration2 != null}">
+                    <span th:text="${legDecoration2.skillName}"></span>
+                    Lv<span th:text="${legDecoration2.skillLevel}"></span>
+                    （必要スロット
+                    <span th:text="${legDecoration2.requiredSlotSize}"></span>
+                    ）
+                </span>
+            </td>
+
+            <td>
+                <span th:if="${legArmor.slot2Size == 0}">
+                    -
+                </span>
+
+                <a th:if="${legArmor.slot2Size > 0}"
+                   th:href="@{/decoration-select(
+                        slotSize=${legArmor.slot2Size},
+                        target='legDecoration2Id',
+                        weaponId=${simulatorForm.weaponId},
+                        headArmorId=${simulatorForm.headArmorId},
+                        chestArmorId=${simulatorForm.chestArmorId},
+                        armArmorId=${simulatorForm.armArmorId},
+                        waistArmorId=${simulatorForm.waistArmorId},
+                        legArmorId=${simulatorForm.legArmorId},
+                        weaponDecoration1Id=${simulatorForm.weaponDecoration1Id},
+                        weaponDecoration2Id=${simulatorForm.weaponDecoration2Id},
+                        weaponDecoration3Id=${simulatorForm.weaponDecoration3Id},
+                        headDecoration1Id=${simulatorForm.headDecoration1Id},
+                        headDecoration2Id=${simulatorForm.headDecoration2Id},
+                        headDecoration3Id=${simulatorForm.headDecoration3Id},
+                        chestDecoration1Id=${simulatorForm.chestDecoration1Id},
+                        chestDecoration2Id=${simulatorForm.chestDecoration2Id},
+                        chestDecoration3Id=${simulatorForm.chestDecoration3Id},
+                        armDecoration1Id=${simulatorForm.armDecoration1Id},
+                        armDecoration2Id=${simulatorForm.armDecoration2Id},
+                        armDecoration3Id=${simulatorForm.armDecoration3Id},
+                        waistDecoration1Id=${simulatorForm.waistDecoration1Id},
+                        waistDecoration2Id=${simulatorForm.waistDecoration2Id},
+                        waistDecoration3Id=${simulatorForm.waistDecoration3Id},
+                        legDecoration1Id=${simulatorForm.legDecoration1Id},
+                        legDecoration2Id=${simulatorForm.legDecoration2Id},
+                        legDecoration3Id=${simulatorForm.legDecoration3Id}
+                   )}">
+                    装飾品を選ぶ
+                </a>
+            </td>
+
+        </tr>
+
+
+        <!-- 脚スロット3 -->
+        <tr>
+
+            <td>3</td>
+
+            <td th:text="${legArmor.slot3Size}"></td>
+
+            <td>
+                <span th:if="${legArmor.slot3Size == 0}">
+                    スロットなし
+                </span>
+
+                <span th:if="${legArmor.slot3Size > 0 and legDecoration3 == null}">
+                    未選択
+                </span>
+
+                <span th:if="${legDecoration3 != null}">
+                    <span th:text="${legDecoration3.skillName}"></span>
+                    Lv<span th:text="${legDecoration3.skillLevel}"></span>
+                    （必要スロット
+                    <span th:text="${legDecoration3.requiredSlotSize}"></span>
+                    ）
+                </span>
+            </td>
+
+            <td>
+                <span th:if="${legArmor.slot3Size == 0}">
+                    -
+                </span>
+
+                <a th:if="${legArmor.slot3Size > 0}"
+                   th:href="@{/decoration-select(
+                        slotSize=${legArmor.slot3Size},
+                        target='legDecoration3Id',
+                        weaponId=${simulatorForm.weaponId},
+                        headArmorId=${simulatorForm.headArmorId},
+                        chestArmorId=${simulatorForm.chestArmorId},
+                        armArmorId=${simulatorForm.armArmorId},
+                        waistArmorId=${simulatorForm.waistArmorId},
+                        legArmorId=${simulatorForm.legArmorId},
+                        weaponDecoration1Id=${simulatorForm.weaponDecoration1Id},
+                        weaponDecoration2Id=${simulatorForm.weaponDecoration2Id},
+                        weaponDecoration3Id=${simulatorForm.weaponDecoration3Id},
+                        headDecoration1Id=${simulatorForm.headDecoration1Id},
+                        headDecoration2Id=${simulatorForm.headDecoration2Id},
+                        headDecoration3Id=${simulatorForm.headDecoration3Id},
+                        chestDecoration1Id=${simulatorForm.chestDecoration1Id},
+                        chestDecoration2Id=${simulatorForm.chestDecoration2Id},
+                        chestDecoration3Id=${simulatorForm.chestDecoration3Id},
+                        armDecoration1Id=${simulatorForm.armDecoration1Id},
+                        armDecoration2Id=${simulatorForm.armDecoration2Id},
+                        armDecoration3Id=${simulatorForm.armDecoration3Id},
+                        waistDecoration1Id=${simulatorForm.waistDecoration1Id},
+                        waistDecoration2Id=${simulatorForm.waistDecoration2Id},
+                        waistDecoration3Id=${simulatorForm.waistDecoration3Id},
+                        legDecoration1Id=${simulatorForm.legDecoration1Id},
+                        legDecoration2Id=${simulatorForm.legDecoration2Id},
+                        legDecoration3Id=${simulatorForm.legDecoration3Id}
+                   )}">
+                    装飾品を選ぶ
+                </a>
+            </td>
+
+        </tr>
+
+    </table>
+
+
+    <br>
+
+
+    <!-- ================================================== -->
+    <!-- 発動スキル -->
+    <!-- ================================================== -->
+
+    <h2>発動スキル合計</h2>
+
+    <div th:if="${skillTotals.isEmpty()}">
+        <p>発動スキルはありません。</p>
+    </div>
+
+    <table border="1"
+           th:if="${!skillTotals.isEmpty()}">
+
+        <tr>
+            <th>スキル名</th>
+            <th>合計Lv</th>
+        </tr>
+
+        <tr th:each="skill : ${skillTotals}">
+            <td th:text="${skill.skillName}"></td>
+            <td th:text="${skill.level}"></td>
+        </tr>
+
+    </table>
+
+
+    <br>
+
+    <a th:href="@{/weapon-list}">
+        武器を選び直す
+    </a>
+
+</body>
+</html>

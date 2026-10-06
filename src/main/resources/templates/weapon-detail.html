@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>武器詳細</title>
+</head>
+<body>
+
+    <h1>武器詳細</h1>
+
+    <table border="1">
+
+        <tr>
+            <th>武器名</th>
+            <td th:text="${weapon.weaponName}"></td>
+        </tr>
+
+        <tr>
+            <th>武器種</th>
+            <td th:text="${weapon.weaponType}"></td>
+        </tr>
+
+        <tr>
+            <th>攻撃力</th>
+            <td th:text="${weapon.attack}"></td>
+        </tr>
+
+        <tr>
+            <th>属性</th>
+            <td th:text="${weapon.elementType}"></td>
+        </tr>
+
+        <tr>
+            <th>属性値</th>
+            <td th:text="${weapon.elementValue}"></td>
+        </tr>
+
+        <tr>
+            <th>会心率</th>
+            <td th:text="${weapon.affinity} + '%'"></td>
+        </tr>
+
+        <tr>
+            <th>防御力ボーナス</th>
+            <td th:text="${weapon.defenseBonus}"></td>
+        </tr>
+
+        <tr>
+            <th>百竜装飾品スロット</th>
+            <td th:text="${weapon.rampageSlotSize}"></td>
+        </tr>
+
+        <tr>
+            <th>スロット1</th>
+            <td th:text="${weapon.slot1Size}"></td>
+        </tr>
+
+        <tr>
+            <th>スロット2</th>
+            <td th:text="${weapon.slot2Size}"></td>
+        </tr>
+
+        <tr>
+            <th>スロット3</th>
+            <td th:text="${weapon.slot3Size}"></td>
+        </tr>
+
+        <tr>
+            <th>最大斬れ味</th>
+            <td th:text="${weapon.maxSharpnessColor}"></td>
+        </tr>
+
+    </table>
+
+    <br>
+
+    <a th:href="@{/simulator(weaponId=${weapon.weaponId})}">
+        この武器を選択
+    </a>
+
+    <br>
+    <br>
+
+    <a th:href="@{/weapon-list}">
+        武器一覧へ戻る
+    </a>
+
+</body>
+</html>

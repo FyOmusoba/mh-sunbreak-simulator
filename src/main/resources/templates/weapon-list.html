@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>武器一覧</title>
+</head>
+<body>
+
+    <h1>武器一覧</h1>
+
+    <form th:action="@{/weapon-list}" method="get">
+
+        <label>武器種：</label>
+
+        <select name="weaponType">
+
+            <option value=""
+                    th:selected="${selectedWeaponType == null or selectedWeaponType == ''}">
+                すべて
+            </option>
+
+            <option value="大剣"
+                    th:selected="${selectedWeaponType == '大剣'}">大剣</option>
+
+            <option value="太刀"
+                    th:selected="${selectedWeaponType == '太刀'}">太刀</option>
+
+            <option value="片手剣"
+                    th:selected="${selectedWeaponType == '片手剣'}">片手剣</option>
+
+            <option value="双剣"
+                    th:selected="${selectedWeaponType == '双剣'}">双剣</option>
+
+            <option value="ハンマー"
+                    th:selected="${selectedWeaponType == 'ハンマー'}">ハンマー</option>
+
+            <option value="狩猟笛"
+                    th:selected="${selectedWeaponType == '狩猟笛'}">狩猟笛</option>
+
+            <option value="ランス"
+                    th:selected="${selectedWeaponType == 'ランス'}">ランス</option>
+
+            <option value="ガンランス"
+                    th:selected="${selectedWeaponType == 'ガンランス'}">ガンランス</option>
+
+            <option value="スラッシュアックス"
+                    th:selected="${selectedWeaponType == 'スラッシュアックス'}">
+                スラッシュアックス
+            </option>
+
+            <option value="チャージアックス"
+                    th:selected="${selectedWeaponType == 'チャージアックス'}">
+                チャージアックス
+            </option>
+
+            <option value="操虫棍"
+                    th:selected="${selectedWeaponType == '操虫棍'}">操虫棍</option>
+
+            <option value="弓"
+                    th:selected="${selectedWeaponType == '弓'}">弓</option>
+
+            <option value="ライトボウガン"
+                    th:selected="${selectedWeaponType == 'ライトボウガン'}">
+                ライトボウガン
+            </option>
+
+            <option value="ヘビィボウガン"
+                    th:selected="${selectedWeaponType == 'ヘビィボウガン'}">
+                ヘビィボウガン
+            </option>
+
+        </select>
+
+        <button type="submit">
+            絞り込み
+        </button>
+
+    </form>
+
+    <br>
+
+    <table border="1">
+
+        <thead>
+            <tr>
+                <th>武器名</th>
+                <th>武器種</th>
+                <th>攻撃力</th>
+                <th>属性</th>
+                <th>属性値</th>
+                <th>会心率</th>
+                <th>選択</th>
+            </tr>
+        </thead>
+
+        <tbody>
+
+            <tr th:each="weapon : ${weapons}">
+
+                <td th:text="${weapon.weaponName}"></td>
+                <td th:text="${weapon.weaponType}"></td>
+                <td th:text="${weapon.attack}"></td>
+                <td th:text="${weapon.elementType}"></td>
+                <td th:text="${weapon.elementValue}"></td>
+                <td th:text="${weapon.affinity} + '%'"></td>
+
+                <td>
+                    <a th:href="@{/weapon/{weaponId}(weaponId=${weapon.weaponId})}">
+                        選択
+                    </a>
+                </td>
+
+            </tr>
+
+        </tbody>
+
+    </table>
+
+</body>
+</html>

@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>防具詳細</title>
+</head>
+<body>
+
+    <h1>防具詳細</h1>
+
+    <table border="1">
+
+        <tr>
+            <th>防具名</th>
+            <td th:text="${armor.armorName}"></td>
+        </tr>
+
+        <tr>
+            <th>部位</th>
+            <td th:text="${armor.part}"></td>
+        </tr>
+
+        <tr>
+            <th>防御力</th>
+            <td th:text="${armor.defense}"></td>
+        </tr>
+
+        <tr>
+            <th>火耐性</th>
+            <td th:text="${armor.fireRes}"></td>
+        </tr>
+
+        <tr>
+            <th>水耐性</th>
+            <td th:text="${armor.waterRes}"></td>
+        </tr>
+
+        <tr>
+            <th>雷耐性</th>
+            <td th:text="${armor.thunderRes}"></td>
+        </tr>
+
+        <tr>
+            <th>氷耐性</th>
+            <td th:text="${armor.iceRes}"></td>
+        </tr>
+
+        <tr>
+            <th>龍耐性</th>
+            <td th:text="${armor.dragonRes}"></td>
+        </tr>
+
+        <tr>
+            <th>スロット1</th>
+            <td th:text="${armor.slot1Size}"></td>
+        </tr>
+
+        <tr>
+            <th>スロット2</th>
+            <td th:text="${armor.slot2Size}"></td>
+        </tr>
+
+        <tr>
+            <th>スロット3</th>
+            <td th:text="${armor.slot3Size}"></td>
+        </tr>
+
+        <tr th:if="${armor.skill1Name != null}">
+            <th>スキル1</th>
+            <td>
+                <span th:text="${armor.skill1Name}"></span>
+                Lv<span th:text="${armor.skill1Level}"></span>
+            </td>
+        </tr>
+
+        <tr th:if="${armor.skill2Name != null}">
+            <th>スキル2</th>
+            <td>
+                <span th:text="${armor.skill2Name}"></span>
+                Lv<span th:text="${armor.skill2Level}"></span>
+            </td>
+        </tr>
+
+        <tr th:if="${armor.skill3Name != null}">
+            <th>スキル3</th>
+            <td>
+                <span th:text="${armor.skill3Name}"></span>
+                Lv<span th:text="${armor.skill3Level}"></span>
+            </td>
+        </tr>
+
+        <tr th:if="${armor.skill4Name != null}">
+            <th>スキル4</th>
+            <td>
+                <span th:text="${armor.skill4Name}"></span>
+                Lv<span th:text="${armor.skill4Level}"></span>
+            </td>
+        </tr>
+
+    </table>
+
+    <br>
+
+    <a th:href="@{/simulator(
+        weaponId=${simulatorForm.weaponId},
+
+        armorId=${armor.armorId},
+
+        headArmorId=${simulatorForm.headArmorId},
+        chestArmorId=${simulatorForm.chestArmorId},
+        armArmorId=${simulatorForm.armArmorId},
+        waistArmorId=${simulatorForm.waistArmorId},
+        legArmorId=${simulatorForm.legArmorId},
+
+        weaponDecoration1Id=${simulatorForm.weaponDecoration1Id},
+        weaponDecoration2Id=${simulatorForm.weaponDecoration2Id},
+        weaponDecoration3Id=${simulatorForm.weaponDecoration3Id},
+
+        headDecoration1Id=${simulatorForm.headDecoration1Id},
+        headDecoration2Id=${simulatorForm.headDecoration2Id},
+        headDecoration3Id=${simulatorForm.headDecoration3Id},
+
+        chestDecoration1Id=${simulatorForm.chestDecoration1Id},
+        chestDecoration2Id=${simulatorForm.chestDecoration2Id},
+        chestDecoration3Id=${simulatorForm.chestDecoration3Id},
+
+        armDecoration1Id=${simulatorForm.armDecoration1Id},
+        armDecoration2Id=${simulatorForm.armDecoration2Id},
+        armDecoration3Id=${simulatorForm.armDecoration3Id},
+
+        waistDecoration1Id=${simulatorForm.waistDecoration1Id},
+        waistDecoration2Id=${simulatorForm.waistDecoration2Id},
+        waistDecoration3Id=${simulatorForm.waistDecoration3Id},
+
+        legDecoration1Id=${simulatorForm.legDecoration1Id},
+        legDecoration2Id=${simulatorForm.legDecoration2Id},
+        legDecoration3Id=${simulatorForm.legDecoration3Id}
+    )}">
+        この防具を選択
+    </a>
+
+    <br>
+    <br>
+
+    <a th:href="@{/armor-list(
+        weaponId=${simulatorForm.weaponId},
+
+        headArmorId=${simulatorForm.headArmorId},
+        chestArmorId=${simulatorForm.chestArmorId},
+        armArmorId=${simulatorForm.armArmorId},
+        waistArmorId=${simulatorForm.waistArmorId},
+        legArmorId=${simulatorForm.legArmorId},
+
+        weaponDecoration1Id=${simulatorForm.weaponDecoration1Id},
+        weaponDecoration2Id=${simulatorForm.weaponDecoration2Id},
+        weaponDecoration3Id=${simulatorForm.weaponDecoration3Id},
+
+        headDecoration1Id=${simulatorForm.headDecoration1Id},
+        headDecoration2Id=${simulatorForm.headDecoration2Id},
+        headDecoration3Id=${simulatorForm.headDecoration3Id},
+
+        chestDecoration1Id=${simulatorForm.chestDecoration1Id},
+        chestDecoration2Id=${simulatorForm.chestDecoration2Id},
+        chestDecoration3Id=${simulatorForm.chestDecoration3Id},
+
+        armDecoration1Id=${simulatorForm.armDecoration1Id},
+        armDecoration2Id=${simulatorForm.armDecoration2Id},
+        armDecoration3Id=${simulatorForm.armDecoration3Id},
+
+        waistDecoration1Id=${simulatorForm.waistDecoration1Id},
+        waistDecoration2Id=${simulatorForm.waistDecoration2Id},
+        waistDecoration3Id=${simulatorForm.waistDecoration3Id},
+
+        legDecoration1Id=${simulatorForm.legDecoration1Id},
+        legDecoration2Id=${simulatorForm.legDecoration2Id},
+        legDecoration3Id=${simulatorForm.legDecoration3Id}
+    )}">
+        防具一覧へ戻る
+    </a>
+
+</body>
+</html>
