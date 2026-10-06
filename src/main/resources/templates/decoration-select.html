@@ -1,9 +1,11 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
+
 <head>
     <meta charset="UTF-8">
     <title>装飾品選択</title>
 </head>
+
 <body>
 
     <h1>装飾品選択</h1>
@@ -29,9 +31,7 @@
             <tr th:each="decoration : ${decorations}">
 
                 <td th:text="${decoration.skillName}"></td>
-
                 <td th:text="${decoration.skillLevel}"></td>
-
                 <td th:text="${decoration.requiredSlotSize}"></td>
 
                 <td>
@@ -186,6 +186,61 @@
                                th:value="${simulatorForm.legDecoration3Id}">
 
 
+                        <!-- ===================== -->
+                        <!-- 護石スキル -->
+                        <!-- ===================== -->
+
+                        <input type="hidden"
+                               name="talismanSkill1Id"
+                               th:value="${simulatorForm.talismanSkill1Id}">
+
+                        <input type="hidden"
+                               name="talismanSkill1Level"
+                               th:value="${simulatorForm.talismanSkill1Level}">
+
+                        <input type="hidden"
+                               name="talismanSkill2Id"
+                               th:value="${simulatorForm.talismanSkill2Id}">
+
+                        <input type="hidden"
+                               name="talismanSkill2Level"
+                               th:value="${simulatorForm.talismanSkill2Level}">
+
+
+                        <!-- ===================== -->
+                        <!-- 護石スロット -->
+                        <!-- ===================== -->
+
+                        <input type="hidden"
+                               name="talismanSlot1Size"
+                               th:value="${simulatorForm.talismanSlot1Size}">
+
+                        <input type="hidden"
+                               name="talismanSlot2Size"
+                               th:value="${simulatorForm.talismanSlot2Size}">
+
+                        <input type="hidden"
+                               name="talismanSlot3Size"
+                               th:value="${simulatorForm.talismanSlot3Size}">
+
+
+                        <!-- ===================== -->
+                        <!-- 護石の装飾品 -->
+                        <!-- ===================== -->
+
+                        <input type="hidden"
+                               name="talismanDecoration1Id"
+                               th:value="${simulatorForm.talismanDecoration1Id}">
+
+                        <input type="hidden"
+                               name="talismanDecoration2Id"
+                               th:value="${simulatorForm.talismanDecoration2Id}">
+
+                        <input type="hidden"
+                               name="talismanDecoration3Id"
+                               th:value="${simulatorForm.talismanDecoration3Id}">
+
+
                         <button type="submit">
                             選択
                         </button>
@@ -201,4 +256,5 @@
     </table>
 
 </body>
+
 </html>

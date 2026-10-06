@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.mhsunbreaksimulator.mapper.SkillMapper">
+
+    <!--
+        全スキル取得
+    -->
+    <select id="findAll"
+            resultType="com.example.mhsunbreaksimulator.entity.Skill">
+
+        SELECT
+            skill_id,
+            skill_name,
+            max_level,
+            description,
+            condition_text,
+            state_select_required,
+            stage_select_required
+        FROM skill
+        ORDER BY skill_name
+
+    </select>
+
+
+    <!--
+        スキルIDから1件取得
+    -->
+    <select id="findById"
+            resultType="com.example.mhsunbreaksimulator.entity.Skill">
+
+        SELECT
+            skill_id,
+            skill_name,
+            max_level,
+            description,
+            condition_text,
+            state_select_required,
+            stage_select_required
+        FROM skill
+        WHERE skill_id = #{skillId}
+
+    </select>
+
+</mapper>

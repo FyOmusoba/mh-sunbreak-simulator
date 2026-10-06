@@ -7,6 +7,7 @@ import java.util.Map;
 import org.springframework.stereotype.Service;
 
 import com.example.mhsunbreaksimulator.dto.SkillTotal;
+import com.example.mhsunbreaksimulator.dto.TalismanSkill;
 import com.example.mhsunbreaksimulator.entity.Armor;
 import com.example.mhsunbreaksimulator.entity.Decoration;
 
@@ -14,104 +15,159 @@ import com.example.mhsunbreaksimulator.entity.Decoration;
 public class SkillAggregationService {
 
     /*
-     * 防具だけを合算する場合
+     * =========================================
+     * 防具のみ
+     * =========================================
      */
     public List<SkillTotal> calculateSkillTotals(
             List<Armor> armors) {
 
         return calculateSkillTotals(
                 armors,
+                List.of(),
                 List.of()
         );
     }
 
 
     /*
-     * 防具 + 装飾品を合算する場合
+     * =========================================
+     * 防具 + 装飾品
+     * =========================================
      */
     public List<SkillTotal> calculateSkillTotals(
             List<Armor> armors,
             List<Decoration> decorations) {
+
+        return calculateSkillTotals(
+                armors,
+                decorations,
+                List.of()
+        );
+    }
+
+
+    /*
+     * =========================================
+     * 防具 + 装飾品 + 護石
+     * =========================================
+     */
+    public List<SkillTotal> calculateSkillTotals(
+            List<Armor> armors,
+            List<Decoration> decorations,
+            List<TalismanSkill> talismanSkills) {
 
         Map<Integer, SkillTotal> skillMap
                 = new LinkedHashMap<>();
 
 
         /*
-         * =========================
+         * =========================================
          * 防具スキル
-         * =========================
+         * =========================================
          */
-        for (Armor armor : armors) {
+        if (armors != null) {
 
-            if (armor == null) {
-                continue;
+            for (Armor armor : armors) {
+
+                if (armor == null) {
+                    continue;
+                }
+
+                addSkill(
+                        skillMap,
+                        armor.getSkill1Id(),
+                        armor.getSkill1Name(),
+                        armor.getSkill1Level(),
+                        armor.getSkill1MaxLevel()
+                );
+
+                addSkill(
+                        skillMap,
+                        armor.getSkill2Id(),
+                        armor.getSkill2Name(),
+                        armor.getSkill2Level(),
+                        armor.getSkill2MaxLevel()
+                );
+
+                addSkill(
+                        skillMap,
+                        armor.getSkill3Id(),
+                        armor.getSkill3Name(),
+                        armor.getSkill3Level(),
+                        armor.getSkill3MaxLevel()
+                );
+
+                addSkill(
+                        skillMap,
+                        armor.getSkill4Id(),
+                        armor.getSkill4Name(),
+                        armor.getSkill4Level(),
+                        armor.getSkill4MaxLevel()
+                );
             }
-
-            addSkill(
-                    skillMap,
-                    armor.getSkill1Id(),
-                    armor.getSkill1Name(),
-                    armor.getSkill1Level(),
-                    armor.getSkill1MaxLevel()
-            );
-
-            addSkill(
-                    skillMap,
-                    armor.getSkill2Id(),
-                    armor.getSkill2Name(),
-                    armor.getSkill2Level(),
-                    armor.getSkill2MaxLevel()
-            );
-
-            addSkill(
-                    skillMap,
-                    armor.getSkill3Id(),
-                    armor.getSkill3Name(),
-                    armor.getSkill3Level(),
-                    armor.getSkill3MaxLevel()
-            );
-
-            addSkill(
-                    skillMap,
-                    armor.getSkill4Id(),
-                    armor.getSkill4Name(),
-                    armor.getSkill4Level(),
-                    armor.getSkill4MaxLevel()
-            );
         }
 
 
         /*
-         * =========================
+         * =========================================
          * 装飾品スキル
-         * =========================
+         * =========================================
          */
-        for (Decoration decoration : decorations) {
+        if (decorations != null) {
 
-            if (decoration == null) {
-                continue;
+            for (Decoration decoration : decorations) {
+
+                if (decoration == null) {
+                    continue;
+                }
+
+                addSkill(
+                        skillMap,
+                        decoration.getSkillId(),
+                        decoration.getSkillName(),
+                        decoration.getSkillLevel(),
+                        decoration.getSkillMaxLevel()
+                );
             }
-
-            addSkill(
-                    skillMap,
-                    decoration.getSkillId(),
-                    decoration.getSkillName(),
-                    decoration.getSkillLevel(),
-                    decoration.getSkillMaxLevel()
-            );
         }
 
 
-        return skillMap.values()
+        /*
+         * =========================================
+         * 護石スキル
+         * =========================================
+         */
+        if (talismanSkills != null) {
+
+            for (TalismanSkill talismanSkill : talismanSkills) {
+
+                if (talismanSkill == null) {
+                    continue;
+                }
+
+                addSkill(
+                        skillMap,
+                        talismanSkill.getSkillId(),
+                        talismanSkill.getSkillName(),
+                        talismanSkill.getLevel(),
+                        talismanSkill.getMaxLevel()
+                );
+            }
+        }
+
+
+        return skillMap
+                .values()
                 .stream()
                 .toList();
     }
 
 
     /*
-     * 同じスキルIDならLvを加算する。
-     * ただし最大Lvを超えない。
+     * =========================================
+     * スキル加算
+     * =========================================
      */
     private void addSkill(
             Map<Integer, SkillTotal> skillMap,
@@ -124,16 +180,22 @@ public class SkillAggregationService {
                 || skillName == null
                 || level == null
                 || maxLevel == null) {
+
             return;
         }
 
+
+        /*
+         * すでに同じスキルがある場合
+         */
         if (skillMap.containsKey(skillId)) {
 
             SkillTotal existing
                     = skillMap.get(skillId);
 
             int totalLevel
-                    = existing.getLevel() + level;
+                    = existing.getLevel()
+                    + level;
 
             int cappedLevel
                     = Math.min(
@@ -141,9 +203,16 @@ public class SkillAggregationService {
                             existing.getMaxLevel()
                     );
 
-            existing.setLevel(cappedLevel);
+            existing.setLevel(
+                    cappedLevel
+            );
+        }
 
-        } else {
+
+        /*
+         * 初めて出てきたスキル
+         */
+        else {
 
             int cappedLevel
                     = Math.min(

@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <title>護石編集</title>
+</head>
+
+<body>
+
+    <h1>護石編集</h1>
+
+    <form th:action="@{/talisman-apply}"
+          th:object="${simulatorForm}"
+          method="get">
+
+        <!-- ====================================== -->
+        <!-- 現在の装備状態を保持 -->
+        <!-- ====================================== -->
+
+        <!-- 武器 -->
+        <input type="hidden" th:field="*{weaponId}">
+
+        <input type="hidden" th:field="*{weaponDecoration1Id}">
+        <input type="hidden" th:field="*{weaponDecoration2Id}">
+        <input type="hidden" th:field="*{weaponDecoration3Id}">
+
+
+        <!-- 頭 -->
+        <input type="hidden" th:field="*{headArmorId}">
+
+        <input type="hidden" th:field="*{headDecoration1Id}">
+        <input type="hidden" th:field="*{headDecoration2Id}">
+        <input type="hidden" th:field="*{headDecoration3Id}">
+
+
+        <!-- 胴 -->
+        <input type="hidden" th:field="*{chestArmorId}">
+
+        <input type="hidden" th:field="*{chestDecoration1Id}">
+        <input type="hidden" th:field="*{chestDecoration2Id}">
+        <input type="hidden" th:field="*{chestDecoration3Id}">
+
+
+        <!-- 腕 -->
+        <input type="hidden" th:field="*{armArmorId}">
+
+        <input type="hidden" th:field="*{armDecoration1Id}">
+        <input type="hidden" th:field="*{armDecoration2Id}">
+        <input type="hidden" th:field="*{armDecoration3Id}">
+
+
+        <!-- 腰 -->
+        <input type="hidden" th:field="*{waistArmorId}">
+
+        <input type="hidden" th:field="*{waistDecoration1Id}">
+        <input type="hidden" th:field="*{waistDecoration2Id}">
+        <input type="hidden" th:field="*{waistDecoration3Id}">
+
+
+        <!-- 脚 -->
+        <input type="hidden" th:field="*{legArmorId}">
+
+        <input type="hidden" th:field="*{legDecoration1Id}">
+        <input type="hidden" th:field="*{legDecoration2Id}">
+        <input type="hidden" th:field="*{legDecoration3Id}">
+
+
+        <!-- ====================================== -->
+        <!-- 護石スキル1 -->
+        <!-- ====================================== -->
+
+        <h2>スキル1</h2>
+
+        <label>スキル：</label>
+
+        <select th:field="*{talismanSkill1Id}">
+
+            <option value="">
+                なし
+            </option>
+
+            <option th:each="skill : ${skills}"
+                    th:value="${skill.skillId}"
+                    th:text="${skill.skillName}">
+            </option>
+
+        </select>
+
+
+        <label>Lv：</label>
+
+        <input type="number"
+               th:field="*{talismanSkill1Level}"
+               min="1"
+               max="7">
+
+        <br>
+        <br>
+
+
+        <!-- ====================================== -->
+        <!-- 護石スキル2 -->
+        <!-- ====================================== -->
+
+        <h2>スキル2</h2>
+
+        <label>スキル：</label>
+
+        <select th:field="*{talismanSkill2Id}">
+
+            <option value="">
+                なし
+            </option>
+
+            <option th:each="skill : ${skills}"
+                    th:value="${skill.skillId}"
+                    th:text="${skill.skillName}">
+            </option>
+
+        </select>
+
+
+        <label>Lv：</label>
+
+        <input type="number"
+               th:field="*{talismanSkill2Level}"
+               min="1"
+               max="7">
+
+        <br>
+        <br>
+
+
+        <!-- ====================================== -->
+        <!-- 護石スロット -->
+        <!-- ====================================== -->
+
+        <h2>スロット</h2>
+
+
+        <label>スロット1：</label>
+
+        <select th:field="*{talismanSlot1Size}">
+
+            <option value="0">0</option>
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+
+        </select>
+
+
+        <br>
+        <br>
+
+
+        <label>スロット2：</label>
+
+        <select th:field="*{talismanSlot2Size}">
+
+            <option value="0">0</option>
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+
+        </select>
+
+
+        <br>
+        <br>
+
+
+        <label>スロット3：</label>
+
+        <select th:field="*{talismanSlot3Size}">
+
+            <option value="0">0</option>
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+
+        </select>
+
+
+        <br>
+        <br>
+
+
+        <button type="submit">
+            この護石を設定
+        </button>
+
+    </form>
+
+</body>
+
+</html>

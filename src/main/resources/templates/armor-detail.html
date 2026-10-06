@@ -1,9 +1,11 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
+
 <head>
     <meta charset="UTF-8">
     <title>防具詳細</title>
 </head>
+
 <body>
 
     <h1>防具詳細</h1>
@@ -134,7 +136,16 @@
 
         legDecoration1Id=${simulatorForm.legDecoration1Id},
         legDecoration2Id=${simulatorForm.legDecoration2Id},
-        legDecoration3Id=${simulatorForm.legDecoration3Id}
+        legDecoration3Id=${simulatorForm.legDecoration3Id},
+
+        talismanSkill1Id=${simulatorForm.talismanSkill1Id},
+        talismanSkill1Level=${simulatorForm.talismanSkill1Level},
+        talismanSkill2Id=${simulatorForm.talismanSkill2Id},
+        talismanSkill2Level=${simulatorForm.talismanSkill2Level},
+
+        talismanSlot1Size=${simulatorForm.talismanSlot1Size},
+        talismanSlot2Size=${simulatorForm.talismanSlot2Size},
+        talismanSlot3Size=${simulatorForm.talismanSlot3Size}
     )}">
         この防具を選択
     </a>
@@ -173,10 +184,20 @@
 
         legDecoration1Id=${simulatorForm.legDecoration1Id},
         legDecoration2Id=${simulatorForm.legDecoration2Id},
-        legDecoration3Id=${simulatorForm.legDecoration3Id}
+        legDecoration3Id=${simulatorForm.legDecoration3Id},
+
+        talismanSkill1Id=${simulatorForm.talismanSkill1Id},
+        talismanSkill1Level=${simulatorForm.talismanSkill1Level},
+        talismanSkill2Id=${simulatorForm.talismanSkill2Id},
+        talismanSkill2Level=${simulatorForm.talismanSkill2Level},
+
+        talismanSlot1Size=${simulatorForm.talismanSlot1Size},
+        talismanSlot2Size=${simulatorForm.talismanSlot2Size},
+        talismanSlot3Size=${simulatorForm.talismanSlot3Size}
     )}">
         防具一覧へ戻る
     </a>
 
 </body>
+
 </html>

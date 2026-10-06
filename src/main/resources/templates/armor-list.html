@@ -1,9 +1,11 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
+
 <head>
     <meta charset="UTF-8">
     <title>防具一覧</title>
 </head>
+
 <body>
 
     <h1>防具一覧</h1>
@@ -52,6 +54,15 @@
         <input type="hidden" th:field="*{legDecoration2Id}">
         <input type="hidden" th:field="*{legDecoration3Id}">
 
+        <!-- 護石 -->
+        <input type="hidden" th:field="*{talismanSkill1Id}">
+        <input type="hidden" th:field="*{talismanSkill1Level}">
+        <input type="hidden" th:field="*{talismanSkill2Id}">
+        <input type="hidden" th:field="*{talismanSkill2Level}">
+        <input type="hidden" th:field="*{talismanSlot1Size}">
+        <input type="hidden" th:field="*{talismanSlot2Size}">
+        <input type="hidden" th:field="*{talismanSlot3Size}">
+
         <label>部位：</label>
 
         <select name="part">
@@ -99,6 +110,7 @@
     <table border="1">
 
         <thead>
+
             <tr>
                 <th>防具名</th>
                 <th>部位</th>
@@ -109,6 +121,7 @@
                 <th>スロット3</th>
                 <th>選択</th>
             </tr>
+
         </thead>
 
         <tbody>
@@ -184,7 +197,16 @@
 
                         legDecoration1Id=${simulatorForm.legDecoration1Id},
                         legDecoration2Id=${simulatorForm.legDecoration2Id},
-                        legDecoration3Id=${simulatorForm.legDecoration3Id}
+                        legDecoration3Id=${simulatorForm.legDecoration3Id},
+
+                        talismanSkill1Id=${simulatorForm.talismanSkill1Id},
+                        talismanSkill1Level=${simulatorForm.talismanSkill1Level},
+                        talismanSkill2Id=${simulatorForm.talismanSkill2Id},
+                        talismanSkill2Level=${simulatorForm.talismanSkill2Level},
+
+                        talismanSlot1Size=${simulatorForm.talismanSlot1Size},
+                        talismanSlot2Size=${simulatorForm.talismanSlot2Size},
+                        talismanSlot3Size=${simulatorForm.talismanSlot3Size}
                     )}">
                         選択
                     </a>
@@ -198,4 +220,5 @@
     </table>
 
 </body>
+
 </html>
