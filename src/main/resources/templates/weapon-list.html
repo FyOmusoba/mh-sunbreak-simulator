@@ -1,14 +1,122 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
+
 <head>
     <meta charset="UTF-8">
     <title>武器一覧</title>
 </head>
+
 <body>
 
     <h1>武器一覧</h1>
 
-    <form th:action="@{/weapon-list}" method="get">
+    <form th:action="@{/weapon-list}"
+          th:object="${simulatorForm}"
+          method="get">
+
+        <!-- ============================== -->
+        <!-- 現在の武器 -->
+        <!-- ============================== -->
+
+        <input type="hidden" th:field="*{weaponId}">
+
+
+        <!-- ============================== -->
+        <!-- 防具 -->
+        <!-- ============================== -->
+
+        <input type="hidden" th:field="*{headArmorId}">
+        <input type="hidden" th:field="*{chestArmorId}">
+        <input type="hidden" th:field="*{armArmorId}">
+        <input type="hidden" th:field="*{waistArmorId}">
+        <input type="hidden" th:field="*{legArmorId}">
+
+
+        <!-- ============================== -->
+        <!-- 武器装飾品 -->
+        <!-- ============================== -->
+
+        <input type="hidden" th:field="*{weaponDecoration1Id}">
+        <input type="hidden" th:field="*{weaponDecoration2Id}">
+        <input type="hidden" th:field="*{weaponDecoration3Id}">
+
+
+        <!-- ============================== -->
+        <!-- 頭装飾品 -->
+        <!-- ============================== -->
+
+        <input type="hidden" th:field="*{headDecoration1Id}">
+        <input type="hidden" th:field="*{headDecoration2Id}">
+        <input type="hidden" th:field="*{headDecoration3Id}">
+
+
+        <!-- ============================== -->
+        <!-- 胴装飾品 -->
+        <!-- ============================== -->
+
+        <input type="hidden" th:field="*{chestDecoration1Id}">
+        <input type="hidden" th:field="*{chestDecoration2Id}">
+        <input type="hidden" th:field="*{chestDecoration3Id}">
+
+
+        <!-- ============================== -->
+        <!-- 腕装飾品 -->
+        <!-- ============================== -->
+
+        <input type="hidden" th:field="*{armDecoration1Id}">
+        <input type="hidden" th:field="*{armDecoration2Id}">
+        <input type="hidden" th:field="*{armDecoration3Id}">
+
+
+        <!-- ============================== -->
+        <!-- 腰装飾品 -->
+        <!-- ============================== -->
+
+        <input type="hidden" th:field="*{waistDecoration1Id}">
+        <input type="hidden" th:field="*{waistDecoration2Id}">
+        <input type="hidden" th:field="*{waistDecoration3Id}">
+
+
+        <!-- ============================== -->
+        <!-- 脚装飾品 -->
+        <!-- ============================== -->
+
+        <input type="hidden" th:field="*{legDecoration1Id}">
+        <input type="hidden" th:field="*{legDecoration2Id}">
+        <input type="hidden" th:field="*{legDecoration3Id}">
+
+
+        <!-- ============================== -->
+        <!-- 護石スキル -->
+        <!-- ============================== -->
+
+        <input type="hidden" th:field="*{talismanSkill1Id}">
+        <input type="hidden" th:field="*{talismanSkill1Level}">
+        <input type="hidden" th:field="*{talismanSkill2Id}">
+        <input type="hidden" th:field="*{talismanSkill2Level}">
+
+
+        <!-- ============================== -->
+        <!-- 護石スロット -->
+        <!-- ============================== -->
+
+        <input type="hidden" th:field="*{talismanSlot1Size}">
+        <input type="hidden" th:field="*{talismanSlot2Size}">
+        <input type="hidden" th:field="*{talismanSlot3Size}">
+
+
+        <!-- ============================== -->
+        <!-- 護石装飾品 -->
+        <!-- ============================== -->
+
+        <input type="hidden" th:field="*{talismanDecoration1Id}">
+        <input type="hidden" th:field="*{talismanDecoration2Id}">
+        <input type="hidden" th:field="*{talismanDecoration3Id}">
+
+
+        <!-- ============================== -->
+        <!-- 武器種絞り込み -->
+        <!-- ============================== -->
 
         <label>武器種：</label>
 
@@ -20,28 +128,44 @@
             </option>
 
             <option value="大剣"
-                    th:selected="${selectedWeaponType == '大剣'}">大剣</option>
+                    th:selected="${selectedWeaponType == '大剣'}">
+                大剣
+            </option>
 
             <option value="太刀"
-                    th:selected="${selectedWeaponType == '太刀'}">太刀</option>
+                    th:selected="${selectedWeaponType == '太刀'}">
+                太刀
+            </option>
 
             <option value="片手剣"
-                    th:selected="${selectedWeaponType == '片手剣'}">片手剣</option>
+                    th:selected="${selectedWeaponType == '片手剣'}">
+                片手剣
+            </option>
 
             <option value="双剣"
-                    th:selected="${selectedWeaponType == '双剣'}">双剣</option>
+                    th:selected="${selectedWeaponType == '双剣'}">
+                双剣
+            </option>
 
             <option value="ハンマー"
-                    th:selected="${selectedWeaponType == 'ハンマー'}">ハンマー</option>
+                    th:selected="${selectedWeaponType == 'ハンマー'}">
+                ハンマー
+            </option>
 
             <option value="狩猟笛"
-                    th:selected="${selectedWeaponType == '狩猟笛'}">狩猟笛</option>
+                    th:selected="${selectedWeaponType == '狩猟笛'}">
+                狩猟笛
+            </option>
 
             <option value="ランス"
-                    th:selected="${selectedWeaponType == 'ランス'}">ランス</option>
+                    th:selected="${selectedWeaponType == 'ランス'}">
+                ランス
+            </option>
 
             <option value="ガンランス"
-                    th:selected="${selectedWeaponType == 'ガンランス'}">ガンランス</option>
+                    th:selected="${selectedWeaponType == 'ガンランス'}">
+                ガンランス
+            </option>
 
             <option value="スラッシュアックス"
                     th:selected="${selectedWeaponType == 'スラッシュアックス'}">
@@ -54,10 +178,14 @@
             </option>
 
             <option value="操虫棍"
-                    th:selected="${selectedWeaponType == '操虫棍'}">操虫棍</option>
+                    th:selected="${selectedWeaponType == '操虫棍'}">
+                操虫棍
+            </option>
 
             <option value="弓"
-                    th:selected="${selectedWeaponType == '弓'}">弓</option>
+                    th:selected="${selectedWeaponType == '弓'}">
+                弓
+            </option>
 
             <option value="ライトボウガン"
                     th:selected="${selectedWeaponType == 'ライトボウガン'}">
@@ -82,6 +210,7 @@
     <table border="1">
 
         <thead>
+
             <tr>
                 <th>武器名</th>
                 <th>武器種</th>
@@ -91,6 +220,7 @@
                 <th>会心率</th>
                 <th>選択</th>
             </tr>
+
         </thead>
 
         <tbody>
@@ -98,16 +228,68 @@
             <tr th:each="weapon : ${weapons}">
 
                 <td th:text="${weapon.weaponName}"></td>
+
                 <td th:text="${weapon.weaponType}"></td>
+
                 <td th:text="${weapon.attack}"></td>
+
                 <td th:text="${weapon.elementType}"></td>
+
                 <td th:text="${weapon.elementValue}"></td>
+
                 <td th:text="${weapon.affinity} + '%'"></td>
 
                 <td>
-                    <a th:href="@{/weapon/{weaponId}(weaponId=${weapon.weaponId})}">
+
+                    <a th:href="@{/weapon/{weaponId}(
+                        weaponId=${weapon.weaponId},
+
+                        headArmorId=${simulatorForm.headArmorId},
+                        chestArmorId=${simulatorForm.chestArmorId},
+                        armArmorId=${simulatorForm.armArmorId},
+                        waistArmorId=${simulatorForm.waistArmorId},
+                        legArmorId=${simulatorForm.legArmorId},
+
+                        weaponDecoration1Id=${simulatorForm.weaponDecoration1Id},
+                        weaponDecoration2Id=${simulatorForm.weaponDecoration2Id},
+                        weaponDecoration3Id=${simulatorForm.weaponDecoration3Id},
+
+                        headDecoration1Id=${simulatorForm.headDecoration1Id},
+                        headDecoration2Id=${simulatorForm.headDecoration2Id},
+                        headDecoration3Id=${simulatorForm.headDecoration3Id},
+
+                        chestDecoration1Id=${simulatorForm.chestDecoration1Id},
+                        chestDecoration2Id=${simulatorForm.chestDecoration2Id},
+                        chestDecoration3Id=${simulatorForm.chestDecoration3Id},
+
+                        armDecoration1Id=${simulatorForm.armDecoration1Id},
+                        armDecoration2Id=${simulatorForm.armDecoration2Id},
+                        armDecoration3Id=${simulatorForm.armDecoration3Id},
+
+                        waistDecoration1Id=${simulatorForm.waistDecoration1Id},
+                        waistDecoration2Id=${simulatorForm.waistDecoration2Id},
+                        waistDecoration3Id=${simulatorForm.waistDecoration3Id},
+
+                        legDecoration1Id=${simulatorForm.legDecoration1Id},
+                        legDecoration2Id=${simulatorForm.legDecoration2Id},
+                        legDecoration3Id=${simulatorForm.legDecoration3Id},
+
+                        talismanSkill1Id=${simulatorForm.talismanSkill1Id},
+                        talismanSkill1Level=${simulatorForm.talismanSkill1Level},
+                        talismanSkill2Id=${simulatorForm.talismanSkill2Id},
+                        talismanSkill2Level=${simulatorForm.talismanSkill2Level},
+
+                        talismanSlot1Size=${simulatorForm.talismanSlot1Size},
+                        talismanSlot2Size=${simulatorForm.talismanSlot2Size},
+                        talismanSlot3Size=${simulatorForm.talismanSlot3Size},
+
+                        talismanDecoration1Id=${simulatorForm.talismanDecoration1Id},
+                        talismanDecoration2Id=${simulatorForm.talismanDecoration2Id},
+                        talismanDecoration3Id=${simulatorForm.talismanDecoration3Id}
+                    )}">
                         選択
                     </a>
+
                 </td>
 
             </tr>
@@ -117,4 +299,5 @@
     </table>
 
 </body>
+
 </html>

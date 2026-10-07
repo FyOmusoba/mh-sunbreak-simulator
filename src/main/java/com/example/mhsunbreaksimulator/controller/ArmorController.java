@@ -34,7 +34,6 @@ public class ArmorController {
         } else {
             armors = armorService.findByPart(part);
         }
-
         model.addAttribute("armors", armors);
         model.addAttribute("selectedPart", part);
         model.addAttribute("simulatorForm", simulatorForm);

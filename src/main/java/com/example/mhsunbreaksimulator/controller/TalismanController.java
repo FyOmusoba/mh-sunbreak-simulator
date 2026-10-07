@@ -20,12 +20,6 @@ public class TalismanController {
 
     private final SkillService skillService;
 
-
-    /*
-     * =========================================
-     * 護石編集画面
-     * =========================================
-     */
     @GetMapping("/talisman")
     public String showTalisman(
             @ModelAttribute SimulatorForm simulatorForm,
@@ -47,42 +41,19 @@ public class TalismanController {
         return "talisman";
     }
 
-
-    /*
-     * =========================================
-     * 護石設定
-     * =========================================
-     */
     @GetMapping("/talisman-apply")
     public String applyTalisman(
             @ModelAttribute SimulatorForm simulatorForm,
             RedirectAttributes redirectAttributes) {
 
-        /*
-         * =========================================
-         * スキル1をチェック
-         * =========================================
-         */
         validateSkill1(
                 simulatorForm
         );
 
-
-        /*
-         * =========================================
-         * スキル2をチェック
-         * =========================================
-         */
         validateSkill2(
                 simulatorForm
         );
 
-
-        /*
-         * =========================================
-         * スロットサイズを0～4に制限
-         * =========================================
-         */
         simulatorForm.setTalismanSlot1Size(
                 normalizeSlotSize(
                         simulatorForm.getTalismanSlot1Size()
@@ -101,12 +72,6 @@ public class TalismanController {
                 )
         );
 
-
-        /*
-         * =========================================
-         * シミュレーターへ選択状態を返す
-         * =========================================
-         */
         addSimulatorAttributes(
                 simulatorForm,
                 redirectAttributes
@@ -115,21 +80,12 @@ public class TalismanController {
         return "redirect:/simulator";
     }
 
-
-    /*
-     * =========================================
-     * 護石スキル1チェック
-     * =========================================
-     */
     private void validateSkill1(
             SimulatorForm simulatorForm) {
 
         Integer skillId
                 = simulatorForm.getTalismanSkill1Id();
 
-        /*
-         * スキル未選択
-         */
         if (skillId == null) {
 
             simulatorForm.setTalismanSkill1Level(
@@ -139,15 +95,11 @@ public class TalismanController {
             return;
         }
 
-
         Skill skill
                 = skillService.findById(
                         skillId
                 );
 
-        /*
-         * 存在しないスキルID
-         */
         if (skill == null) {
 
             simulatorForm.setTalismanSkill1Id(
@@ -161,13 +113,9 @@ public class TalismanController {
             return;
         }
 
-
         Integer level
                 = simulatorForm.getTalismanSkill1Level();
 
-        /*
-         * Lv未入力ならLv1
-         */
         if (level == null || level < 1) {
 
             simulatorForm.setTalismanSkill1Level(
@@ -177,10 +125,6 @@ public class TalismanController {
             return;
         }
 
-
-        /*
-         * 最大Lv超過なら最大Lvまで
-         */
         if (level > skill.getMaxLevel()) {
 
             simulatorForm.setTalismanSkill1Level(
@@ -189,21 +133,12 @@ public class TalismanController {
         }
     }
 
-
-    /*
-     * =========================================
-     * 護石スキル2チェック
-     * =========================================
-     */
     private void validateSkill2(
             SimulatorForm simulatorForm) {
 
         Integer skillId
                 = simulatorForm.getTalismanSkill2Id();
 
-        /*
-         * スキル未選択
-         */
         if (skillId == null) {
 
             simulatorForm.setTalismanSkill2Level(
@@ -213,15 +148,11 @@ public class TalismanController {
             return;
         }
 
-
         Skill skill
                 = skillService.findById(
                         skillId
                 );
 
-        /*
-         * 存在しないスキルID
-         */
         if (skill == null) {
 
             simulatorForm.setTalismanSkill2Id(
@@ -235,13 +166,9 @@ public class TalismanController {
             return;
         }
 
-
         Integer level
                 = simulatorForm.getTalismanSkill2Level();
 
-        /*
-         * Lv未入力ならLv1
-         */
         if (level == null || level < 1) {
 
             simulatorForm.setTalismanSkill2Level(
@@ -251,10 +178,6 @@ public class TalismanController {
             return;
         }
 
-
-        /*
-         * 最大Lv超過なら最大Lvまで
-         */
         if (level > skill.getMaxLevel()) {
 
             simulatorForm.setTalismanSkill2Level(
@@ -263,12 +186,6 @@ public class TalismanController {
         }
     }
 
-
-    /*
-     * =========================================
-     * スロットサイズを0～4へ正規化
-     * =========================================
-     */
     private Integer normalizeSlotSize(
             Integer slotSize) {
 
@@ -287,20 +204,14 @@ public class TalismanController {
         return slotSize;
     }
 
-
-    /*
-     * =========================================
-     * 現在のSimulatorFormを
-     * シミュレーターへ引き継ぐ
-     * =========================================
-     */
     private void addSimulatorAttributes(
             SimulatorForm simulatorForm,
             RedirectAttributes redirectAttributes) {
 
-        /*
-         * 武器
-         */
+        /* ============================== */
+        /* 武器 */
+        /* ============================== */
+
         redirectAttributes.addAttribute(
                 "weaponId",
                 simulatorForm.getWeaponId()
@@ -322,9 +233,10 @@ public class TalismanController {
         );
 
 
-        /*
-         * 頭
-         */
+        /* ============================== */
+        /* 頭 */
+        /* ============================== */
+
         redirectAttributes.addAttribute(
                 "headArmorId",
                 simulatorForm.getHeadArmorId()
@@ -346,9 +258,10 @@ public class TalismanController {
         );
 
 
-        /*
-         * 胴
-         */
+        /* ============================== */
+        /* 胴 */
+        /* ============================== */
+
         redirectAttributes.addAttribute(
                 "chestArmorId",
                 simulatorForm.getChestArmorId()
@@ -370,9 +283,10 @@ public class TalismanController {
         );
 
 
-        /*
-         * 腕
-         */
+        /* ============================== */
+        /* 腕 */
+        /* ============================== */
+
         redirectAttributes.addAttribute(
                 "armArmorId",
                 simulatorForm.getArmArmorId()
@@ -394,9 +308,10 @@ public class TalismanController {
         );
 
 
-        /*
-         * 腰
-         */
+        /* ============================== */
+        /* 腰 */
+        /* ============================== */
+
         redirectAttributes.addAttribute(
                 "waistArmorId",
                 simulatorForm.getWaistArmorId()
@@ -418,9 +333,10 @@ public class TalismanController {
         );
 
 
-        /*
-         * 脚
-         */
+        /* ============================== */
+        /* 脚 */
+        /* ============================== */
+
         redirectAttributes.addAttribute(
                 "legArmorId",
                 simulatorForm.getLegArmorId()
@@ -442,9 +358,10 @@ public class TalismanController {
         );
 
 
-        /*
-         * 護石
-         */
+        /* ============================== */
+        /* 護石スキル */
+        /* ============================== */
+
         redirectAttributes.addAttribute(
                 "talismanSkill1Id",
                 simulatorForm.getTalismanSkill1Id()
@@ -465,6 +382,11 @@ public class TalismanController {
                 simulatorForm.getTalismanSkill2Level()
         );
 
+
+        /* ============================== */
+        /* 護石スロット */
+        /* ============================== */
+
         redirectAttributes.addAttribute(
                 "talismanSlot1Size",
                 simulatorForm.getTalismanSlot1Size()
@@ -478,6 +400,26 @@ public class TalismanController {
         redirectAttributes.addAttribute(
                 "talismanSlot3Size",
                 simulatorForm.getTalismanSlot3Size()
+        );
+
+
+        /* ============================== */
+        /* 護石装飾品 */
+        /* ============================== */
+
+        redirectAttributes.addAttribute(
+                "talismanDecoration1Id",
+                simulatorForm.getTalismanDecoration1Id()
+        );
+
+        redirectAttributes.addAttribute(
+                "talismanDecoration2Id",
+                simulatorForm.getTalismanDecoration2Id()
+        );
+
+        redirectAttributes.addAttribute(
+                "talismanDecoration3Id",
+                simulatorForm.getTalismanDecoration3Id()
         );
     }
 }

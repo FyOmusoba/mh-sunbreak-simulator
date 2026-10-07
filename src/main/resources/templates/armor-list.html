@@ -54,14 +54,21 @@
         <input type="hidden" th:field="*{legDecoration2Id}">
         <input type="hidden" th:field="*{legDecoration3Id}">
 
-        <!-- 護石 -->
+        <!-- 護石スキル -->
         <input type="hidden" th:field="*{talismanSkill1Id}">
         <input type="hidden" th:field="*{talismanSkill1Level}">
         <input type="hidden" th:field="*{talismanSkill2Id}">
         <input type="hidden" th:field="*{talismanSkill2Level}">
+
+        <!-- 護石スロット -->
         <input type="hidden" th:field="*{talismanSlot1Size}">
         <input type="hidden" th:field="*{talismanSlot2Size}">
         <input type="hidden" th:field="*{talismanSlot3Size}">
+
+        <!-- 護石装飾品 -->
+        <input type="hidden" th:field="*{talismanDecoration1Id}">
+        <input type="hidden" th:field="*{talismanDecoration2Id}">
+        <input type="hidden" th:field="*{talismanDecoration3Id}">
 
         <label>部位：</label>
 
@@ -206,7 +213,11 @@
 
                         talismanSlot1Size=${simulatorForm.talismanSlot1Size},
                         talismanSlot2Size=${simulatorForm.talismanSlot2Size},
-                        talismanSlot3Size=${simulatorForm.talismanSlot3Size}
+                        talismanSlot3Size=${simulatorForm.talismanSlot3Size},
+
+                        talismanDecoration1Id=${simulatorForm.talismanDecoration1Id},
+                        talismanDecoration2Id=${simulatorForm.talismanDecoration2Id},
+                        talismanDecoration3Id=${simulatorForm.talismanDecoration3Id}
                     )}">
                         選択
                     </a>

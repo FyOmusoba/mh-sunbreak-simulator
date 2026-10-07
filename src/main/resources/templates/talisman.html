@@ -14,11 +14,10 @@
           th:object="${simulatorForm}"
           method="get">
 
-        <!-- ====================================== -->
-        <!-- 現在の装備状態を保持 -->
-        <!-- ====================================== -->
-
+        <!-- ============================== -->
         <!-- 武器 -->
+        <!-- ============================== -->
+
         <input type="hidden" th:field="*{weaponId}">
 
         <input type="hidden" th:field="*{weaponDecoration1Id}">
@@ -26,7 +25,10 @@
         <input type="hidden" th:field="*{weaponDecoration3Id}">
 
 
+        <!-- ============================== -->
         <!-- 頭 -->
+        <!-- ============================== -->
+
         <input type="hidden" th:field="*{headArmorId}">
 
         <input type="hidden" th:field="*{headDecoration1Id}">
@@ -34,7 +36,10 @@
         <input type="hidden" th:field="*{headDecoration3Id}">
 
 
+        <!-- ============================== -->
         <!-- 胴 -->
+        <!-- ============================== -->
+
         <input type="hidden" th:field="*{chestArmorId}">
 
         <input type="hidden" th:field="*{chestDecoration1Id}">
@@ -42,7 +47,10 @@
         <input type="hidden" th:field="*{chestDecoration3Id}">
 
 
+        <!-- ============================== -->
         <!-- 腕 -->
+        <!-- ============================== -->
+
         <input type="hidden" th:field="*{armArmorId}">
 
         <input type="hidden" th:field="*{armDecoration1Id}">
@@ -50,7 +58,10 @@
         <input type="hidden" th:field="*{armDecoration3Id}">
 
 
+        <!-- ============================== -->
         <!-- 腰 -->
+        <!-- ============================== -->
+
         <input type="hidden" th:field="*{waistArmorId}">
 
         <input type="hidden" th:field="*{waistDecoration1Id}">
@@ -58,7 +69,10 @@
         <input type="hidden" th:field="*{waistDecoration3Id}">
 
 
+        <!-- ============================== -->
         <!-- 脚 -->
+        <!-- ============================== -->
+
         <input type="hidden" th:field="*{legArmorId}">
 
         <input type="hidden" th:field="*{legDecoration1Id}">
@@ -66,9 +80,18 @@
         <input type="hidden" th:field="*{legDecoration3Id}">
 
 
-        <!-- ====================================== -->
+        <!-- ============================== -->
+        <!-- 護石に装着中の装飾品 -->
+        <!-- ============================== -->
+
+        <input type="hidden" th:field="*{talismanDecoration1Id}">
+        <input type="hidden" th:field="*{talismanDecoration2Id}">
+        <input type="hidden" th:field="*{talismanDecoration3Id}">
+
+
+        <!-- ============================== -->
         <!-- 護石スキル1 -->
-        <!-- ====================================== -->
+        <!-- ============================== -->
 
         <h2>スキル1</h2>
 
@@ -87,7 +110,6 @@
 
         </select>
 
-
         <label>Lv：</label>
 
         <input type="number"
@@ -99,9 +121,9 @@
         <br>
 
 
-        <!-- ====================================== -->
+        <!-- ============================== -->
         <!-- 護石スキル2 -->
-        <!-- ====================================== -->
+        <!-- ============================== -->
 
         <h2>スキル2</h2>
 
@@ -120,7 +142,6 @@
 
         </select>
 
-
         <label>Lv：</label>
 
         <input type="number"
@@ -132,63 +153,50 @@
         <br>
 
 
-        <!-- ====================================== -->
+        <!-- ============================== -->
         <!-- 護石スロット -->
-        <!-- ====================================== -->
+        <!-- ============================== -->
 
         <h2>スロット</h2>
-
 
         <label>スロット1：</label>
 
         <select th:field="*{talismanSlot1Size}">
-
             <option value="0">0</option>
             <option value="1">1</option>
             <option value="2">2</option>
             <option value="3">3</option>
             <option value="4">4</option>
-
         </select>
 
-
         <br>
         <br>
-
 
         <label>スロット2：</label>
 
         <select th:field="*{talismanSlot2Size}">
-
             <option value="0">0</option>
             <option value="1">1</option>
             <option value="2">2</option>
             <option value="3">3</option>
             <option value="4">4</option>
-
         </select>
 
-
         <br>
         <br>
-
 
         <label>スロット3：</label>
 
         <select th:field="*{talismanSlot3Size}">
-
             <option value="0">0</option>
             <option value="1">1</option>
             <option value="2">2</option>
             <option value="3">3</option>
             <option value="4">4</option>
-
         </select>
 
-
         <br>
         <br>
-
 
         <button type="submit">
             この護石を設定
