@@ -54,6 +54,10 @@ public class TalismanController {
                 simulatorForm
         );
 
+        validateDuplicateSkills(
+                simulatorForm
+        );
+
         simulatorForm.setTalismanSlot1Size(
                 normalizeSlotSize(
                         simulatorForm.getTalismanSlot1Size()
@@ -182,6 +186,28 @@ public class TalismanController {
 
             simulatorForm.setTalismanSkill2Level(
                     skill.getMaxLevel()
+            );
+        }
+    }
+
+    private void validateDuplicateSkills(
+            SimulatorForm simulatorForm) {
+
+        Integer skill1Id
+                = simulatorForm.getTalismanSkill1Id();
+
+        Integer skill2Id
+                = simulatorForm.getTalismanSkill2Id();
+
+        if (skill1Id != null
+                && skill1Id.equals(skill2Id)) {
+
+            simulatorForm.setTalismanSkill2Id(
+                    null
+            );
+
+            simulatorForm.setTalismanSkill2Level(
+                    null
             );
         }
     }

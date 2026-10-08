@@ -159,40 +159,52 @@
 
         <h2>スロット</h2>
 
-        <label>スロット1：</label>
+        <!--
+            実際にSimulatorFormへ送信する値。
+            下の「スロット構成」選択時にJavaScriptで設定する。
+        -->
 
-        <select th:field="*{talismanSlot1Size}">
-            <option value="0">0</option>
-            <option value="1">1</option>
-            <option value="2">2</option>
-            <option value="3">3</option>
-            <option value="4">4</option>
-        </select>
+        <input type="hidden"
+               th:field="*{talismanSlot1Size}">
 
-        <br>
-        <br>
+        <input type="hidden"
+               th:field="*{talismanSlot2Size}">
 
-        <label>スロット2：</label>
+        <input type="hidden"
+               th:field="*{talismanSlot3Size}">
 
-        <select th:field="*{talismanSlot2Size}">
-            <option value="0">0</option>
-            <option value="1">1</option>
-            <option value="2">2</option>
-            <option value="3">3</option>
-            <option value="4">4</option>
-        </select>
 
-        <br>
-        <br>
+        <label for="talismanSlotPattern">
+            スロット構成：
+        </label>
 
-        <label>スロット3：</label>
+        <select id="talismanSlotPattern">
 
-        <select th:field="*{talismanSlot3Size}">
-            <option value="0">0</option>
-            <option value="1">1</option>
-            <option value="2">2</option>
-            <option value="3">3</option>
-            <option value="4">4</option>
+            <option value="0-0-0">0-0-0</option>
+
+            <option value="1-0-0">1-0-0</option>
+            <option value="1-1-0">1-1-0</option>
+            <option value="1-1-1">1-1-1</option>
+
+            <option value="2-0-0">2-0-0</option>
+            <option value="2-1-0">2-1-0</option>
+            <option value="2-1-1">2-1-1</option>
+            <option value="2-2-0">2-2-0</option>
+            <option value="2-2-1">2-2-1</option>
+            <option value="2-2-2">2-2-2</option>
+
+            <option value="3-0-0">3-0-0</option>
+            <option value="3-1-0">3-1-0</option>
+            <option value="3-1-1">3-1-1</option>
+            <option value="3-2-0">3-2-0</option>
+            <option value="3-2-1">3-2-1</option>
+            <option value="3-3-0">3-3-0</option>
+            <option value="3-3-1">3-3-1</option>
+
+            <option value="4-0-0">4-0-0</option>
+            <option value="4-1-0">4-1-0</option>
+            <option value="4-1-1">4-1-1</option>
+
         </select>
 
         <br>
@@ -203,6 +215,108 @@
         </button>
 
     </form>
+
+
+    <script>
+
+        document.addEventListener(
+            "DOMContentLoaded",
+            function () {
+
+                const slot1
+                    = document.getElementById(
+                        "talismanSlot1Size"
+                    );
+
+                const slot2
+                    = document.getElementById(
+                        "talismanSlot2Size"
+                    );
+
+                const slot3
+                    = document.getElementById(
+                        "talismanSlot3Size"
+                    );
+
+                const patternSelect
+                    = document.getElementById(
+                        "talismanSlotPattern"
+                    );
+
+
+                function getSlotValue(slot) {
+
+                    if (slot.value === "") {
+                        return "0";
+                    }
+
+                    return slot.value;
+                }
+
+
+                function applyPattern(pattern) {
+
+                    const values
+                        = pattern.split("-");
+
+                    slot1.value
+                        = values[0];
+
+                    slot2.value
+                        = values[1];
+
+                    slot3.value
+                        = values[2];
+                }
+
+
+                const currentPattern
+                    = getSlotValue(slot1)
+                    + "-"
+                    + getSlotValue(slot2)
+                    + "-"
+                    + getSlotValue(slot3);
+
+
+                const patternExists
+                    = Array.from(
+                        patternSelect.options
+                    ).some(
+                        option =>
+                            option.value
+                            === currentPattern
+                    );
+
+
+                if (patternExists) {
+
+                    patternSelect.value
+                        = currentPattern;
+
+                } else {
+
+                    patternSelect.value
+                        = "0-0-0";
+
+                    applyPattern(
+                        "0-0-0"
+                    );
+                }
+
+
+                patternSelect.addEventListener(
+                    "change",
+                    function () {
+
+                        applyPattern(
+                            patternSelect.value
+                        );
+                    }
+                );
+            }
+        );
+
+    </script>
 
 </body>
 
