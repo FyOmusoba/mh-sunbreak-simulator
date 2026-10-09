@@ -14,11 +14,13 @@ import com.example.mhsunbreaksimulator.dto.SkillTotal;
 import com.example.mhsunbreaksimulator.dto.TalismanSkill;
 import com.example.mhsunbreaksimulator.entity.Armor;
 import com.example.mhsunbreaksimulator.entity.Decoration;
+import com.example.mhsunbreaksimulator.entity.RampageDecoration;
 import com.example.mhsunbreaksimulator.entity.Skill;
 import com.example.mhsunbreaksimulator.entity.Weapon;
 import com.example.mhsunbreaksimulator.form.SimulatorForm;
 import com.example.mhsunbreaksimulator.service.ArmorService;
 import com.example.mhsunbreaksimulator.service.DecorationService;
+import com.example.mhsunbreaksimulator.service.RampageDecorationService;
 import com.example.mhsunbreaksimulator.service.SkillAggregationService;
 import com.example.mhsunbreaksimulator.service.SkillService;
 import com.example.mhsunbreaksimulator.service.WeaponService;
@@ -32,6 +34,7 @@ public class SimulatorController {
     private final WeaponService weaponService;
     private final ArmorService armorService;
     private final DecorationService decorationService;
+    private final RampageDecorationService rampageDecorationService;
     private final SkillAggregationService skillAggregationService;
     private final SkillService skillService;
 
@@ -56,6 +59,34 @@ public class SimulatorController {
         model.addAttribute(
                 "weapon",
                 weapon
+        );
+
+
+        /* ========================================== */
+        /* 百竜装飾品 */
+        /* ========================================== */
+
+        RampageDecoration rampageDecoration
+                = findUsableRampageDecoration(
+                        simulatorForm.getRampageDecorationId(),
+                        weapon == null
+                                ? 0
+                                : safeSlotSize(
+                                        weapon.getRampageSlotSize()
+                                )
+                );
+
+        if (simulatorForm.getRampageDecorationId() != null
+                && rampageDecoration == null) {
+
+            simulatorForm.setRampageDecorationId(
+                    null
+            );
+        }
+
+        model.addAttribute(
+                "rampageDecoration",
+                rampageDecoration
         );
 
 
@@ -938,6 +969,39 @@ public class SimulatorController {
     }
 
 
+    private RampageDecoration findUsableRampageDecoration(
+            Integer rampageDecorationId,
+            int slotSize) {
+
+        if (rampageDecorationId == null) {
+            return null;
+        }
+
+        if (slotSize <= 0) {
+            return null;
+        }
+
+        RampageDecoration rampageDecoration
+                = rampageDecorationService.findById(
+                        rampageDecorationId
+                );
+
+        if (rampageDecoration == null) {
+            return null;
+        }
+
+        if (rampageDecoration.getRequiredSlotSize() == null) {
+            return null;
+        }
+
+        if (rampageDecoration.getRequiredSlotSize() > slotSize) {
+            return null;
+        }
+
+        return rampageDecoration;
+    }
+
+
     private Decoration findUsableDecoration(
             Integer decorationId,
             int slotSize) {
@@ -1088,6 +1152,12 @@ public class SimulatorController {
                 builder,
                 "weaponId",
                 form.getWeaponId()
+        );
+
+        addQueryParam(
+                builder,
+                "rampageDecorationId",
+                form.getRampageDecorationId()
         );
 
         addQueryParam(

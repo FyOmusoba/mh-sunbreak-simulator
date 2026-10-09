@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.mhsunbreaksimulator.mapper.RampageDecorationMapper">
+
+    <!--
+        百竜装飾品を全件取得
+    -->
+    <select id="findAll"
+            resultType="com.example.mhsunbreaksimulator.entity.RampageDecoration">
+
+        SELECT
+            rampage_decoration_id,
+            rampage_skill_id,
+            rampage_skill_name,
+            decoration_name,
+            required_slot_size,
+            description
+        FROM rampage_decoration
+        ORDER BY
+            required_slot_size,
+            rampage_decoration_id
+
+    </select>
+
+
+    <!--
+        必要スロットサイズが完全一致する百竜装飾品を取得
+    -->
+    <select id="findByRequiredSlotSize"
+            resultType="com.example.mhsunbreaksimulator.entity.RampageDecoration">
+
+        SELECT
+            rampage_decoration_id,
+            rampage_skill_id,
+            rampage_skill_name,
+            decoration_name,
+            required_slot_size,
+            description
+        FROM rampage_decoration
+        WHERE required_slot_size = #{requiredSlotSize}
+        ORDER BY rampage_decoration_id
+
+    </select>
+
+
+    <!--
+        武器の百竜スロットに装着可能な百竜装飾品を取得
+        例：
+        武器スロット3なら、サイズ1・2・3が装着可能
+    -->
+    <select id="findUsableBySlotSize"
+            resultType="com.example.mhsunbreaksimulator.entity.RampageDecoration">
+
+        SELECT
+            rampage_decoration_id,
+            rampage_skill_id,
+            rampage_skill_name,
+            decoration_name,
+            required_slot_size,
+            description
+        FROM rampage_decoration
+        WHERE required_slot_size &lt;= #{slotSize}
+        ORDER BY
+            required_slot_size DESC,
+            rampage_decoration_id
+
+    </select>
+
+
+    <!--
+        IDから1件取得
+    -->
+    <select id="findById"
+            resultType="com.example.mhsunbreaksimulator.entity.RampageDecoration">
+
+        SELECT
+            rampage_decoration_id,
+            rampage_skill_id,
+            rampage_skill_name,
+            decoration_name,
+            required_slot_size,
+            description
+        FROM rampage_decoration
+        WHERE rampage_decoration_id = #{rampageDecorationId}
+
+    </select>
+
+</mapper>

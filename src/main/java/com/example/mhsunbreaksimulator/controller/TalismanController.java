@@ -76,6 +76,10 @@ public class TalismanController {
                 )
         );
 
+        validateSlotPattern(
+                simulatorForm
+        );
+
         addSimulatorAttributes(
                 simulatorForm,
                 redirectAttributes
@@ -104,7 +108,8 @@ public class TalismanController {
                         skillId
                 );
 
-        if (skill == null) {
+        if (skill == null
+                || skill.getTalismanSkill1MaxLevel() == null) {
 
             simulatorForm.setTalismanSkill1Id(
                     null
@@ -120,6 +125,9 @@ public class TalismanController {
         Integer level
                 = simulatorForm.getTalismanSkill1Level();
 
+        Integer maxLevel
+                = skill.getTalismanSkill1MaxLevel();
+
         if (level == null || level < 1) {
 
             simulatorForm.setTalismanSkill1Level(
@@ -129,10 +137,10 @@ public class TalismanController {
             return;
         }
 
-        if (level > skill.getMaxLevel()) {
+        if (level > maxLevel) {
 
             simulatorForm.setTalismanSkill1Level(
-                    skill.getMaxLevel()
+                    maxLevel
             );
         }
     }
@@ -157,7 +165,8 @@ public class TalismanController {
                         skillId
                 );
 
-        if (skill == null) {
+        if (skill == null
+                || skill.getTalismanSkill2MaxLevel() == null) {
 
             simulatorForm.setTalismanSkill2Id(
                     null
@@ -173,6 +182,9 @@ public class TalismanController {
         Integer level
                 = simulatorForm.getTalismanSkill2Level();
 
+        Integer maxLevel
+                = skill.getTalismanSkill2MaxLevel();
+
         if (level == null || level < 1) {
 
             simulatorForm.setTalismanSkill2Level(
@@ -182,10 +194,10 @@ public class TalismanController {
             return;
         }
 
-        if (level > skill.getMaxLevel()) {
+        if (level > maxLevel) {
 
             simulatorForm.setTalismanSkill2Level(
-                    skill.getMaxLevel()
+                    maxLevel
             );
         }
     }
@@ -228,6 +240,84 @@ public class TalismanController {
         }
 
         return slotSize;
+    }
+
+    private void validateSlotPattern(
+            SimulatorForm simulatorForm) {
+
+        int slot1
+                = simulatorForm.getTalismanSlot1Size();
+
+        int slot2
+                = simulatorForm.getTalismanSlot2Size();
+
+        int slot3
+                = simulatorForm.getTalismanSlot3Size();
+
+        if (!isValidSlotPattern(
+                slot1,
+                slot2,
+                slot3
+        )) {
+
+            simulatorForm.setTalismanSlot1Size(
+                    0
+            );
+
+            simulatorForm.setTalismanSlot2Size(
+                    0
+            );
+
+            simulatorForm.setTalismanSlot3Size(
+                    0
+            );
+        }
+    }
+
+    private boolean isValidSlotPattern(
+            int slot1,
+            int slot2,
+            int slot3) {
+
+        String pattern
+                = slot1
+                + "-"
+                + slot2
+                + "-"
+                + slot3;
+
+        return switch (pattern) {
+
+            case "0-0-0",
+
+                 "1-0-0",
+                 "1-1-0",
+                 "1-1-1",
+
+                 "2-0-0",
+                 "2-1-0",
+                 "2-1-1",
+                 "2-2-0",
+                 "2-2-1",
+                 "2-2-2",
+
+                 "3-0-0",
+                 "3-1-0",
+                 "3-1-1",
+                 "3-2-0",
+                 "3-2-1",
+                 "3-3-0",
+                 "3-3-1",
+
+                 "4-0-0",
+                 "4-1-0",
+                 "4-1-1"
+
+                    -> true;
+
+            default
+                    -> false;
+        };
     }
 
     private void addSimulatorAttributes(

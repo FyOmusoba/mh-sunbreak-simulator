@@ -6,16 +6,16 @@
 
     <meta charset="UTF-8">
 
-    <title>装飾品選択</title>
+    <title>百竜装飾品選択</title>
 
 </head>
 
 <body>
 
-    <h1>装飾品選択</h1>
+    <h1>百竜装飾品選択</h1>
 
     <p>
-        使用できるスロットサイズ：
+        使用できる百竜スロットサイズ：
         <span th:text="${slotSize}"></span>
     </p>
 
@@ -26,9 +26,9 @@
 
             <tr>
 
-                <th>スキル名</th>
+                <th>装飾品名</th>
 
-                <th>付与Lv</th>
+                <th>百竜スキル</th>
 
                 <th>必要スロット</th>
 
@@ -41,33 +41,28 @@
 
         <tbody>
 
-            <tr th:each="decoration : ${decorations}">
+            <tr th:each="rampageDecoration : ${rampageDecorations}">
 
-                <td th:text="${decoration.skillName}"></td>
+                <td th:text="${rampageDecoration.decorationName}"></td>
 
-                <td th:text="${decoration.skillLevel}"></td>
+                <td th:text="${rampageDecoration.rampageSkillName}"></td>
 
-                <td th:text="${decoration.requiredSlotSize}"></td>
+                <td th:text="${rampageDecoration.requiredSlotSize}"></td>
 
 
                 <td>
 
-                    <form th:action="@{/decoration-apply}"
+                    <form th:action="@{/rampage-decoration-apply}"
                           method="get">
 
 
-                        <!-- 今回選んだ装飾品 -->
+                        <!-- ===================== -->
+                        <!-- 今回選ぶ百竜装飾品 -->
+                        <!-- ===================== -->
 
                         <input type="hidden"
-                               name="decorationId"
-                               th:value="${decoration.decorationId}">
-
-
-                        <!-- どこのスロットに入れるか -->
-
-                        <input type="hidden"
-                               name="target"
-                               th:value="${target}">
+                               name="rampageDecorationId"
+                               th:value="${rampageDecoration.rampageDecorationId}">
 
 
                         <!-- ===================== -->
@@ -77,15 +72,6 @@
                         <input type="hidden"
                                name="weaponId"
                                th:value="${simulatorForm.weaponId}">
-
-
-                        <!-- ===================== -->
-                        <!-- 百竜装飾品 -->
-                        <!-- ===================== -->
-
-                        <input type="hidden"
-                               name="rampageDecorationId"
-                               th:value="${simulatorForm.rampageDecorationId}">
 
 
                         <!-- ===================== -->
@@ -114,7 +100,7 @@
 
 
                         <!-- ===================== -->
-                        <!-- 武器の装飾品 -->
+                        <!-- 武器装飾品 -->
                         <!-- ===================== -->
 
                         <input type="hidden"
@@ -131,7 +117,7 @@
 
 
                         <!-- ===================== -->
-                        <!-- 頭の装飾品 -->
+                        <!-- 頭装飾品 -->
                         <!-- ===================== -->
 
                         <input type="hidden"
@@ -148,7 +134,7 @@
 
 
                         <!-- ===================== -->
-                        <!-- 胴の装飾品 -->
+                        <!-- 胴装飾品 -->
                         <!-- ===================== -->
 
                         <input type="hidden"
@@ -165,7 +151,7 @@
 
 
                         <!-- ===================== -->
-                        <!-- 腕の装飾品 -->
+                        <!-- 腕装飾品 -->
                         <!-- ===================== -->
 
                         <input type="hidden"
@@ -182,7 +168,7 @@
 
 
                         <!-- ===================== -->
-                        <!-- 腰の装飾品 -->
+                        <!-- 腰装飾品 -->
                         <!-- ===================== -->
 
                         <input type="hidden"
@@ -199,7 +185,7 @@
 
 
                         <!-- ===================== -->
-                        <!-- 脚の装飾品 -->
+                        <!-- 脚装飾品 -->
                         <!-- ===================== -->
 
                         <input type="hidden"
@@ -254,7 +240,7 @@
 
 
                         <!-- ===================== -->
-                        <!-- 護石の装飾品 -->
+                        <!-- 護石装飾品 -->
                         <!-- ===================== -->
 
                         <input type="hidden"

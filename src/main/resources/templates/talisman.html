@@ -104,6 +104,7 @@
             </option>
 
             <option th:each="skill : ${skills}"
+                    th:if="${skill.talismanSkill1MaxLevel != null}"
                     th:value="${skill.skillId}"
                     th:text="${skill.skillName}">
             </option>
@@ -136,6 +137,7 @@
             </option>
 
             <option th:each="skill : ${skills}"
+                    th:if="${skill.talismanSkill2MaxLevel != null}"
                     th:value="${skill.skillId}"
                     th:text="${skill.skillName}">
             </option>

@@ -18,4 +18,8 @@ public class Skill {
     private Boolean stateSelectRequired;
 
     private Boolean stageSelectRequired;
+
+    private Integer talismanSkill1MaxLevel;
+
+    private Integer talismanSkill2MaxLevel;
 }

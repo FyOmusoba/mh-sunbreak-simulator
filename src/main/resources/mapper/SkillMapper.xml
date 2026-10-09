@@ -18,7 +18,9 @@
             description,
             condition_text,
             state_select_required,
-            stage_select_required
+            stage_select_required,
+            talisman_skill1_max_level,
+            talisman_skill2_max_level
         FROM skill
         ORDER BY skill_name
 
@@ -38,7 +40,9 @@
             description,
             condition_text,
             state_select_required,
-            stage_select_required
+            stage_select_required,
+            talisman_skill1_max_level,
+            talisman_skill2_max_level
         FROM skill
         WHERE skill_id = #{skillId}
 
