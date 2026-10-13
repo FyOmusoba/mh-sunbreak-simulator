@@ -8173,6 +8173,112 @@
 
 
 
+    <!-- ================================================== -->
+
+
+
+    <!-- 条件付きスキル状態選択 -->
+
+
+
+    <!-- ================================================== -->
+
+
+
+    <div th:if="${skillStateSelections != null and !skillStateSelections.isEmpty()}">
+
+
+
+        <h2>条件付きスキル設定</h2>
+
+
+
+        <div th:each="selection : ${skillStateSelections}">
+
+
+
+            <h3>
+
+
+
+                <span th:text="${selection.skillName}"></span>
+
+
+
+                Lv<span th:text="${selection.level}"></span>
+
+
+
+            </h3>
+
+
+
+            <p th:if="${selection.conditionText != null and !selection.conditionText.isBlank()}">
+
+
+
+                条件：
+
+
+
+                <span th:text="${selection.conditionText}"></span>
+
+
+
+            </p>
+
+
+
+            <div th:each="state : ${selection.states}">
+
+
+
+                <label>
+
+
+
+                    <input type="radio"
+
+                           th:name="${'skillState_' + selection.skillId}"
+
+                           th:value="${state.stateCode}"
+
+                           th:checked="${param['skillState_' + selection.skillId] != null
+                               ? param['skillState_' + selection.skillId][0] == state.stateCode
+                               : state.stateCode == 'INACTIVE'}"
+
+                           onchange="selectSkillState(this.name, this.value)">
+
+
+
+                    <span th:text="${state.stateName}"></span>
+
+
+
+                </label>
+
+
+
+                <br>
+
+
+
+            </div>
+
+
+
+            <br>
+
+
+
+        </div>
+
+
+
+    </div>
+
+
+
     <br>
 
 
@@ -8430,6 +8536,17 @@
 
         }
 
+
+        function selectSkillState(parameterName, stateCode) {
+
+            const url = new URL(window.location.href);
+
+            url.searchParams.set(parameterName, stateCode);
+
+            window.location.href = url.toString();
+
+        }
+
     </script>
 
 </body>
@@ -8437,4 +8554,3 @@
 
 
 </html>
-	
