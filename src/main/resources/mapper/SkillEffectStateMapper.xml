@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.mhsunbreaksimulator.mapper.SkillEffectStateMapper">
+
+    <!--
+        スキルID・Lv・武器種から
+        使用可能な状態別効果を取得
+    -->
+    <select id="findBySkillIdAndLevel"
+            resultType="com.example.mhsunbreaksimulator.entity.SkillEffectState">
+
+        SELECT
+            es.effect_state_id,
+            es.skill_level_id,
+            es.state_code,
+            es.state_name,
+            es.attack_add,
+            es.attack_mul,
+            es.element_add,
+            es.element_mul,
+            es.affinity_add,
+            es.crit_damage_mul,
+            es.defense_add,
+            es.defense_mul,
+            es.fire_res_add,
+            es.water_res_add,
+            es.thunder_res_add,
+            es.ice_res_add,
+            es.dragon_res_add,
+            es.shot_mul,
+            es.phial_mul,
+            es.fixed_damage_add,
+            es.status_add,
+            es.status_mul,
+            es.sharpness_add,
+            es.recovery_mul,
+            es.element_damage_mul,
+            es.element_crit_damage_mul,
+            es.weapon_type,
+            es.armor_skill_level_add,
+            es.physical_damage_mul,
+            es.activation_chance,
+            es.bounce_prevention_chance,
+            es.artillery_damage_mul,
+            es.all_element_res_set,
+            es.nullify_non_dragon_element,
+            es.activation_hp_threshold_pct,
+            es.nullify_status,
+            es.resistance_to_element_rate,
+            es.guarantee_status_accumulation,
+            es.effect_duration_seconds,
+            es.recovery_threshold,
+            es.required_sharpness_recovery_stages,
+            es.poison_duration_mul,
+            es.close_range_coating_mul_override,
+            es.unlock_bow_charge_stage,
+            es.bowgun_custom_attack_mul_override,
+            es.additional_damage_attack_mul,
+            es.additional_damage_ignore_hitzone,
+            es.damage_heal_ratio
+        FROM skill_effect_state es
+        INNER JOIN skill_level sl
+            ON sl.skill_level_id = es.skill_level_id
+        WHERE sl.skill_id = #{skillId}
+          AND sl.level = #{level}
+          AND (
+              es.weapon_type IS NULL
+              OR es.weapon_type = #{weaponType}
+          )
+        ORDER BY es.state_code
+
+    </select>
+
+
+    <!--
+        スキルID・Lv・状態コード・武器種から
+        状態別効果を1件取得
+    -->
+    <select id="findBySkillIdAndLevelAndStateCode"
+            resultType="com.example.mhsunbreaksimulator.entity.SkillEffectState">
+
+        SELECT
+            es.effect_state_id,
+            es.skill_level_id,
+            es.state_code,
+            es.state_name,
+            es.attack_add,
+            es.attack_mul,
+            es.element_add,
+            es.element_mul,
+            es.affinity_add,
+            es.crit_damage_mul,
+            es.defense_add,
+            es.defense_mul,
+            es.fire_res_add,
+            es.water_res_add,
+            es.thunder_res_add,
+            es.ice_res_add,
+            es.dragon_res_add,
+            es.shot_mul,
+            es.phial_mul,
+            es.fixed_damage_add,
+            es.status_add,
+            es.status_mul,
+            es.sharpness_add,
+            es.recovery_mul,
+            es.element_damage_mul,
+            es.element_crit_damage_mul,
+            es.weapon_type,
+            es.armor_skill_level_add,
+            es.physical_damage_mul,
+            es.activation_chance,
+            es.bounce_prevention_chance,
+            es.artillery_damage_mul,
+            es.all_element_res_set,
+            es.nullify_non_dragon_element,
+            es.activation_hp_threshold_pct,
+            es.nullify_status,
+            es.resistance_to_element_rate,
+            es.guarantee_status_accumulation,
+            es.effect_duration_seconds,
+            es.recovery_threshold,
+            es.required_sharpness_recovery_stages,
+            es.poison_duration_mul,
+            es.close_range_coating_mul_override,
+            es.unlock_bow_charge_stage,
+            es.bowgun_custom_attack_mul_override,
+            es.additional_damage_attack_mul,
+            es.additional_damage_ignore_hitzone,
+            es.damage_heal_ratio
+        FROM skill_effect_state es
+        INNER JOIN skill_level sl
+            ON sl.skill_level_id = es.skill_level_id
+        WHERE sl.skill_id = #{skillId}
+          AND sl.level = #{level}
+          AND es.state_code = #{stateCode}
+          AND (
+              es.weapon_type IS NULL
+              OR es.weapon_type = #{weaponType}
+          )
+        ORDER BY
+            CASE
+                WHEN es.weapon_type = #{weaponType} THEN 0
+                ELSE 1
+            END
+        LIMIT 1
+
+    </select>
+
+</mapper>
