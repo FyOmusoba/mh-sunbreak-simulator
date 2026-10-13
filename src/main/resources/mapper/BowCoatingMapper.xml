@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.mhsunbreaksimulator.mapper.BowCoatingMapper">
+
+    <select id="findByWeaponId"
+            resultType="com.example.mhsunbreaksimulator.entity.BowCoating">
+
+        SELECT
+            bow_coating_id,
+            weapon_id,
+            coating_type,
+            is_enhanced
+        FROM bow_coating
+        WHERE weapon_id = #{weaponId}
+        ORDER BY bow_coating_id
+
+    </select>
+
+    <select id="findById"
+            resultType="com.example.mhsunbreaksimulator.entity.BowCoating">
+
+        SELECT
+            bow_coating_id,
+            weapon_id,
+            coating_type,
+            is_enhanced
+        FROM bow_coating
+        WHERE bow_coating_id = #{bowCoatingId}
+
+    </select>
+
+</mapper>

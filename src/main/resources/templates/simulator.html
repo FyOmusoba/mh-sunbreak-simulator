@@ -66,6 +66,14 @@
 
 
 
+            bowChargeId=${simulatorForm.bowChargeId},
+
+
+
+            bowCoatingId=${simulatorForm.bowCoatingId},
+
+
+
 
 
 
@@ -354,6 +362,249 @@
 
 
 
+    <!-- 弓の溜め段階 -->
+
+
+
+    <!-- ================================================== -->
+
+
+
+    <div th:if="${weapon != null and weapon.weaponType == '弓'}">
+
+
+
+        <h3>弓の溜め段階</h3>
+
+
+
+        <p th:if="${bowCharges == null or #lists.isEmpty(bowCharges)}">
+
+            溜め段階データがありません。
+
+        </p>
+
+
+
+        <table border="1"
+               th:if="${bowCharges != null and not #lists.isEmpty(bowCharges)}">
+
+
+
+            <tr>
+
+                <th>選択</th>
+
+                <th>溜め段階</th>
+
+                <th>矢タイプ</th>
+
+                <th>矢Lv</th>
+
+                <th>使用条件</th>
+
+            </tr>
+
+
+
+            <tr th:each="charge : ${bowCharges}">
+
+                <td>
+
+                    <input type="radio"
+                           name="bowChargeChoice"
+                           th:value="${charge.bowChargeId}"
+                           th:checked="${selectedBowCharge != null
+                               and selectedBowCharge.bowChargeId == charge.bowChargeId}"
+                           onchange="selectBowCharge(this.value)">
+
+                </td>
+
+                <td>
+                    溜め<span th:text="${charge.chargeLevel}"></span>
+                </td>
+
+                <td th:text="${charge.shotType}"></td>
+
+                <td>
+                    Lv<span th:text="${charge.shotLevel}"></span>
+                </td>
+
+                <td>
+
+                    <span th:if="${charge.initiallyAvailable}">
+                        通常使用可能
+                    </span>
+
+                    <span th:if="${!charge.initiallyAvailable}">
+                        弓溜め段階解放が必要
+                    </span>
+
+                </td>
+
+            </tr>
+
+
+
+        </table>
+
+
+
+        <p th:if="${selectedBowCharge != null}">
+
+            選択中：
+            溜め<span th:text="${selectedBowCharge.chargeLevel}"></span>
+            /
+            <span th:text="${selectedBowCharge.shotType}"></span>
+            Lv<span th:text="${selectedBowCharge.shotLevel}"></span>
+
+        </p>
+
+
+
+    </div>
+
+
+
+    <br>
+
+
+
+    <!-- ================================================== -->
+
+
+
+    <!-- 弓のビン -->
+
+
+
+    <!-- ================================================== -->
+
+
+
+    <div th:if="${weapon != null and weapon.weaponType == '弓'}">
+
+
+
+        <h3>弓のビン</h3>
+
+
+
+        <p th:if="${bowCoatings == null or #lists.isEmpty(bowCoatings)}">
+
+            使用可能なビンデータがありません。
+
+        </p>
+
+
+
+        <table border="1"
+               th:if="${bowCoatings != null and not #lists.isEmpty(bowCoatings)}">
+
+
+
+            <tr>
+
+                <th>選択</th>
+
+                <th>ビン</th>
+
+                <th>強化</th>
+
+            </tr>
+
+
+
+            <tr>
+
+                <td>
+
+                    <input type="radio"
+                           name="bowCoatingChoice"
+                           value=""
+                           th:checked="${selectedBowCoating == null}"
+                           onchange="clearBowCoating()">
+
+                </td>
+
+                <td>ビンなし</td>
+
+                <td>-</td>
+
+            </tr>
+
+
+
+            <tr th:each="coating : ${bowCoatings}">
+
+                <td>
+
+                    <input type="radio"
+                           name="bowCoatingChoice"
+                           th:value="${coating.bowCoatingId}"
+                           th:checked="${selectedBowCoating != null
+                               and selectedBowCoating.bowCoatingId == coating.bowCoatingId}"
+                           onchange="selectBowCoating(this.value)">
+
+                </td>
+
+                <td th:text="${coating.coatingType}"></td>
+
+                <td>
+
+                    <span th:if="${coating.isEnhanced}">
+                        強化
+                    </span>
+
+                    <span th:if="${!coating.isEnhanced}">
+                        通常
+                    </span>
+
+                </td>
+
+            </tr>
+
+
+
+        </table>
+
+
+
+        <p th:if="${selectedBowCoating != null}">
+
+            選択中：
+            <span th:text="${selectedBowCoating.coatingType}"></span>
+
+            <span th:if="${selectedBowCoating.isEnhanced}">
+                （強化）
+            </span>
+
+        </p>
+
+
+
+        <p th:if="${selectedBowCoating == null
+                   and bowCoatings != null
+                   and not #lists.isEmpty(bowCoatings)}">
+
+            選択中：ビンなし
+
+        </p>
+
+
+
+    </div>
+
+
+
+    <br>
+
+
+
+    <!-- ================================================== -->
+
+
+
     <!-- 百竜装飾品 -->
 
 
@@ -483,6 +734,14 @@
 
 
                        rampageDecorationId=${simulatorForm.rampageDecorationId},
+
+
+
+                       bowChargeId=${simulatorForm.bowChargeId},
+
+
+
+                       bowCoatingId=${simulatorForm.bowCoatingId},
 
 
 
@@ -806,6 +1065,14 @@
 
 
 
+            bowChargeId=${simulatorForm.bowChargeId},
+
+
+
+            bowCoatingId=${simulatorForm.bowCoatingId},
+
+
+
                         headArmorId=${simulatorForm.headArmorId},
 
 
@@ -1066,6 +1333,14 @@
 
 
 
+            bowChargeId=${simulatorForm.bowChargeId},
+
+
+
+            bowCoatingId=${simulatorForm.bowCoatingId},
+
+
+
                         headArmorId=${simulatorForm.headArmorId},
 
 
@@ -1323,6 +1598,14 @@
 
 
             rampageDecorationId=${simulatorForm.rampageDecorationId},
+
+
+
+            bowChargeId=${simulatorForm.bowChargeId},
+
+
+
+            bowCoatingId=${simulatorForm.bowCoatingId},
 
 
 
@@ -1594,6 +1877,14 @@
 
 
 
+            bowChargeId=${simulatorForm.bowChargeId},
+
+
+
+            bowCoatingId=${simulatorForm.bowCoatingId},
+
+
+
                     headArmorId=${simulatorForm.headArmorId},
 
 
@@ -1799,6 +2090,14 @@
 
 
             rampageDecorationId=${simulatorForm.rampageDecorationId},
+
+
+
+            bowChargeId=${simulatorForm.bowChargeId},
+
+
+
+            bowCoatingId=${simulatorForm.bowCoatingId},
 
 
 
@@ -2010,6 +2309,14 @@
 
 
 
+            bowChargeId=${simulatorForm.bowChargeId},
+
+
+
+            bowCoatingId=${simulatorForm.bowCoatingId},
+
+
+
                     headArmorId=${simulatorForm.headArmorId},
 
 
@@ -2218,6 +2525,14 @@
 
 
 
+            bowChargeId=${simulatorForm.bowChargeId},
+
+
+
+            bowCoatingId=${simulatorForm.bowCoatingId},
+
+
+
                     headArmorId=${simulatorForm.headArmorId},
 
 
@@ -2423,6 +2738,14 @@
 
 
             rampageDecorationId=${simulatorForm.rampageDecorationId},
+
+
+
+            bowChargeId=${simulatorForm.bowChargeId},
+
+
+
+            bowCoatingId=${simulatorForm.bowCoatingId},
 
 
 
@@ -2718,6 +3041,14 @@
 
 
 
+            bowChargeId=${simulatorForm.bowChargeId},
+
+
+
+            bowCoatingId=${simulatorForm.bowCoatingId},
+
+
+
                         headArmorId=${simulatorForm.headArmorId},
 
 
@@ -2958,6 +3289,14 @@
 
 
 
+            bowChargeId=${simulatorForm.bowChargeId},
+
+
+
+            bowCoatingId=${simulatorForm.bowCoatingId},
+
+
+
                         headArmorId=${simulatorForm.headArmorId},
 
 
@@ -3195,6 +3534,14 @@
 
 
             rampageDecorationId=${simulatorForm.rampageDecorationId},
+
+
+
+            bowChargeId=${simulatorForm.bowChargeId},
+
+
+
+            bowCoatingId=${simulatorForm.bowCoatingId},
 
 
 
@@ -3502,6 +3849,14 @@
 
 
 
+            bowChargeId=${simulatorForm.bowChargeId},
+
+
+
+            bowCoatingId=${simulatorForm.bowCoatingId},
+
+
+
                         headArmorId=${simulatorForm.headArmorId},
 
 
@@ -3742,6 +4097,14 @@
 
 
 
+            bowChargeId=${simulatorForm.bowChargeId},
+
+
+
+            bowCoatingId=${simulatorForm.bowCoatingId},
+
+
+
                         headArmorId=${simulatorForm.headArmorId},
 
 
@@ -3979,6 +4342,14 @@
 
 
             rampageDecorationId=${simulatorForm.rampageDecorationId},
+
+
+
+            bowChargeId=${simulatorForm.bowChargeId},
+
+
+
+            bowCoatingId=${simulatorForm.bowCoatingId},
 
 
 
@@ -4286,6 +4657,14 @@
 
 
 
+            bowChargeId=${simulatorForm.bowChargeId},
+
+
+
+            bowCoatingId=${simulatorForm.bowCoatingId},
+
+
+
                         headArmorId=${simulatorForm.headArmorId},
 
 
@@ -4526,6 +4905,14 @@
 
 
 
+            bowChargeId=${simulatorForm.bowChargeId},
+
+
+
+            bowCoatingId=${simulatorForm.bowCoatingId},
+
+
+
                         headArmorId=${simulatorForm.headArmorId},
 
 
@@ -4763,6 +5150,14 @@
 
 
             rampageDecorationId=${simulatorForm.rampageDecorationId},
+
+
+
+            bowChargeId=${simulatorForm.bowChargeId},
+
+
+
+            bowCoatingId=${simulatorForm.bowCoatingId},
 
 
 
@@ -5070,6 +5465,14 @@
 
 
 
+            bowChargeId=${simulatorForm.bowChargeId},
+
+
+
+            bowCoatingId=${simulatorForm.bowCoatingId},
+
+
+
                         headArmorId=${simulatorForm.headArmorId},
 
 
@@ -5310,6 +5713,14 @@
 
 
 
+            bowChargeId=${simulatorForm.bowChargeId},
+
+
+
+            bowCoatingId=${simulatorForm.bowCoatingId},
+
+
+
                         headArmorId=${simulatorForm.headArmorId},
 
 
@@ -5547,6 +5958,14 @@
 
 
             rampageDecorationId=${simulatorForm.rampageDecorationId},
+
+
+
+            bowChargeId=${simulatorForm.bowChargeId},
+
+
+
+            bowCoatingId=${simulatorForm.bowCoatingId},
 
 
 
@@ -5894,6 +6313,14 @@
 
 
 
+            bowChargeId=${simulatorForm.bowChargeId},
+
+
+
+            bowCoatingId=${simulatorForm.bowCoatingId},
+
+
+
                         headArmorId=${simulatorForm.headArmorId},
 
 
@@ -6174,6 +6601,14 @@
 
 
 
+            bowChargeId=${simulatorForm.bowChargeId},
+
+
+
+            bowCoatingId=${simulatorForm.bowCoatingId},
+
+
+
                         headArmorId=${simulatorForm.headArmorId},
 
 
@@ -6451,6 +6886,14 @@
 
 
             rampageDecorationId=${simulatorForm.rampageDecorationId},
+
+
+
+            bowChargeId=${simulatorForm.bowChargeId},
+
+
+
+            bowCoatingId=${simulatorForm.bowCoatingId},
 
 
 
@@ -6930,6 +7373,14 @@
 
 
 
+            bowChargeId=${simulatorForm.bowChargeId},
+
+
+
+            bowCoatingId=${simulatorForm.bowCoatingId},
+
+
+
                        headArmorId=${simulatorForm.headArmorId},
 
 
@@ -7186,6 +7637,14 @@
 
 
 
+            bowChargeId=${simulatorForm.bowChargeId},
+
+
+
+            bowCoatingId=${simulatorForm.bowCoatingId},
+
+
+
                        headArmorId=${simulatorForm.headArmorId},
 
 
@@ -7439,6 +7898,14 @@
 
 
             rampageDecorationId=${simulatorForm.rampageDecorationId},
+
+
+
+            bowChargeId=${simulatorForm.bowChargeId},
+
+
+
+            bowCoatingId=${simulatorForm.bowCoatingId},
 
 
 
@@ -7722,6 +8189,14 @@
 
 
 
+            bowChargeId=${simulatorForm.bowChargeId},
+
+
+
+            bowCoatingId=${simulatorForm.bowCoatingId},
+
+
+
 
 
 
@@ -7922,6 +8397,39 @@
 
         }
 
+
+        function selectBowCharge(bowChargeId) {
+
+            const url = new URL(window.location.href);
+
+            url.searchParams.set("bowChargeId", bowChargeId);
+
+            window.location.href = url.toString();
+
+        }
+
+
+        function selectBowCoating(bowCoatingId) {
+
+            const url = new URL(window.location.href);
+
+            url.searchParams.set("bowCoatingId", bowCoatingId);
+
+            window.location.href = url.toString();
+
+        }
+
+
+        function clearBowCoating() {
+
+            const url = new URL(window.location.href);
+
+            url.searchParams.delete("bowCoatingId");
+
+            window.location.href = url.toString();
+
+        }
+
     </script>
 
 </body>
@@ -7929,3 +8437,4 @@
 
 
 </html>
+	

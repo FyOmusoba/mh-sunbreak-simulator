@@ -13,12 +13,16 @@ import org.springframework.web.util.UriComponentsBuilder;
 import com.example.mhsunbreaksimulator.dto.SkillTotal;
 import com.example.mhsunbreaksimulator.dto.TalismanSkill;
 import com.example.mhsunbreaksimulator.entity.Armor;
+import com.example.mhsunbreaksimulator.entity.BowCharge;
+import com.example.mhsunbreaksimulator.entity.BowCoating;
 import com.example.mhsunbreaksimulator.entity.Decoration;
 import com.example.mhsunbreaksimulator.entity.RampageDecoration;
 import com.example.mhsunbreaksimulator.entity.Skill;
 import com.example.mhsunbreaksimulator.entity.Weapon;
 import com.example.mhsunbreaksimulator.form.SimulatorForm;
 import com.example.mhsunbreaksimulator.service.ArmorService;
+import com.example.mhsunbreaksimulator.service.BowChargeService;
+import com.example.mhsunbreaksimulator.service.BowCoatingService;
 import com.example.mhsunbreaksimulator.service.DecorationService;
 import com.example.mhsunbreaksimulator.service.RampageDecorationService;
 import com.example.mhsunbreaksimulator.service.SkillAggregationService;
@@ -32,6 +36,8 @@ import lombok.RequiredArgsConstructor;
 public class SimulatorController {
 
     private final WeaponService weaponService;
+    private final BowChargeService bowChargeService;
+    private final BowCoatingService bowCoatingService;
     private final ArmorService armorService;
     private final DecorationService decorationService;
     private final RampageDecorationService rampageDecorationService;
@@ -59,6 +65,120 @@ public class SimulatorController {
         model.addAttribute(
                 "weapon",
                 weapon
+        );
+
+
+        /* ========================================== */
+        /* 弓の溜め段階 */
+        /* ========================================== */
+
+        List<BowCharge> bowCharges
+                = new ArrayList<>();
+
+        BowCharge selectedBowCharge = null;
+
+        if (weapon != null
+                && "弓".equals(weapon.getWeaponType())) {
+
+            bowCharges
+                    = bowChargeService.findByWeaponId(
+                            weapon.getWeaponId()
+                    );
+
+            if (simulatorForm.getBowChargeId() != null) {
+
+                BowCharge candidateBowCharge
+                        = bowChargeService.findById(
+                                simulatorForm.getBowChargeId()
+                        );
+
+                if (candidateBowCharge != null
+                        && weapon.getWeaponId().equals(
+                                candidateBowCharge.getWeaponId()
+                        )) {
+
+                    selectedBowCharge = candidateBowCharge;
+
+                } else {
+
+                    simulatorForm.setBowChargeId(
+                            null
+                    );
+                }
+            }
+
+        } else {
+
+            simulatorForm.setBowChargeId(
+                    null
+            );
+        }
+
+        model.addAttribute(
+                "bowCharges",
+                bowCharges
+        );
+
+        model.addAttribute(
+                "selectedBowCharge",
+                selectedBowCharge
+        );
+
+
+        /* ========================================== */
+        /* 弓のビン */
+        /* ========================================== */
+
+        List<BowCoating> bowCoatings
+                = new ArrayList<>();
+
+        BowCoating selectedBowCoating = null;
+
+        if (weapon != null
+                && "弓".equals(weapon.getWeaponType())) {
+
+            bowCoatings
+                    = bowCoatingService.findByWeaponId(
+                            weapon.getWeaponId()
+                    );
+
+            if (simulatorForm.getBowCoatingId() != null) {
+
+                BowCoating candidateBowCoating
+                        = bowCoatingService.findById(
+                                simulatorForm.getBowCoatingId()
+                        );
+
+                if (candidateBowCoating != null
+                        && weapon.getWeaponId().equals(
+                                candidateBowCoating.getWeaponId()
+                        )) {
+
+                    selectedBowCoating = candidateBowCoating;
+
+                } else {
+
+                    simulatorForm.setBowCoatingId(
+                            null
+                    );
+                }
+            }
+
+        } else {
+
+            simulatorForm.setBowCoatingId(
+                    null
+            );
+        }
+
+        model.addAttribute(
+                "bowCoatings",
+                bowCoatings
+        );
+
+        model.addAttribute(
+                "selectedBowCoating",
+                selectedBowCoating
         );
 
 
@@ -934,6 +1054,40 @@ public class SimulatorController {
 
 
         /* ========================================== */
+        /* 弓溜め段階解放の適用 */
+        /* ========================================== */
+
+        boolean bowChargeLevelUnlocked
+                = hasSkill(
+                        skillTotals,
+                        "弓溜め段階解放"
+                );
+
+        if (selectedBowCharge != null
+                && Boolean.FALSE.equals(
+                        selectedBowCharge.getInitiallyAvailable()
+                )
+                && !bowChargeLevelUnlocked) {
+
+            simulatorForm.setBowChargeId(
+                    null
+            );
+
+            selectedBowCharge = null;
+        }
+
+        model.addAttribute(
+                "bowChargeLevelUnlocked",
+                bowChargeLevelUnlocked
+        );
+
+        model.addAttribute(
+                "selectedBowCharge",
+                selectedBowCharge
+        );
+
+
+        /* ========================================== */
         /* 護石編集URL */
         /* ========================================== */
 
@@ -953,6 +1107,33 @@ public class SimulatorController {
         );
 
         return "simulator";
+    }
+
+
+    private boolean hasSkill(
+            List<SkillTotal> skillTotals,
+            String skillName) {
+
+        if (skillTotals == null
+                || skillName == null) {
+
+            return false;
+        }
+
+        for (SkillTotal skillTotal : skillTotals) {
+
+            if (skillTotal != null
+                    && skillName.equals(
+                            skillTotal.getSkillName()
+                    )
+                    && skillTotal.getLevel() != null
+                    && skillTotal.getLevel() > 0) {
+
+                return true;
+            }
+        }
+
+        return false;
     }
 
 
@@ -1158,6 +1339,18 @@ public class SimulatorController {
                 builder,
                 "rampageDecorationId",
                 form.getRampageDecorationId()
+        );
+
+        addQueryParam(
+                builder,
+                "bowChargeId",
+                form.getBowChargeId()
+        );
+
+        addQueryParam(
+                builder,
+                "bowCoatingId",
+                form.getBowCoatingId()
         );
 
         addQueryParam(
@@ -1387,3 +1580,4 @@ public class SimulatorController {
         }
     }
 }
+

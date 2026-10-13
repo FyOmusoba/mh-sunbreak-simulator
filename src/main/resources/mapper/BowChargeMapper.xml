@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.mhsunbreaksimulator.mapper.BowChargeMapper">
+
+    <!--
+        指定した武器の溜め段階を取得
+    -->
+    <select id="findByWeaponId"
+            resultType="com.example.mhsunbreaksimulator.entity.BowCharge">
+
+        SELECT
+            bow_charge_id,
+            weapon_id,
+            charge_level,
+            shot_type,
+            shot_level,
+            initially_available
+        FROM bow_charge
+        WHERE weapon_id = #{weaponId}
+        ORDER BY charge_level
+
+    </select>
+
+
+    <!--
+        IDから1件取得
+    -->
+    <select id="findById"
+            resultType="com.example.mhsunbreaksimulator.entity.BowCharge">
+
+        SELECT
+            bow_charge_id,
+            weapon_id,
+            charge_level,
+            shot_type,
+            shot_level,
+            initially_available
+        FROM bow_charge
+        WHERE bow_charge_id = #{bowChargeId}
+
+    </select>
+
+</mapper>

@@ -10,6 +10,12 @@ public class SimulatorForm {
     // 百竜装飾品
     private Integer rampageDecorationId;
 
+    // 弓の選択中溜め段階
+    private Integer bowChargeId;
+
+    // 弓の選択中ビン
+    private Integer bowCoatingId;
+
     // 武器装飾品
     private Integer weaponDecoration1Id;
     private Integer weaponDecoration2Id;
