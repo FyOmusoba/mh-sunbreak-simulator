@@ -407,6 +407,24 @@ public class DecorationController {
                 simulatorForm.getWeaponId()
         );
 
+        /* 百竜装飾品 */
+        redirectAttributes.addAttribute(
+                "rampageDecorationId",
+                simulatorForm.getRampageDecorationId()
+        );
+
+        /* 弓：溜め段階 */
+        redirectAttributes.addAttribute(
+                "bowChargeId",
+                simulatorForm.getBowChargeId()
+        );
+
+        /* 弓：ビン */
+        redirectAttributes.addAttribute(
+                "bowCoatingId",
+                simulatorForm.getBowCoatingId()
+        );
+
         /* 防具 */
         redirectAttributes.addAttribute(
                 "headArmorId",

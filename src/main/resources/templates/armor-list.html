@@ -17,6 +17,13 @@
         <!-- 武器 -->
         <input type="hidden" th:field="*{weaponId}">
 
+        <!-- 百竜装飾品 -->
+        <input type="hidden" th:field="*{rampageDecorationId}">
+
+        <!-- 弓設定 -->
+        <input type="hidden" th:field="*{bowChargeId}">
+        <input type="hidden" th:field="*{bowCoatingId}">
+
         <!-- 防具 -->
         <input type="hidden" th:field="*{headArmorId}">
         <input type="hidden" th:field="*{chestArmorId}">
@@ -175,6 +182,9 @@
                         armorId=${armor.armorId},
 
                         weaponId=${simulatorForm.weaponId},
+                        rampageDecorationId=${simulatorForm.rampageDecorationId},
+                        bowChargeId=${simulatorForm.bowChargeId},
+                        bowCoatingId=${simulatorForm.bowCoatingId},
 
                         headArmorId=${simulatorForm.headArmorId},
                         chestArmorId=${simulatorForm.chestArmorId},

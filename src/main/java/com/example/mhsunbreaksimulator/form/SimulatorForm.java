@@ -16,6 +16,9 @@ public class SimulatorForm {
     // 弓の選択中ビン
     private Integer bowCoatingId;
 
+    // ボウガンの選択中弾
+    private Integer bowgunAmmoId;
+
     // 武器装飾品
     private Integer weaponDecoration1Id;
     private Integer weaponDecoration2Id;

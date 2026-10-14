@@ -188,6 +188,18 @@ public class RampageDecorationController {
                 simulatorForm.getRampageDecorationId()
         );
 
+        /* 弓：溜め段階 */
+        redirectAttributes.addAttribute(
+                "bowChargeId",
+                simulatorForm.getBowChargeId()
+        );
+
+        /* 弓：ビン */
+        redirectAttributes.addAttribute(
+                "bowCoatingId",
+                simulatorForm.getBowCoatingId()
+        );
+
 
         /* ====================================== */
         /* 防具 */

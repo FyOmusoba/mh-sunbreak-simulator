@@ -362,6 +362,153 @@
 
 
 
+    <!-- ボウガンの弾 -->
+
+
+
+    <!-- ================================================== -->
+
+
+
+    <div th:if="${weapon != null
+                 and (weapon.weaponType == 'ライトボウガン'
+                      or weapon.weaponType == 'ヘビィボウガン')}">
+
+
+
+        <h3>ボウガンの弾</h3>
+
+
+
+        <p th:if="${bowgunAmmos == null or #lists.isEmpty(bowgunAmmos)}">
+
+            使用可能な弾データがありません。
+
+        </p>
+
+
+
+        <table border="1"
+               th:if="${bowgunAmmos != null and not #lists.isEmpty(bowgunAmmos)}">
+
+
+
+            <tr>
+
+                <th>選択</th>
+
+                <th>弾</th>
+
+                <th>Lv</th>
+
+                <th>装填数</th>
+
+                <th>速射</th>
+
+                <th>移動射撃</th>
+
+                <th>移動リロード</th>
+
+                <th>単発自動装填</th>
+
+            </tr>
+
+
+
+            <tr th:each="ammo : ${bowgunAmmos}">
+
+                <td>
+
+                    <input type="radio"
+                           name="bowgunAmmoChoice"
+                           th:value="${ammo.bowgunAmmoId}"
+                           th:checked="${selectedBowgunAmmo != null
+                               and selectedBowgunAmmo.bowgunAmmoId == ammo.bowgunAmmoId}"
+                           onchange="selectBowgunAmmo(this.value)">
+
+                </td>
+
+                <td th:text="${ammo.ammoType}"></td>
+
+                <td th:text="${ammo.ammoLevel}"></td>
+
+                <td th:text="${ammo.capacity}"></td>
+
+                <td th:text="${ammo.rapidFire ? '○' : '-'}"></td>
+
+                <td th:text="${ammo.movingShot ? '○' : '-'}"></td>
+
+                <td th:text="${ammo.movingReload ? '○' : '-'}"></td>
+
+                <td th:text="${ammo.singleAuto ? '○' : '-'}"></td>
+
+            </tr>
+
+
+
+        </table>
+
+
+
+        <p th:if="${selectedBowgunAmmo != null}">
+
+            選択中：
+            <strong th:text="${selectedBowgunAmmo.ammoType}"></strong>
+            Lv<span th:text="${selectedBowgunAmmo.ammoLevel}"></span>
+
+            /
+            装填数
+            <span th:text="${selectedBowgunAmmo.capacity}"></span>
+
+            <span th:if="${selectedBowgunAmmo.rapidFire}">
+                / 速射対応
+            </span>
+
+        </p>
+
+
+
+        <div th:if="${selectedBowgunAmmo != null
+                     and bowgunAmmoModifier != null}">
+
+            <h4>選択中の弾・計算用データ</h4>
+
+            <p>
+                1hit物理モーション値：
+                <strong th:text="${bowgunAmmoModifier.physicalMotionValuePerHit}"></strong>
+            </p>
+
+            <p>
+                1hit属性モーション値：
+                <strong th:text="${bowgunAmmoModifier.elementMotionValuePerHit}"></strong>
+            </p>
+
+            <p>
+                1hit固定ダメージ値：
+                <strong th:text="${bowgunAmmoModifier.fixedDamageValuePerHit}"></strong>
+            </p>
+
+            <p>
+                最大ヒット数：
+                <strong th:text="${bowgunAmmoModifier.maxHitCount}"></strong>
+            </p>
+
+        </div>
+
+
+
+    </div>
+
+
+
+    <br>
+
+
+
+    <!-- ================================================== -->
+
+
+
     <!-- 弓の溜め段階 -->
 
 
@@ -459,6 +606,34 @@
             Lv<span th:text="${selectedBowCharge.shotLevel}"></span>
 
         </p>
+
+        <div th:if="${selectedBowCharge != null and bowChargeModifier != null}">
+
+            <p>
+                溜め物理倍率：
+                <strong th:text="${bowChargeModifier.physicalMul}"></strong>
+            </p>
+
+            <p>
+                溜め属性倍率：
+                <strong th:text="${bowChargeModifier.elementMul}"></strong>
+            </p>
+
+        </div>
+
+        <div th:if="${selectedBowCharge != null and bowShotModifier != null}">
+
+            <p>
+                矢モーション値（1hit）：
+                <strong th:text="${bowShotModifier.motionValuePerHit}"></strong>
+            </p>
+
+            <p>
+                最大ヒット数：
+                <strong th:text="${bowShotModifier.maxHitCount}"></strong>
+            </p>
+
+        </div>
 
 
 
@@ -581,6 +756,20 @@
 
         </p>
 
+        <div th:if="${selectedBowCoating != null and bowCoatingModifier != null}">
+
+            <p>
+                ビン物理倍率：
+                <strong th:text="${bowCoatingModifier.physicalMul}"></strong>
+            </p>
+
+            <p>
+                ビン状態異常倍率：
+                <strong th:text="${bowCoatingModifier.statusMul}"></strong>
+            </p>
+
+        </div>
+
 
 
         <p th:if="${selectedBowCoating == null
@@ -592,6 +781,82 @@
         </p>
 
 
+
+    </div>
+
+
+
+    <div th:if="${weapon != null
+                 and weapon.weaponType == '弓'
+                 and selectedBowCharge != null
+                 and bowPhysicalModifier != null}">
+
+        <h3>弓の最終物理係数</h3>
+
+        <p>
+            1hitあたり物理係数：
+            <strong th:text="${bowPhysicalModifier.physicalRatePerHit}"></strong>
+        </p>
+
+        <p>
+            最大ヒット時物理係数：
+            <strong th:text="${bowPhysicalModifier.maxPhysicalRate}"></strong>
+        </p>
+
+        <p>
+            最大ヒット数：
+            <strong th:text="${bowPhysicalModifier.maxHitCount}"></strong>
+        </p>
+
+    </div>
+
+
+    <div th:if="${weapon != null
+                 and weapon.weaponType == '弓'
+                 and selectedBowCharge != null
+                 and bowPhysicalDamageResult != null}">
+
+        <h3>弓の物理ダメージ計算途中値</h3>
+
+        <p>
+            条件付き補正後攻撃力：
+            <strong th:text="${bowPhysicalDamageResult.effectiveAttack}"></strong>
+        </p>
+
+        <p>
+            肉質補正前・1hit物理値：
+            <strong th:text="${bowPhysicalDamageResult.physicalDamagePerHit}"></strong>
+        </p>
+
+        <p>
+            肉質補正前・最大ヒット物理値：
+            <strong th:text="${bowPhysicalDamageResult.maxPhysicalDamage}"></strong>
+        </p>
+
+    </div>
+
+
+    <div th:if="${weapon != null
+                 and weapon.weaponType == '弓'
+                 and selectedBowCharge != null
+                 and bowElementDamageResult != null}">
+
+        <h3>弓の属性ダメージ計算途中値</h3>
+
+        <p>
+            条件付き補正後属性値：
+            <strong th:text="${bowElementDamageResult.effectiveElement}"></strong>
+        </p>
+
+        <p>
+            肉質補正前・1hit属性値：
+            <strong th:text="${bowElementDamageResult.elementDamagePerHit}"></strong>
+        </p>
+
+        <p>
+            肉質補正前・最大ヒット属性値：
+            <strong th:text="${bowElementDamageResult.maxElementDamage}"></strong>
+        </p>
 
     </div>
 
@@ -8267,6 +8532,48 @@
 
 
 
+            <div th:if="${selectedSkillEffects != null
+                         and selectedSkillEffects[selection.skillId] != null}"
+                 th:with="selectedEffect=${selectedSkillEffects[selection.skillId]}">
+
+
+
+                <p>
+
+                    Java側で選択中：
+
+                    <strong th:text="${selectedEffect.stateName}"></strong>
+
+                    （<span th:text="${selectedEffect.stateCode}"></span>）
+
+                </p>
+
+
+
+                <p>
+
+                    攻撃力加算：
+
+                    <span th:text="${selectedEffect.attackAdd != null
+                        ? selectedEffect.attackAdd
+                        : 0}"></span>
+
+                    /
+
+                    属性値加算：
+
+                    <span th:text="${selectedEffect.elementAdd != null
+                        ? selectedEffect.elementAdd
+                        : 0}"></span>
+
+                </p>
+
+
+
+            </div>
+
+
+
             <br>
 
 
@@ -8274,6 +8581,59 @@
         </div>
 
 
+
+    </div>
+
+
+
+    <div th:if="${conditionalSkillModifierTotal != null}">
+
+        <h3>条件付きスキル補正合計</h3>
+
+        <p>
+            攻撃力加算合計：
+            <strong th:text="${conditionalSkillModifierTotal.attackAdd}"></strong>
+        </p>
+
+        <p>
+            攻撃力倍率合計：
+            <strong th:text="${conditionalSkillModifierTotal.attackMul}"></strong>
+        </p>
+
+        <p>
+            属性値加算合計：
+            <strong th:text="${conditionalSkillModifierTotal.elementAdd}"></strong>
+        </p>
+
+        <p>
+            属性値倍率合計：
+            <strong th:text="${conditionalSkillModifierTotal.elementMul}"></strong>
+        </p>
+
+        <p>
+            会心率加算合計：
+            <strong th:text="${conditionalSkillModifierTotal.affinityAdd}"></strong>
+        </p>
+
+        <p>
+            会心ダメージ倍率合計：
+            <strong th:text="${conditionalSkillModifierTotal.critDamageMul}"></strong>
+        </p>
+
+        <p>
+            物理ダメージ倍率合計：
+            <strong th:text="${conditionalSkillModifierTotal.physicalDamageMul}"></strong>
+        </p>
+
+        <p>
+            属性ダメージ倍率合計：
+            <strong th:text="${conditionalSkillModifierTotal.elementDamageMul}"></strong>
+        </p>
+
+        <p>
+            属性会心ダメージ倍率合計：
+            <strong th:text="${conditionalSkillModifierTotal.elementCritDamageMul}"></strong>
+        </p>
 
     </div>
 
@@ -8498,6 +8858,17 @@
             const url = new URL(window.location.href);
 
             url.searchParams.delete(parameterName);
+
+            window.location.href = url.toString();
+
+        }
+
+
+        function selectBowgunAmmo(bowgunAmmoId) {
+
+            const url = new URL(window.location.href);
+
+            url.searchParams.set("bowgunAmmoId", bowgunAmmoId);
 
             window.location.href = url.toString();
 

@@ -22,6 +22,14 @@
 
 
         <!-- ============================== -->
+        <!-- 弓設定 -->
+        <!-- ============================== -->
+
+        <input type="hidden" th:field="*{bowChargeId}">
+        <input type="hidden" th:field="*{bowCoatingId}">
+
+
+        <!-- ============================== -->
         <!-- 防具 -->
         <!-- ============================== -->
 
@@ -243,6 +251,9 @@
 
                     <a th:href="@{/weapon/{weaponId}(
                         weaponId=${weapon.weaponId},
+
+                        bowChargeId=${simulatorForm.bowChargeId},
+                        bowCoatingId=${simulatorForm.bowCoatingId},
 
                         headArmorId=${simulatorForm.headArmorId},
                         chestArmorId=${simulatorForm.chestArmorId},
