@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.mhsunbreaksimulator.mapper.MonsterHitzoneMapper">
+
+    <!--
+        モンスターIDから
+        全部位の肉質を取得する
+    -->
+    <select id="findByMonsterId"
+            resultType="com.example.mhsunbreaksimulator.entity.MonsterHitzone">
+
+        SELECT
+            hitzone_id,
+            monster_id,
+            part_name,
+            sever,
+            blunt,
+            shot,
+            fire,
+            water,
+            thunder,
+            ice,
+            dragon
+        FROM monster_hitzone
+        WHERE monster_id = #{monsterId}
+        ORDER BY hitzone_id
+
+    </select>
+
+
+    <!--
+        肉質IDから
+        1部位を取得する
+    -->
+    <select id="findById"
+            resultType="com.example.mhsunbreaksimulator.entity.MonsterHitzone">
+
+        SELECT
+            hitzone_id,
+            monster_id,
+            part_name,
+            sever,
+            blunt,
+            shot,
+            fire,
+            water,
+            thunder,
+            ice,
+            dragon
+        FROM monster_hitzone
+        WHERE hitzone_id = #{hitzoneId}
+
+    </select>
+
+</mapper>

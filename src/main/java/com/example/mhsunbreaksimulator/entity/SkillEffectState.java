@@ -51,6 +51,19 @@ public class SkillEffectState {
 
     private BigDecimal statusMul;
 
+    /*
+     * 状態異常補正の対象。
+     *
+     * POISON
+     * PARALYSIS
+     * SLEEP
+     * BLAST
+     * ALL
+     *
+     * 状態異常補正と無関係な効果はnull。
+     */
+    private String statusTarget;
+
     private Integer sharpnessAdd;
 
     private BigDecimal recoveryMul;

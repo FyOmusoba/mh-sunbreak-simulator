@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.mhsunbreaksimulator.mapper.MonsterMapper">
+
+    <!--
+        全モンスター取得
+    -->
+    <select id="findAll"
+            resultType="com.example.mhsunbreaksimulator.entity.Monster">
+
+        SELECT
+            monster_id,
+            monster_name
+        FROM monster
+        ORDER BY monster_name
+
+    </select>
+
+
+    <!--
+        モンスターIDから1件取得
+    -->
+    <select id="findById"
+            resultType="com.example.mhsunbreaksimulator.entity.Monster">
+
+        SELECT
+            monster_id,
+            monster_name
+        FROM monster
+        WHERE monster_id = #{monsterId}
+
+    </select>
+
+</mapper>

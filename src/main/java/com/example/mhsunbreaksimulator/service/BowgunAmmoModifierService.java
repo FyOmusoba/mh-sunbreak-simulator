@@ -113,6 +113,53 @@ public class BowgunAmmoModifierService {
             break;
 
 
+        case "貫通滅龍弾":
+
+            applyPiercingDragonAmmo(
+                    result
+            );
+
+            break;
+
+
+        case "斬裂弾":
+
+            applySlicingAmmo(
+                    result
+            );
+
+            break;
+
+
+        case "徹甲榴弾":
+
+            applyStickyAmmo(
+                    result,
+                    ammoLevel
+            );
+
+            break;
+
+
+        case "拡散弾":
+
+            applyClusterAmmo(
+                    result,
+                    ammoLevel
+            );
+
+            break;
+
+
+        case "竜撃弾":
+
+            applyWyvernAmmo(
+                    result
+            );
+
+            break;
+
+
         default:
 
             break;
@@ -380,10 +427,8 @@ public class BowgunAmmoModifierService {
      * 貫通電撃弾
      * 貫通氷結弾
      *
-     * 1hitあたり
      * 物理MV：10
      * 属性MV：22
-     *
      * 最大7hit
      */
     private void applyPiercingElementAmmo(
@@ -423,6 +468,311 @@ public class BowgunAmmoModifierService {
 
         result.setMaxHitCount(
                 1
+        );
+    }
+
+
+    /*
+     * 貫通滅龍弾
+     *
+     * 1hitあたり
+     *
+     * 物理MV：20
+     * 龍属性MV：44
+     *
+     * 最大7hit
+     */
+    private void applyPiercingDragonAmmo(
+            BowgunAmmoModifier result) {
+
+        result.setPhysicalMotionValuePerHit(
+                new BigDecimal("20")
+        );
+
+        result.setElementMotionValuePerHit(
+                new BigDecimal("44")
+        );
+
+        result.setMaxHitCount(
+                7
+        );
+    }
+
+
+    /*
+     * 斬裂弾
+     *
+     * 着弾：
+     * 物理MV 1
+     *
+     * 炸裂：
+     * 切断属性
+     * 物理MV 14 × 3hit
+     */
+    private void applySlicingAmmo(
+            BowgunAmmoModifier result) {
+
+        result.setImpactPhysicalMotionValue(
+                new BigDecimal("1")
+        );
+
+        result.setSecondaryPhysicalMotionValuePerHit(
+                new BigDecimal("14")
+        );
+
+        result.setSecondaryHitCount(
+                3
+        );
+
+        result.setSecondaryUsesSeveringHitzone(
+                true
+        );
+
+        result.setSecondaryIgnoresPhysicalHitzone(
+                false
+        );
+    }
+
+
+    /*
+     * 徹甲榴弾
+     */
+    private void applyStickyAmmo(
+            BowgunAmmoModifier result,
+            Integer ammoLevel) {
+
+        result.setImpactPhysicalMotionValue(
+                new BigDecimal("1")
+        );
+
+        result.setSecondaryHitCount(
+                1
+        );
+
+        result.setSecondaryIgnoresPhysicalHitzone(
+                true
+        );
+
+        result.setSecondaryUsesSeveringHitzone(
+                false
+        );
+
+
+        switch (ammoLevel) {
+
+        case 1:
+
+            result.setSecondaryFixedDamageMotionValuePerHit(
+                    new BigDecimal("12")
+            );
+
+            result.setSecondaryFixedElementValuePerHit(
+                    new BigDecimal("3")
+            );
+
+            break;
+
+
+        case 2:
+
+            result.setSecondaryFixedDamageMotionValuePerHit(
+                    new BigDecimal("15")
+            );
+
+            result.setSecondaryFixedElementValuePerHit(
+                    new BigDecimal("5")
+            );
+
+            break;
+
+
+        case 3:
+
+            result.setSecondaryFixedDamageMotionValuePerHit(
+                    new BigDecimal("19")
+            );
+
+            result.setSecondaryFixedElementValuePerHit(
+                    new BigDecimal("5")
+            );
+
+            break;
+
+
+        default:
+
+            result.setImpactPhysicalMotionValue(
+                    BigDecimal.ZERO
+            );
+
+            result.setSecondaryHitCount(
+                    0
+            );
+
+            result.setSecondaryIgnoresPhysicalHitzone(
+                    false
+            );
+
+            break;
+        }
+    }
+
+
+    /*
+     * 拡散弾
+     */
+    private void applyClusterAmmo(
+            BowgunAmmoModifier result,
+            Integer ammoLevel) {
+
+        result.setImpactPhysicalMotionValue(
+                new BigDecimal("1")
+        );
+
+        result.setSecondaryIgnoresPhysicalHitzone(
+                true
+        );
+
+        result.setSecondaryUsesSeveringHitzone(
+                false
+        );
+
+
+        switch (ammoLevel) {
+
+        case 1:
+
+            result.setSecondaryFixedDamageMotionValuePerHit(
+                    new BigDecimal("10")
+            );
+
+            result.setSecondaryFixedElementValuePerHit(
+                    new BigDecimal("5")
+            );
+
+            result.setSecondaryHitCount(
+                    3
+            );
+
+            break;
+
+
+        case 2:
+
+            result.setSecondaryFixedDamageMotionValuePerHit(
+                    new BigDecimal("15")
+            );
+
+            result.setSecondaryFixedElementValuePerHit(
+                    new BigDecimal("8")
+            );
+
+            result.setSecondaryHitCount(
+                    4
+            );
+
+            break;
+
+
+        case 3:
+
+            result.setSecondaryFixedDamageMotionValuePerHit(
+                    new BigDecimal("20")
+            );
+
+            result.setSecondaryFixedElementValuePerHit(
+                    new BigDecimal("10")
+            );
+
+            result.setSecondaryHitCount(
+                    5
+            );
+
+            break;
+
+
+        default:
+
+            result.setImpactPhysicalMotionValue(
+                    BigDecimal.ZERO
+            );
+
+            result.setSecondaryFixedDamageMotionValuePerHit(
+                    BigDecimal.ZERO
+            );
+
+            result.setSecondaryFixedElementValuePerHit(
+                    BigDecimal.ZERO
+            );
+
+            result.setSecondaryHitCount(
+                    0
+            );
+
+            result.setSecondaryIgnoresPhysicalHitzone(
+                    false
+            );
+
+            break;
+        }
+    }
+
+
+    /*
+     * 竜撃弾
+     *
+     * 1段目：
+     * 固定0.80 × 攻撃力
+     * ＋ 火40
+     *
+     * 2段目：
+     * 固定0.19 × 攻撃力
+     * ＋ 火20
+     */
+    private void applyWyvernAmmo(
+            BowgunAmmoModifier result) {
+
+        /*
+         * 1段目
+         */
+        result.setSecondaryFixedDamageMotionValuePerHit(
+                new BigDecimal("80")
+        );
+
+        result.setSecondaryFixedElementValuePerHit(
+                new BigDecimal("40")
+        );
+
+        result.setSecondaryHitCount(
+                1
+        );
+
+        result.setSecondaryIgnoresPhysicalHitzone(
+                true
+        );
+
+        result.setSecondaryUsesSeveringHitzone(
+                false
+        );
+
+
+        /*
+         * 2段目
+         */
+        result.setAdditionalFixedDamageMotionValuePerHit(
+                new BigDecimal("19")
+        );
+
+        result.setAdditionalFixedElementValuePerHit(
+                new BigDecimal("20")
+        );
+
+        result.setAdditionalFixedHitCount(
+                1
+        );
+
+        result.setAdditionalIgnoresPhysicalHitzone(
+                true
         );
     }
 }

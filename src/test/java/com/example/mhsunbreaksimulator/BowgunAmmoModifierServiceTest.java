@@ -368,11 +368,6 @@ public class BowgunAmmoModifierServiceTest {
                     result.getElementMotionValuePerHit()
             );
 
-            assertBigDecimalEquals(
-                    "0",
-                    result.getFixedDamageValuePerHit()
-            );
-
             assertEquals(
                     7,
                     result.getMaxHitCount()
@@ -418,11 +413,6 @@ public class BowgunAmmoModifierServiceTest {
                 result.getElementMotionValuePerHit()
         );
 
-        assertBigDecimalEquals(
-                "0",
-                result.getFixedDamageValuePerHit()
-        );
-
         assertEquals(
                 1,
                 result.getMaxHitCount()
@@ -436,6 +426,454 @@ public class BowgunAmmoModifierServiceTest {
                 + result.getElementMotionValuePerHit()
                 + " / hit="
                 + result.getMaxHitCount()
+        );
+    }
+
+
+    @Test
+    void testPiercingDragonAmmo() {
+
+        BowgunAmmo ammo
+                = createAmmo(
+                        "貫通滅龍弾",
+                        1
+                );
+
+
+        BowgunAmmoModifier result
+                = bowgunAmmoModifierService.calculate(
+                        ammo
+                );
+
+
+        assertBigDecimalEquals(
+                "20",
+                result.getPhysicalMotionValuePerHit()
+        );
+
+        assertBigDecimalEquals(
+                "44",
+                result.getElementMotionValuePerHit()
+        );
+
+        assertEquals(
+                7,
+                result.getMaxHitCount()
+        );
+
+
+        System.out.println(
+                "貫通滅龍弾：physical="
+                + result.getPhysicalMotionValuePerHit()
+                + " / element="
+                + result.getElementMotionValuePerHit()
+                + " / hit="
+                + result.getMaxHitCount()
+        );
+    }
+
+
+    @Test
+    void testSlicingAmmo() {
+
+        BowgunAmmo ammo
+                = createAmmo(
+                        "斬裂弾",
+                        1
+                );
+
+
+        BowgunAmmoModifier result
+                = bowgunAmmoModifierService.calculate(
+                        ammo
+                );
+
+
+        assertBigDecimalEquals(
+                "1",
+                result.getImpactPhysicalMotionValue()
+        );
+
+        assertBigDecimalEquals(
+                "14",
+                result.getSecondaryPhysicalMotionValuePerHit()
+        );
+
+        assertEquals(
+                3,
+                result.getSecondaryHitCount()
+        );
+
+        assertTrue(
+                result.isSecondaryUsesSeveringHitzone()
+        );
+
+        assertFalse(
+                result.isSecondaryIgnoresPhysicalHitzone()
+        );
+
+
+        System.out.println(
+                "斬裂弾：impact="
+                + result.getImpactPhysicalMotionValue()
+                + " / secondary="
+                + result.getSecondaryPhysicalMotionValuePerHit()
+                + "×"
+                + result.getSecondaryHitCount()
+                + " / severingHitzone="
+                + result.isSecondaryUsesSeveringHitzone()
+                + " / ignorePhysicalHitzone="
+                + result.isSecondaryIgnoresPhysicalHitzone()
+        );
+    }
+
+
+    @Test
+    void testStickyAmmo() {
+
+        BowgunAmmo lv1 = createAmmo("徹甲榴弾", 1);
+        BowgunAmmo lv2 = createAmmo("徹甲榴弾", 2);
+        BowgunAmmo lv3 = createAmmo("徹甲榴弾", 3);
+
+        BowgunAmmoModifier result1
+                = bowgunAmmoModifierService.calculate(lv1);
+
+        BowgunAmmoModifier result2
+                = bowgunAmmoModifierService.calculate(lv2);
+
+        BowgunAmmoModifier result3
+                = bowgunAmmoModifierService.calculate(lv3);
+
+
+        assertBigDecimalEquals(
+                "1",
+                result1.getImpactPhysicalMotionValue()
+        );
+
+        assertBigDecimalEquals(
+                "12",
+                result1.getSecondaryFixedDamageMotionValuePerHit()
+        );
+
+        assertBigDecimalEquals(
+                "3",
+                result1.getSecondaryFixedElementValuePerHit()
+        );
+
+        assertEquals(
+                1,
+                result1.getSecondaryHitCount()
+        );
+
+        assertTrue(
+                result1.isSecondaryIgnoresPhysicalHitzone()
+        );
+
+
+        assertBigDecimalEquals(
+                "1",
+                result2.getImpactPhysicalMotionValue()
+        );
+
+        assertBigDecimalEquals(
+                "15",
+                result2.getSecondaryFixedDamageMotionValuePerHit()
+        );
+
+        assertBigDecimalEquals(
+                "5",
+                result2.getSecondaryFixedElementValuePerHit()
+        );
+
+        assertEquals(
+                1,
+                result2.getSecondaryHitCount()
+        );
+
+        assertTrue(
+                result2.isSecondaryIgnoresPhysicalHitzone()
+        );
+
+
+        assertBigDecimalEquals(
+                "1",
+                result3.getImpactPhysicalMotionValue()
+        );
+
+        assertBigDecimalEquals(
+                "19",
+                result3.getSecondaryFixedDamageMotionValuePerHit()
+        );
+
+        assertBigDecimalEquals(
+                "5",
+                result3.getSecondaryFixedElementValuePerHit()
+        );
+
+        assertEquals(
+                1,
+                result3.getSecondaryHitCount()
+        );
+
+        assertTrue(
+                result3.isSecondaryIgnoresPhysicalHitzone()
+        );
+
+
+        System.out.println(
+                "徹甲榴弾Lv1：impact="
+                + result1.getImpactPhysicalMotionValue()
+                + " / fixedMV="
+                + result1.getSecondaryFixedDamageMotionValuePerHit()
+                + " / fire="
+                + result1.getSecondaryFixedElementValuePerHit()
+                + " / hit="
+                + result1.getSecondaryHitCount()
+                + " / ignoreHitzone="
+                + result1.isSecondaryIgnoresPhysicalHitzone()
+        );
+
+        System.out.println(
+                "徹甲榴弾Lv2：impact="
+                + result2.getImpactPhysicalMotionValue()
+                + " / fixedMV="
+                + result2.getSecondaryFixedDamageMotionValuePerHit()
+                + " / fire="
+                + result2.getSecondaryFixedElementValuePerHit()
+                + " / hit="
+                + result2.getSecondaryHitCount()
+                + " / ignoreHitzone="
+                + result2.isSecondaryIgnoresPhysicalHitzone()
+        );
+
+        System.out.println(
+                "徹甲榴弾Lv3：impact="
+                + result3.getImpactPhysicalMotionValue()
+                + " / fixedMV="
+                + result3.getSecondaryFixedDamageMotionValuePerHit()
+                + " / fire="
+                + result3.getSecondaryFixedElementValuePerHit()
+                + " / hit="
+                + result3.getSecondaryHitCount()
+                + " / ignoreHitzone="
+                + result3.isSecondaryIgnoresPhysicalHitzone()
+        );
+    }
+
+
+    @Test
+    void testClusterAmmo() {
+
+        BowgunAmmo lv1 = createAmmo("拡散弾", 1);
+        BowgunAmmo lv2 = createAmmo("拡散弾", 2);
+        BowgunAmmo lv3 = createAmmo("拡散弾", 3);
+
+        BowgunAmmoModifier result1
+                = bowgunAmmoModifierService.calculate(lv1);
+
+        BowgunAmmoModifier result2
+                = bowgunAmmoModifierService.calculate(lv2);
+
+        BowgunAmmoModifier result3
+                = bowgunAmmoModifierService.calculate(lv3);
+
+
+        assertBigDecimalEquals(
+                "1",
+                result1.getImpactPhysicalMotionValue()
+        );
+
+        assertBigDecimalEquals(
+                "10",
+                result1.getSecondaryFixedDamageMotionValuePerHit()
+        );
+
+        assertBigDecimalEquals(
+                "5",
+                result1.getSecondaryFixedElementValuePerHit()
+        );
+
+        assertEquals(
+                3,
+                result1.getSecondaryHitCount()
+        );
+
+        assertTrue(
+                result1.isSecondaryIgnoresPhysicalHitzone()
+        );
+
+
+        assertBigDecimalEquals(
+                "1",
+                result2.getImpactPhysicalMotionValue()
+        );
+
+        assertBigDecimalEquals(
+                "15",
+                result2.getSecondaryFixedDamageMotionValuePerHit()
+        );
+
+        assertBigDecimalEquals(
+                "8",
+                result2.getSecondaryFixedElementValuePerHit()
+        );
+
+        assertEquals(
+                4,
+                result2.getSecondaryHitCount()
+        );
+
+        assertTrue(
+                result2.isSecondaryIgnoresPhysicalHitzone()
+        );
+
+
+        assertBigDecimalEquals(
+                "1",
+                result3.getImpactPhysicalMotionValue()
+        );
+
+        assertBigDecimalEquals(
+                "20",
+                result3.getSecondaryFixedDamageMotionValuePerHit()
+        );
+
+        assertBigDecimalEquals(
+                "10",
+                result3.getSecondaryFixedElementValuePerHit()
+        );
+
+        assertEquals(
+                5,
+                result3.getSecondaryHitCount()
+        );
+
+        assertTrue(
+                result3.isSecondaryIgnoresPhysicalHitzone()
+        );
+
+
+        System.out.println(
+                "拡散弾Lv1：impact="
+                + result1.getImpactPhysicalMotionValue()
+                + " / fixedMV="
+                + result1.getSecondaryFixedDamageMotionValuePerHit()
+                + " / fire="
+                + result1.getSecondaryFixedElementValuePerHit()
+                + " / hit="
+                + result1.getSecondaryHitCount()
+                + " / ignoreHitzone="
+                + result1.isSecondaryIgnoresPhysicalHitzone()
+        );
+
+        System.out.println(
+                "拡散弾Lv2：impact="
+                + result2.getImpactPhysicalMotionValue()
+                + " / fixedMV="
+                + result2.getSecondaryFixedDamageMotionValuePerHit()
+                + " / fire="
+                + result2.getSecondaryFixedElementValuePerHit()
+                + " / hit="
+                + result2.getSecondaryHitCount()
+                + " / ignoreHitzone="
+                + result2.isSecondaryIgnoresPhysicalHitzone()
+        );
+
+        System.out.println(
+                "拡散弾Lv3：impact="
+                + result3.getImpactPhysicalMotionValue()
+                + " / fixedMV="
+                + result3.getSecondaryFixedDamageMotionValuePerHit()
+                + " / fire="
+                + result3.getSecondaryFixedElementValuePerHit()
+                + " / hit="
+                + result3.getSecondaryHitCount()
+                + " / ignoreHitzone="
+                + result3.isSecondaryIgnoresPhysicalHitzone()
+        );
+    }
+
+
+    @Test
+    void testWyvernAmmo() {
+
+        BowgunAmmo ammo
+                = createAmmo(
+                        "竜撃弾",
+                        1
+                );
+
+
+        BowgunAmmoModifier result
+                = bowgunAmmoModifierService.calculate(
+                        ammo
+                );
+
+
+        assertBigDecimalEquals(
+                "80",
+                result.getSecondaryFixedDamageMotionValuePerHit()
+        );
+
+        assertBigDecimalEquals(
+                "40",
+                result.getSecondaryFixedElementValuePerHit()
+        );
+
+        assertEquals(
+                1,
+                result.getSecondaryHitCount()
+        );
+
+        assertTrue(
+                result.isSecondaryIgnoresPhysicalHitzone()
+        );
+
+        assertFalse(
+                result.isSecondaryUsesSeveringHitzone()
+        );
+
+
+        assertBigDecimalEquals(
+                "19",
+                result.getAdditionalFixedDamageMotionValuePerHit()
+        );
+
+        assertBigDecimalEquals(
+                "20",
+                result.getAdditionalFixedElementValuePerHit()
+        );
+
+        assertEquals(
+                1,
+                result.getAdditionalFixedHitCount()
+        );
+
+        assertTrue(
+                result.isAdditionalIgnoresPhysicalHitzone()
+        );
+
+
+        System.out.println(
+                "竜撃弾1段目：fixedMV="
+                + result.getSecondaryFixedDamageMotionValuePerHit()
+                + " / fire="
+                + result.getSecondaryFixedElementValuePerHit()
+                + " / hit="
+                + result.getSecondaryHitCount()
+                + " / ignoreHitzone="
+                + result.isSecondaryIgnoresPhysicalHitzone()
+        );
+
+        System.out.println(
+                "竜撃弾2段目：fixedMV="
+                + result.getAdditionalFixedDamageMotionValuePerHit()
+                + " / fire="
+                + result.getAdditionalFixedElementValuePerHit()
+                + " / hit="
+                + result.getAdditionalFixedHitCount()
+                + " / ignoreHitzone="
+                + result.isAdditionalIgnoresPhysicalHitzone()
         );
     }
 
@@ -457,11 +895,6 @@ public class BowgunAmmoModifierServiceTest {
         assertBigDecimalEquals(
                 "0",
                 result.getElementMotionValuePerHit()
-        );
-
-        assertBigDecimalEquals(
-                "0",
-                result.getFixedDamageValuePerHit()
         );
 
         assertEquals(
@@ -500,11 +933,6 @@ public class BowgunAmmoModifierServiceTest {
         assertBigDecimalEquals(
                 "0",
                 result.getElementMotionValuePerHit()
-        );
-
-        assertBigDecimalEquals(
-                "0",
-                result.getFixedDamageValuePerHit()
         );
 
         assertEquals(

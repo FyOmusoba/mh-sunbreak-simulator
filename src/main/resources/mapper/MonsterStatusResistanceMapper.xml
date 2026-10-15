@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.mhsunbreaksimulator.mapper.MonsterStatusResistanceMapper">
+
+    <!--
+        モンスターIDと状態異常種別から
+        状態異常耐性を1件取得する。
+
+        statusTypeはDB上の日本語表記。
+
+        例：
+        毒
+        麻痺
+        睡眠
+        爆破
+    -->
+    <select id="findByMonsterIdAndStatusType"
+            resultType="com.example.mhsunbreaksimulator.entity.MonsterStatusResistance">
+
+        SELECT
+            status_resistance_id,
+            monster_id,
+            status_type,
+            initial_threshold,
+            increase_per_proc,
+            max_threshold,
+            decay_value,
+            effect_duration_sec,
+            proc_damage,
+            is_immune
+        FROM monster_status_resistance
+        WHERE monster_id = #{monsterId}
+          AND status_type = #{statusType}
+        LIMIT 1
+
+    </select>
+
+</mapper>
