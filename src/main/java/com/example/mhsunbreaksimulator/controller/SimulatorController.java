@@ -20,6 +20,7 @@ import com.example.mhsunbreaksimulator.dto.BowShotModifier;
 import com.example.mhsunbreaksimulator.dto.BowgunAmmoModifier;
 import com.example.mhsunbreaksimulator.dto.BowgunPhysicalDamageResult;
 import com.example.mhsunbreaksimulator.dto.ConditionalSkillModifierTotal;
+import com.example.mhsunbreaksimulator.dto.DefenseResistanceResult;
 import com.example.mhsunbreaksimulator.dto.SkillStateSelection;
 import com.example.mhsunbreaksimulator.dto.SkillTotal;
 import com.example.mhsunbreaksimulator.dto.TalismanSkill;
@@ -28,11 +29,14 @@ import com.example.mhsunbreaksimulator.entity.BowCharge;
 import com.example.mhsunbreaksimulator.entity.BowCoating;
 import com.example.mhsunbreaksimulator.entity.BowgunAmmo;
 import com.example.mhsunbreaksimulator.entity.Decoration;
+import com.example.mhsunbreaksimulator.entity.Monster;
+import com.example.mhsunbreaksimulator.entity.MonsterHitzone;
 import com.example.mhsunbreaksimulator.entity.RampageDecoration;
 import com.example.mhsunbreaksimulator.entity.Skill;
 import com.example.mhsunbreaksimulator.entity.SkillEffectState;
 import com.example.mhsunbreaksimulator.entity.Weapon;
 import com.example.mhsunbreaksimulator.form.SimulatorForm;
+import com.example.mhsunbreaksimulator.service.ArmorDefenseResistanceService;
 import com.example.mhsunbreaksimulator.service.ArmorService;
 import com.example.mhsunbreaksimulator.service.BowChargeModifierService;
 import com.example.mhsunbreaksimulator.service.BowChargeService;
@@ -47,7 +51,10 @@ import com.example.mhsunbreaksimulator.service.BowgunAmmoService;
 import com.example.mhsunbreaksimulator.service.BowgunPhysicalDamageService;
 import com.example.mhsunbreaksimulator.service.ConditionalSkillModifierService;
 import com.example.mhsunbreaksimulator.service.DecorationService;
+import com.example.mhsunbreaksimulator.service.MonsterHitzoneService;
+import com.example.mhsunbreaksimulator.service.MonsterService;
 import com.example.mhsunbreaksimulator.service.RampageDecorationService;
+import com.example.mhsunbreaksimulator.service.ResolvedSkillEffectService;
 import com.example.mhsunbreaksimulator.service.SelectedSkillEffectService;
 import com.example.mhsunbreaksimulator.service.SkillAggregationService;
 import com.example.mhsunbreaksimulator.service.SkillService;
@@ -86,6 +93,12 @@ public class SimulatorController {
 
     private final ArmorService armorService;
 
+    private final ArmorDefenseResistanceService armorDefenseResistanceService;
+
+    private final MonsterService monsterService;
+
+    private final MonsterHitzoneService monsterHitzoneService;
+
     private final DecorationService decorationService;
 
     private final RampageDecorationService rampageDecorationService;
@@ -97,6 +110,8 @@ public class SimulatorController {
     private final SkillStateSelectionService skillStateSelectionService;
 
     private final SelectedSkillEffectService selectedSkillEffectService;
+
+    private final ResolvedSkillEffectService resolvedSkillEffectService;
 
     private final ConditionalSkillModifierService conditionalSkillModifierService;
 
@@ -124,6 +139,94 @@ public class SimulatorController {
         model.addAttribute(
                 "weapon",
                 weapon
+        );
+
+
+        /* ========================================== */
+        /* モンスター・部位肉質 */
+        /* ========================================== */
+
+        List<Monster> monsters
+                = monsterService.findAll();
+
+        Monster selectedMonster = null;
+
+        List<MonsterHitzone> monsterHitzones
+                = new ArrayList<>();
+
+        MonsterHitzone selectedHitzone = null;
+
+
+        if (simulatorForm.getMonsterId() != null) {
+
+            selectedMonster
+                    = monsterService.findById(
+                            simulatorForm.getMonsterId()
+                    );
+
+
+            if (selectedMonster == null) {
+
+                simulatorForm.setMonsterId(
+                        null
+                );
+
+                simulatorForm.setHitzoneId(
+                        null
+                );
+
+            } else {
+
+                monsterHitzones
+                        = monsterHitzoneService.findByMonsterId(
+                                selectedMonster.getMonsterId()
+                        );
+
+
+                if (simulatorForm.getHitzoneId() != null) {
+
+                    selectedHitzone
+                            = monsterHitzoneService.findByIdAndMonsterId(
+                                    simulatorForm.getHitzoneId(),
+                                    selectedMonster.getMonsterId()
+                            );
+
+
+                    if (selectedHitzone == null) {
+
+                        simulatorForm.setHitzoneId(
+                                null
+                        );
+                    }
+                }
+            }
+
+        } else {
+
+            simulatorForm.setHitzoneId(
+                    null
+            );
+        }
+
+
+        model.addAttribute(
+                "monsters",
+                monsters
+        );
+
+        model.addAttribute(
+                "selectedMonster",
+                selectedMonster
+        );
+
+        model.addAttribute(
+                "monsterHitzones",
+                monsterHitzones
+        );
+
+        model.addAttribute(
+                "selectedHitzone",
+                selectedHitzone
         );
 
 
@@ -1358,18 +1461,58 @@ public class SimulatorController {
 
 
         /* ========================================== */
-        /* 条件付きスキル補正合計 */
+        /* DEFAULT + 条件付きスキル効果を統合 */
+        /* ========================================== */
+
+        Map<Integer, SkillEffectState> resolvedSkillEffects
+                = resolvedSkillEffectService.resolveAllEffects(
+                        skillTotals,
+                        selectedSkillEffects,
+                        weapon == null
+                                ? null
+                                : weapon.getWeaponType()
+                );
+
+
+        model.addAttribute(
+                "resolvedSkillEffects",
+                resolvedSkillEffects
+        );
+
+
+        /* ========================================== */
+        /* 最終スキル補正合計 */
         /* ========================================== */
 
         ConditionalSkillModifierTotal conditionalSkillModifierTotal
                 = conditionalSkillModifierService.calculate(
-                        selectedSkillEffects
+                        resolvedSkillEffects
                 );
 
 
         model.addAttribute(
                 "conditionalSkillModifierTotal",
                 conditionalSkillModifierTotal
+        );
+
+
+        /* ========================================== */
+        /* 防具5部位 + スキル補正の最終防御・耐性 */
+        /* ========================================== */
+
+        DefenseResistanceResult defenseResistanceResult
+                = armorDefenseResistanceService.calculate(
+                        selectedArmors,
+                        weapon == null
+                                ? null
+                                : weapon.getWeaponType(),
+                        conditionalSkillModifierTotal
+                );
+
+
+        model.addAttribute(
+                "defenseResistanceResult",
+                defenseResistanceResult
         );
 
 
@@ -1803,6 +1946,20 @@ public class SimulatorController {
 
         addQueryParam(
                 builder,
+                "monsterId",
+                form.getMonsterId()
+        );
+
+
+        addQueryParam(
+                builder,
+                "hitzoneId",
+                form.getHitzoneId()
+        );
+
+
+        addQueryParam(
+                builder,
                 "rampageDecorationId",
                 form.getRampageDecorationId()
         );
@@ -1819,6 +1976,13 @@ public class SimulatorController {
                 builder,
                 "bowCoatingId",
                 form.getBowCoatingId()
+        );
+
+
+        addQueryParam(
+                builder,
+                "bowgunAmmoId",
+                form.getBowgunAmmoId()
         );
 
 

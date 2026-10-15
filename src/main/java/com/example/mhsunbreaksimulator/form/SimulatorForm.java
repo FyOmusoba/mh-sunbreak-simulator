@@ -7,6 +7,12 @@ public class SimulatorForm {
 
     private Integer weaponId;
 
+    // モンスター
+    private Integer monsterId;
+
+    // モンスター部位肉質
+    private Integer hitzoneId;
+
     // 百竜装飾品
     private Integer rampageDecorationId;
 
