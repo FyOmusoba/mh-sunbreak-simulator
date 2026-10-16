@@ -1,5 +1,6 @@
 package com.example.mhsunbreaksimulator.controller;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -18,12 +19,21 @@ import com.example.mhsunbreaksimulator.dto.BowPhysicalDamageResult;
 import com.example.mhsunbreaksimulator.dto.BowPhysicalModifier;
 import com.example.mhsunbreaksimulator.dto.BowShotModifier;
 import com.example.mhsunbreaksimulator.dto.BowgunAmmoModifier;
+import com.example.mhsunbreaksimulator.dto.BowgunElementDamageResult;
 import com.example.mhsunbreaksimulator.dto.BowgunPhysicalDamageResult;
+import com.example.mhsunbreaksimulator.dto.BowgunRapidFireModifier;
 import com.example.mhsunbreaksimulator.dto.ConditionalSkillModifierTotal;
+import com.example.mhsunbreaksimulator.dto.CriticalModifierResult;
 import com.example.mhsunbreaksimulator.dto.DefenseResistanceResult;
+import com.example.mhsunbreaksimulator.dto.ElementHitzoneDamageResult;
+import com.example.mhsunbreaksimulator.dto.FinalDamageResult;
+import com.example.mhsunbreaksimulator.dto.MonsterHitzoneValueResult;
+import com.example.mhsunbreaksimulator.dto.MonsterWeakpointResult;
+import com.example.mhsunbreaksimulator.dto.PhysicalHitzoneDamageResult;
 import com.example.mhsunbreaksimulator.dto.SkillStateSelection;
 import com.example.mhsunbreaksimulator.dto.SkillTotal;
 import com.example.mhsunbreaksimulator.dto.TalismanSkill;
+import com.example.mhsunbreaksimulator.dto.WeakpointSkillModifier;
 import com.example.mhsunbreaksimulator.entity.Armor;
 import com.example.mhsunbreaksimulator.entity.BowCharge;
 import com.example.mhsunbreaksimulator.entity.BowCoating;
@@ -48,17 +58,26 @@ import com.example.mhsunbreaksimulator.service.BowPhysicalModifierService;
 import com.example.mhsunbreaksimulator.service.BowShotModifierService;
 import com.example.mhsunbreaksimulator.service.BowgunAmmoModifierService;
 import com.example.mhsunbreaksimulator.service.BowgunAmmoService;
+import com.example.mhsunbreaksimulator.service.BowgunElementDamageService;
 import com.example.mhsunbreaksimulator.service.BowgunPhysicalDamageService;
+import com.example.mhsunbreaksimulator.service.BowgunRapidFireModifierService;
 import com.example.mhsunbreaksimulator.service.ConditionalSkillModifierService;
+import com.example.mhsunbreaksimulator.service.CriticalModifierService;
 import com.example.mhsunbreaksimulator.service.DecorationService;
+import com.example.mhsunbreaksimulator.service.ElementHitzoneDamageService;
+import com.example.mhsunbreaksimulator.service.FinalDamageService;
 import com.example.mhsunbreaksimulator.service.MonsterHitzoneService;
+import com.example.mhsunbreaksimulator.service.MonsterHitzoneValueService;
 import com.example.mhsunbreaksimulator.service.MonsterService;
+import com.example.mhsunbreaksimulator.service.MonsterWeakpointService;
+import com.example.mhsunbreaksimulator.service.PhysicalHitzoneDamageService;
 import com.example.mhsunbreaksimulator.service.RampageDecorationService;
 import com.example.mhsunbreaksimulator.service.ResolvedSkillEffectService;
 import com.example.mhsunbreaksimulator.service.SelectedSkillEffectService;
 import com.example.mhsunbreaksimulator.service.SkillAggregationService;
 import com.example.mhsunbreaksimulator.service.SkillService;
 import com.example.mhsunbreaksimulator.service.SkillStateSelectionService;
+import com.example.mhsunbreaksimulator.service.WeakpointSkillModifierService;
 import com.example.mhsunbreaksimulator.service.WeaponService;
 
 import lombok.RequiredArgsConstructor;
@@ -70,49 +89,45 @@ public class SimulatorController {
     private final WeaponService weaponService;
 
     private final BowChargeService bowChargeService;
-
     private final BowChargeModifierService bowChargeModifierService;
-
     private final BowShotModifierService bowShotModifierService;
 
     private final BowCoatingService bowCoatingService;
-
     private final BowCoatingModifierService bowCoatingModifierService;
 
+    private final BowPhysicalModifierService bowPhysicalModifierService;
+    private final BowPhysicalDamageService bowPhysicalDamageService;
     private final BowElementDamageService bowElementDamageService;
 
     private final BowgunAmmoService bowgunAmmoService;
-
     private final BowgunAmmoModifierService bowgunAmmoModifierService;
-
+    private final BowgunRapidFireModifierService bowgunRapidFireModifierService;
     private final BowgunPhysicalDamageService bowgunPhysicalDamageService;
-
-    private final BowPhysicalModifierService bowPhysicalModifierService;
-
-    private final BowPhysicalDamageService bowPhysicalDamageService;
+    private final BowgunElementDamageService bowgunElementDamageService;
 
     private final ArmorService armorService;
-
     private final ArmorDefenseResistanceService armorDefenseResistanceService;
 
     private final MonsterService monsterService;
-
     private final MonsterHitzoneService monsterHitzoneService;
+    private final MonsterHitzoneValueService monsterHitzoneValueService;
+    private final MonsterWeakpointService monsterWeakpointService;
+
+    private final WeakpointSkillModifierService weakpointSkillModifierService;
+    private final CriticalModifierService criticalModifierService;
+
+    private final PhysicalHitzoneDamageService physicalHitzoneDamageService;
+    private final ElementHitzoneDamageService elementHitzoneDamageService;
+    private final FinalDamageService finalDamageService;
 
     private final DecorationService decorationService;
-
     private final RampageDecorationService rampageDecorationService;
 
     private final SkillAggregationService skillAggregationService;
-
     private final SkillService skillService;
-
     private final SkillStateSelectionService skillStateSelectionService;
-
     private final SelectedSkillEffectService selectedSkillEffectService;
-
     private final ResolvedSkillEffectService resolvedSkillEffectService;
-
     private final ConditionalSkillModifierService conditionalSkillModifierService;
 
 
@@ -123,17 +138,21 @@ public class SimulatorController {
             @RequestParam Map<String, String> requestParams,
             Model model) {
 
-        /* ========================================== */
-        /* 武器 */
-        /* ========================================== */
+
+        /*
+         * =====================================================
+         * 武器
+         * =====================================================
+         */
 
         Weapon weapon = null;
 
         if (simulatorForm.getWeaponId() != null) {
 
-            weapon = weaponService.findById(
-                    simulatorForm.getWeaponId()
-            );
+            weapon
+                    = weaponService.findById(
+                            simulatorForm.getWeaponId()
+                    );
         }
 
         model.addAttribute(
@@ -142,19 +161,23 @@ public class SimulatorController {
         );
 
 
-        /* ========================================== */
-        /* モンスター・部位肉質 */
-        /* ========================================== */
+        /*
+         * =====================================================
+         * モンスター・部位肉質
+         * =====================================================
+         */
 
         List<Monster> monsters
                 = monsterService.findAll();
 
-        Monster selectedMonster = null;
+        Monster selectedMonster
+                = null;
 
         List<MonsterHitzone> monsterHitzones
                 = new ArrayList<>();
 
-        MonsterHitzone selectedHitzone = null;
+        MonsterHitzone selectedHitzone
+                = null;
 
 
         if (simulatorForm.getMonsterId() != null) {
@@ -230,23 +253,29 @@ public class SimulatorController {
         );
 
 
-        /* ========================================== */
-        /* ボウガンの弾 */
-        /* ========================================== */
+        /*
+         * =====================================================
+         * ボウガン弾
+         * =====================================================
+         */
 
         List<BowgunAmmo> bowgunAmmos
                 = new ArrayList<>();
 
-        BowgunAmmo selectedBowgunAmmo = null;
+        BowgunAmmo selectedBowgunAmmo
+                = null;
 
 
         if (weapon != null
-                && ("ライトボウガン".equals(
-                        weapon.getWeaponType()
-                )
-                || "ヘビィボウガン".equals(
-                        weapon.getWeaponType()
-                ))) {
+                && (
+                        "ライトボウガン".equals(
+                                weapon.getWeaponType()
+                        )
+                        ||
+                        "ヘビィボウガン".equals(
+                                weapon.getWeaponType()
+                        )
+                )) {
 
             bowgunAmmos
                     = bowgunAmmoService.findByWeaponId(
@@ -297,6 +326,12 @@ public class SimulatorController {
         );
 
 
+        /*
+         * =====================================================
+         * ボウガン弾補正
+         * =====================================================
+         */
+
         BowgunAmmoModifier bowgunAmmoModifier
                 = bowgunAmmoModifierService.calculate(
                         selectedBowgunAmmo
@@ -309,14 +344,35 @@ public class SimulatorController {
         );
 
 
-        /* ========================================== */
-        /* 弓の溜め段階 */
-        /* ========================================== */
+        /*
+         * =====================================================
+         * ボウガン速射補正
+         * =====================================================
+         */
+
+        BowgunRapidFireModifier bowgunRapidFireModifier
+                = bowgunRapidFireModifierService.calculate(
+                        selectedBowgunAmmo
+                );
+
+
+        model.addAttribute(
+                "bowgunRapidFireModifier",
+                bowgunRapidFireModifier
+        );
+
+
+        /*
+         * =====================================================
+         * 弓の溜め段階
+         * =====================================================
+         */
 
         List<BowCharge> bowCharges
                 = new ArrayList<>();
 
-        BowCharge selectedBowCharge = null;
+        BowCharge selectedBowCharge
+                = null;
 
 
         if (weapon != null
@@ -404,14 +460,17 @@ public class SimulatorController {
         );
 
 
-        /* ========================================== */
-        /* 弓のビン */
-        /* ========================================== */
+        /*
+         * =====================================================
+         * 弓のビン
+         * =====================================================
+         */
 
         List<BowCoating> bowCoatings
                 = new ArrayList<>();
 
-        BowCoating selectedBowCoating = null;
+        BowCoating selectedBowCoating
+                = null;
 
 
         if (weapon != null
@@ -482,9 +541,11 @@ public class SimulatorController {
         );
 
 
-        /* ========================================== */
-        /* 百竜装飾品 */
-        /* ========================================== */
+        /*
+         * =====================================================
+         * 百竜装飾品
+         * =====================================================
+         */
 
         RampageDecoration rampageDecoration
                 = findUsableRampageDecoration(
@@ -512,9 +573,11 @@ public class SimulatorController {
         );
 
 
-        /* ========================================== */
-        /* 新しく選択した防具を反映 */
-        /* ========================================== */
+        /*
+         * =====================================================
+         * 新しく選択された防具
+         * =====================================================
+         */
 
         if (armorId != null) {
 
@@ -574,16 +637,17 @@ public class SimulatorController {
 
 
                 default:
-
                     break;
                 }
             }
         }
 
 
-        /* ========================================== */
-        /* 防具取得 */
-        /* ========================================== */
+        /*
+         * =====================================================
+         * 防具
+         * =====================================================
+         */
 
         Armor headArmor
                 = findArmor(
@@ -637,9 +701,11 @@ public class SimulatorController {
         );
 
 
-        /* ========================================== */
-        /* 武器装飾品 */
-        /* ========================================== */
+        /*
+         * =====================================================
+         * 武器装飾品
+         * =====================================================
+         */
 
         Decoration weaponDecoration1
                 = findUsableDecoration(
@@ -717,9 +783,11 @@ public class SimulatorController {
         );
 
 
-        /* ========================================== */
-        /* 頭装飾品 */
-        /* ========================================== */
+        /*
+         * =====================================================
+         * 頭装飾品
+         * =====================================================
+         */
 
         Decoration headDecoration1
                 = findUsableDecoration(
@@ -794,9 +862,11 @@ public class SimulatorController {
         );
 
 
-        /* ========================================== */
-        /* 胴装飾品 */
-        /* ========================================== */
+        /*
+         * =====================================================
+         * 胴装飾品
+         * =====================================================
+         */
 
         Decoration chestDecoration1
                 = findUsableDecoration(
@@ -871,9 +941,11 @@ public class SimulatorController {
         );
 
 
-        /* ========================================== */
-        /* 腕装飾品 */
-        /* ========================================== */
+        /*
+         * =====================================================
+         * 腕装飾品
+         * =====================================================
+         */
 
         Decoration armDecoration1
                 = findUsableDecoration(
@@ -948,9 +1020,11 @@ public class SimulatorController {
         );
 
 
-        /* ========================================== */
-        /* 腰装飾品 */
-        /* ========================================== */
+        /*
+         * =====================================================
+         * 腰装飾品
+         * =====================================================
+         */
 
         Decoration waistDecoration1
                 = findUsableDecoration(
@@ -1025,9 +1099,11 @@ public class SimulatorController {
         );
 
 
-        /* ========================================== */
-        /* 脚装飾品 */
-        /* ========================================== */
+        /*
+         * =====================================================
+         * 脚装飾品
+         * =====================================================
+         */
 
         Decoration legDecoration1
                 = findUsableDecoration(
@@ -1102,9 +1178,11 @@ public class SimulatorController {
         );
 
 
-        /* ========================================== */
-        /* 護石スロットサイズを正規化 */
-        /* ========================================== */
+        /*
+         * =====================================================
+         * 護石スロット
+         * =====================================================
+         */
 
         int talismanSlot1Size
                 = normalizeSlotSize(
@@ -1135,9 +1213,11 @@ public class SimulatorController {
         );
 
 
-        /* ========================================== */
-        /* 護石装飾品 */
-        /* ========================================== */
+        /*
+         * =====================================================
+         * 護石装飾品
+         * =====================================================
+         */
 
         Decoration talismanDecoration1
                 = findUsableDecoration(
@@ -1203,9 +1283,11 @@ public class SimulatorController {
         );
 
 
-        /* ========================================== */
-        /* 選択防具一覧 */
-        /* ========================================== */
+        /*
+         * =====================================================
+         * 防具一覧
+         * =====================================================
+         */
 
         List<Armor> selectedArmors
                 = new ArrayList<>();
@@ -1231,9 +1313,11 @@ public class SimulatorController {
         );
 
 
-        /* ========================================== */
-        /* 選択装飾品一覧 */
-        /* ========================================== */
+        /*
+         * =====================================================
+         * 装飾品一覧
+         * =====================================================
+         */
 
         List<Decoration> selectedDecorations
                 = new ArrayList<>();
@@ -1323,9 +1407,11 @@ public class SimulatorController {
         );
 
 
-        /* ========================================== */
-        /* 護石スキル */
-        /* ========================================== */
+        /*
+         * =====================================================
+         * 護石スキル
+         * =====================================================
+         */
 
         List<TalismanSkill> talismanSkills
                 = new ArrayList<>();
@@ -1406,9 +1492,11 @@ public class SimulatorController {
         );
 
 
-        /* ========================================== */
-        /* スキル合計 */
-        /* ========================================== */
+        /*
+         * =====================================================
+         * スキル合計
+         * =====================================================
+         */
 
         List<SkillTotal> skillTotals
                 = skillAggregationService.calculateSkillTotals(
@@ -1424,9 +1512,11 @@ public class SimulatorController {
         );
 
 
-        /* ========================================== */
-        /* 条件付きスキル状態選択 */
-        /* ========================================== */
+        /*
+         * =====================================================
+         * 条件付きスキル選択肢
+         * =====================================================
+         */
 
         List<SkillStateSelection> skillStateSelections
                 = skillStateSelectionService.createSelections(
@@ -1443,9 +1533,11 @@ public class SimulatorController {
         );
 
 
-        /* ========================================== */
-        /* 選択中の条件付きスキル効果 */
-        /* ========================================== */
+        /*
+         * =====================================================
+         * ユーザー選択中の条件付き効果
+         * =====================================================
+         */
 
         Map<Integer, SkillEffectState> selectedSkillEffects
                 = selectedSkillEffectService.resolveSelectedEffects(
@@ -1460,9 +1552,11 @@ public class SimulatorController {
         );
 
 
-        /* ========================================== */
-        /* DEFAULT + 条件付きスキル効果を統合 */
-        /* ========================================== */
+        /*
+         * =====================================================
+         * DEFAULT + 条件付き効果
+         * =====================================================
+         */
 
         Map<Integer, SkillEffectState> resolvedSkillEffects
                 = resolvedSkillEffectService.resolveAllEffects(
@@ -1480,9 +1574,11 @@ public class SimulatorController {
         );
 
 
-        /* ========================================== */
-        /* 最終スキル補正合計 */
-        /* ========================================== */
+        /*
+         * =====================================================
+         * 最終スキル補正
+         * =====================================================
+         */
 
         ConditionalSkillModifierTotal conditionalSkillModifierTotal
                 = conditionalSkillModifierService.calculate(
@@ -1496,9 +1592,90 @@ public class SimulatorController {
         );
 
 
-        /* ========================================== */
-        /* 防具5部位 + スキル補正の最終防御・耐性 */
-        /* ========================================== */
+        /*
+         * =====================================================
+         * 使用肉質
+         * =====================================================
+         */
+
+        MonsterHitzoneValueResult monsterHitzoneValueResult
+                = monsterHitzoneValueService.calculate(
+                        weapon,
+                        selectedHitzone
+                );
+
+
+        model.addAttribute(
+                "monsterHitzoneValueResult",
+                monsterHitzoneValueResult
+        );
+
+
+        /*
+         * =====================================================
+         * 弱点判定
+         * =====================================================
+         */
+
+        MonsterWeakpointResult monsterWeakpointResult
+                = monsterWeakpointService.calculate(
+                        monsterHitzoneValueResult
+                );
+
+
+        model.addAttribute(
+                "monsterWeakpointResult",
+                monsterWeakpointResult
+        );
+
+
+        /*
+         * =====================================================
+         * 弱点特効
+         * 弱点特効【属性】
+         * =====================================================
+         */
+
+        WeakpointSkillModifier weakpointSkillModifier
+                = weakpointSkillModifierService.calculate(
+                        monsterWeakpointResult,
+                        resolvedSkillEffects
+                );
+
+
+        model.addAttribute(
+                "weakpointSkillModifier",
+                weakpointSkillModifier
+        );
+
+
+        /*
+         * =====================================================
+         * 会心率・会心倍率
+         * =====================================================
+         */
+
+        CriticalModifierResult criticalModifierResult
+                = criticalModifierService.calculate(
+                        weapon == null
+                                ? null
+                                : weapon.getAffinity(),
+                        conditionalSkillModifierTotal,
+                        weakpointSkillModifier
+                );
+
+
+        model.addAttribute(
+                "criticalModifierResult",
+                criticalModifierResult
+        );
+
+
+        /*
+         * =====================================================
+         * 防御・属性耐性
+         * =====================================================
+         */
 
         DefenseResistanceResult defenseResistanceResult
                 = armorDefenseResistanceService.calculate(
@@ -1516,9 +1693,11 @@ public class SimulatorController {
         );
 
 
-        /* ========================================== */
-        /* 弓溜め段階解放の適用 */
-        /* ========================================== */
+        /*
+         * =====================================================
+         * 弓溜め段階解放
+         * =====================================================
+         */
 
         boolean bowChargeLevelUnlocked
                 = hasSkill(
@@ -1537,7 +1716,8 @@ public class SimulatorController {
                     null
             );
 
-            selectedBowCharge = null;
+            selectedBowCharge
+                    = null;
         }
 
 
@@ -1552,9 +1732,11 @@ public class SimulatorController {
         );
 
 
-        /* ========================================== */
-        /* 弓の最終物理係数 */
-        /* ========================================== */
+        /*
+         * =====================================================
+         * 弓物理係数
+         * =====================================================
+         */
 
         BowPhysicalModifier bowPhysicalModifier
                 = bowPhysicalModifierService.calculate(
@@ -1575,9 +1757,12 @@ public class SimulatorController {
         );
 
 
-        /* ========================================== */
-        /* 弓の物理ダメージ計算途中値 */
-        /* ========================================== */
+        /*
+         * =====================================================
+         * 弓物理ダメージ
+         * 肉質適用前
+         * =====================================================
+         */
 
         BowPhysicalDamageResult bowPhysicalDamageResult
                 = bowPhysicalDamageService.calculate(
@@ -1595,9 +1780,12 @@ public class SimulatorController {
         );
 
 
-        /* ========================================== */
-        /* 弓の属性ダメージ計算途中値 */
-        /* ========================================== */
+        /*
+         * =====================================================
+         * 弓属性ダメージ
+         * 肉質適用前
+         * =====================================================
+         */
 
         BowElementDamageResult bowElementDamageResult
                 = bowElementDamageService.calculate(
@@ -1620,9 +1808,12 @@ public class SimulatorController {
         );
 
 
-        /* ========================================== */
-        /* ボウガンの物理ダメージ計算途中値 */
-        /* ========================================== */
+        /*
+         * =====================================================
+         * ボウガン物理ダメージ
+         * 速射補正込み
+         * =====================================================
+         */
 
         BowgunPhysicalDamageResult bowgunPhysicalDamageResult
                 = bowgunPhysicalDamageService.calculate(
@@ -1632,7 +1823,8 @@ public class SimulatorController {
                         selectedBowgunAmmo == null
                                 ? null
                                 : bowgunAmmoModifier,
-                        conditionalSkillModifierTotal
+                        conditionalSkillModifierTotal,
+                        bowgunRapidFireModifier
                 );
 
 
@@ -1642,9 +1834,221 @@ public class SimulatorController {
         );
 
 
-        /* ========================================== */
-        /* 護石編集URL */
-        /* ========================================== */
+        /*
+         * =====================================================
+         * ボウガン属性ダメージ
+         * 速射補正込み
+         * =====================================================
+         */
+
+        BowgunElementDamageResult bowgunElementDamageResult
+                = bowgunElementDamageService.calculate(
+                        weapon == null
+                                ? null
+                                : weapon.getAttack(),
+                        selectedBowgunAmmo == null
+                                ? null
+                                : bowgunAmmoModifier,
+                        conditionalSkillModifierTotal,
+                        bowgunRapidFireModifier
+                );
+
+
+        model.addAttribute(
+                "bowgunElementDamageResult",
+                bowgunElementDamageResult
+        );
+
+
+        /*
+         * =====================================================
+         * 物理肉質 + 会心
+         * =====================================================
+         */
+
+        BigDecimal physicalDamageBeforeHitzone
+                = null;
+
+
+        /*
+         * 弓
+         */
+        if (weapon != null
+                && "弓".equals(
+                        weapon.getWeaponType()
+                )
+                && selectedBowCharge != null
+                && bowPhysicalDamageResult != null) {
+
+            physicalDamageBeforeHitzone
+                    = bowPhysicalDamageResult
+                            .getPhysicalDamagePerHit();
+        }
+
+
+        /*
+         * ライト / ヘビィ
+         */
+        else if (weapon != null
+                && (
+                        "ライトボウガン".equals(
+                                weapon.getWeaponType()
+                        )
+                        ||
+                        "ヘビィボウガン".equals(
+                                weapon.getWeaponType()
+                        )
+                )
+                && selectedBowgunAmmo != null
+                && bowgunPhysicalDamageResult != null) {
+
+            physicalDamageBeforeHitzone
+                    = bowgunPhysicalDamageResult
+                            .getPhysicalDamagePerHit();
+        }
+
+
+        PhysicalHitzoneDamageResult physicalHitzoneDamageResult
+                = null;
+
+
+        if (physicalDamageBeforeHitzone != null
+                && selectedHitzone != null) {
+
+            physicalHitzoneDamageResult
+                    = physicalHitzoneDamageService.calculate(
+                            physicalDamageBeforeHitzone,
+                            monsterHitzoneValueResult
+                                    .getPhysicalHitzone(),
+                            criticalModifierResult
+                    );
+        }
+
+
+        model.addAttribute(
+                "physicalHitzoneDamageResult",
+                physicalHitzoneDamageResult
+        );
+
+
+        /*
+         * =====================================================
+         * 属性肉質
+         * 弱点特効【属性】
+         * 会心撃【属性】
+         * =====================================================
+         */
+
+        BigDecimal elementDamageBeforeHitzone
+                = null;
+
+
+        /*
+         * 弓
+         */
+        if (weapon != null
+                && "弓".equals(
+                        weapon.getWeaponType()
+                )
+                && selectedBowCharge != null
+                && bowElementDamageResult != null) {
+
+            elementDamageBeforeHitzone
+                    = bowElementDamageResult
+                            .getElementDamagePerHit();
+        }
+
+
+        /*
+         * ライト / ヘビィ
+         */
+        else if (weapon != null
+                && (
+                        "ライトボウガン".equals(
+                                weapon.getWeaponType()
+                        )
+                        ||
+                        "ヘビィボウガン".equals(
+                                weapon.getWeaponType()
+                        )
+                )
+                && selectedBowgunAmmo != null
+                && bowgunElementDamageResult != null) {
+
+            elementDamageBeforeHitzone
+                    = bowgunElementDamageResult
+                            .getElementDamagePerHit();
+        }
+
+
+        ElementHitzoneDamageResult elementHitzoneDamageResult
+                = null;
+
+
+        if (elementDamageBeforeHitzone != null
+                && selectedHitzone != null
+                && monsterHitzoneValueResult.isElemental()) {
+
+            elementHitzoneDamageResult
+                    = elementHitzoneDamageService.calculate(
+                            elementDamageBeforeHitzone,
+                            monsterHitzoneValueResult
+                                    .getElementHitzone(),
+                            weakpointSkillModifier
+                                    .getMainElementDamageMul(),
+                            criticalModifierResult
+                    );
+        }
+
+
+        model.addAttribute(
+                "elementHitzoneDamageResult",
+                elementHitzoneDamageResult
+        );
+
+
+        /*
+         * =====================================================
+         * 最終ダメージ
+         * =====================================================
+         *
+         * 物理肉質適用後
+         * ＋
+         * 属性肉質適用後
+         *
+         * 非会心
+         * プラス会心
+         * マイナス会心
+         *
+         * の3パターンを計算する。
+         */
+
+        FinalDamageResult finalDamageResult
+                = null;
+
+
+        if (physicalHitzoneDamageResult != null
+                || elementHitzoneDamageResult != null) {
+
+            finalDamageResult
+                    = finalDamageService.calculate(
+                            physicalHitzoneDamageResult,
+                            elementHitzoneDamageResult
+                    );
+        }
+
+
+        model.addAttribute(
+                "finalDamageResult",
+                finalDamageResult
+        );
+
+
+        /*
+         * =====================================================
+         * 護石編集URL
+         * =====================================================
+         */
 
         String talismanUrl
                 = buildTalismanUrl(
@@ -1657,7 +2061,6 @@ public class SimulatorController {
                 talismanUrl
         );
 
-
         model.addAttribute(
                 "simulatorForm",
                 simulatorForm
@@ -1667,6 +2070,12 @@ public class SimulatorController {
         return "simulator";
     }
 
+
+    /*
+     * =====================================================
+     * スキル存在確認
+     * =====================================================
+     */
 
     private boolean hasSkill(
             List<SkillTotal> skillTotals,
@@ -1697,6 +2106,12 @@ public class SimulatorController {
     }
 
 
+    /*
+     * =====================================================
+     * 防具取得
+     * =====================================================
+     */
+
     private Armor findArmor(
             Integer armorId) {
 
@@ -1711,6 +2126,12 @@ public class SimulatorController {
         );
     }
 
+
+    /*
+     * =====================================================
+     * 百竜装飾品
+     * =====================================================
+     */
 
     private RampageDecoration findUsableRampageDecoration(
             Integer rampageDecorationId,
@@ -1746,7 +2167,8 @@ public class SimulatorController {
         }
 
 
-        if (rampageDecoration.getRequiredSlotSize() > slotSize) {
+        if (rampageDecoration.getRequiredSlotSize()
+                > slotSize) {
 
             return null;
         }
@@ -1755,6 +2177,12 @@ public class SimulatorController {
         return rampageDecoration;
     }
 
+
+    /*
+     * =====================================================
+     * 通常装飾品
+     * =====================================================
+     */
 
     private Decoration findUsableDecoration(
             Integer decorationId,
@@ -1790,7 +2218,8 @@ public class SimulatorController {
         }
 
 
-        if (decoration.getRequiredSlotSize() > slotSize) {
+        if (decoration.getRequiredSlotSize()
+                > slotSize) {
 
             return null;
         }
@@ -1799,6 +2228,12 @@ public class SimulatorController {
         return decoration;
     }
 
+
+    /*
+     * =====================================================
+     * 護石スキル
+     * =====================================================
+     */
 
     private TalismanSkill createTalismanSkill(
             Integer skillId,
@@ -1829,7 +2264,8 @@ public class SimulatorController {
         if (level == null
                 || level < 1) {
 
-            normalizedLevel = 1;
+            normalizedLevel
+                    = 1;
 
         } else {
 
@@ -1849,6 +2285,12 @@ public class SimulatorController {
         );
     }
 
+
+    /*
+     * =====================================================
+     * 防具スロット
+     * =====================================================
+     */
 
     private int getArmorSlotSize(
             Armor armor,
@@ -1928,6 +2370,12 @@ public class SimulatorController {
     }
 
 
+    /*
+     * =====================================================
+     * 護石編集URL
+     * =====================================================
+     */
+
     private String buildTalismanUrl(
             SimulatorForm form) {
 
@@ -1943,13 +2391,11 @@ public class SimulatorController {
                 form.getWeaponId()
         );
 
-
         addQueryParam(
                 builder,
                 "monsterId",
                 form.getMonsterId()
         );
-
 
         addQueryParam(
                 builder,
@@ -1957,13 +2403,11 @@ public class SimulatorController {
                 form.getHitzoneId()
         );
 
-
         addQueryParam(
                 builder,
                 "rampageDecorationId",
                 form.getRampageDecorationId()
         );
-
 
         addQueryParam(
                 builder,
@@ -1971,13 +2415,11 @@ public class SimulatorController {
                 form.getBowChargeId()
         );
 
-
         addQueryParam(
                 builder,
                 "bowCoatingId",
                 form.getBowCoatingId()
         );
-
 
         addQueryParam(
                 builder,
@@ -1992,13 +2434,11 @@ public class SimulatorController {
                 form.getWeaponDecoration1Id()
         );
 
-
         addQueryParam(
                 builder,
                 "weaponDecoration2Id",
                 form.getWeaponDecoration2Id()
         );
-
 
         addQueryParam(
                 builder,
@@ -2013,20 +2453,17 @@ public class SimulatorController {
                 form.getHeadArmorId()
         );
 
-
         addQueryParam(
                 builder,
                 "headDecoration1Id",
                 form.getHeadDecoration1Id()
         );
 
-
         addQueryParam(
                 builder,
                 "headDecoration2Id",
                 form.getHeadDecoration2Id()
         );
-
 
         addQueryParam(
                 builder,
@@ -2041,20 +2478,17 @@ public class SimulatorController {
                 form.getChestArmorId()
         );
 
-
         addQueryParam(
                 builder,
                 "chestDecoration1Id",
                 form.getChestDecoration1Id()
         );
 
-
         addQueryParam(
                 builder,
                 "chestDecoration2Id",
                 form.getChestDecoration2Id()
         );
-
 
         addQueryParam(
                 builder,
@@ -2069,20 +2503,17 @@ public class SimulatorController {
                 form.getArmArmorId()
         );
 
-
         addQueryParam(
                 builder,
                 "armDecoration1Id",
                 form.getArmDecoration1Id()
         );
 
-
         addQueryParam(
                 builder,
                 "armDecoration2Id",
                 form.getArmDecoration2Id()
         );
-
 
         addQueryParam(
                 builder,
@@ -2097,20 +2528,17 @@ public class SimulatorController {
                 form.getWaistArmorId()
         );
 
-
         addQueryParam(
                 builder,
                 "waistDecoration1Id",
                 form.getWaistDecoration1Id()
         );
 
-
         addQueryParam(
                 builder,
                 "waistDecoration2Id",
                 form.getWaistDecoration2Id()
         );
-
 
         addQueryParam(
                 builder,
@@ -2125,20 +2553,17 @@ public class SimulatorController {
                 form.getLegArmorId()
         );
 
-
         addQueryParam(
                 builder,
                 "legDecoration1Id",
                 form.getLegDecoration1Id()
         );
 
-
         addQueryParam(
                 builder,
                 "legDecoration2Id",
                 form.getLegDecoration2Id()
         );
-
 
         addQueryParam(
                 builder,
@@ -2147,14 +2572,11 @@ public class SimulatorController {
         );
 
 
-        /* 護石スキル */
-
         addQueryParam(
                 builder,
                 "talismanSkill1Id",
                 form.getTalismanSkill1Id()
         );
-
 
         addQueryParam(
                 builder,
@@ -2162,13 +2584,11 @@ public class SimulatorController {
                 form.getTalismanSkill1Level()
         );
 
-
         addQueryParam(
                 builder,
                 "talismanSkill2Id",
                 form.getTalismanSkill2Id()
         );
-
 
         addQueryParam(
                 builder,
@@ -2177,21 +2597,17 @@ public class SimulatorController {
         );
 
 
-        /* 護石スロット */
-
         addQueryParam(
                 builder,
                 "talismanSlot1Size",
                 form.getTalismanSlot1Size()
         );
 
-
         addQueryParam(
                 builder,
                 "talismanSlot2Size",
                 form.getTalismanSlot2Size()
         );
-
 
         addQueryParam(
                 builder,
@@ -2200,21 +2616,17 @@ public class SimulatorController {
         );
 
 
-        /* 護石装飾品 */
-
         addQueryParam(
                 builder,
                 "talismanDecoration1Id",
                 form.getTalismanDecoration1Id()
         );
 
-
         addQueryParam(
                 builder,
                 "talismanDecoration2Id",
                 form.getTalismanDecoration2Id()
         );
-
 
         addQueryParam(
                 builder,

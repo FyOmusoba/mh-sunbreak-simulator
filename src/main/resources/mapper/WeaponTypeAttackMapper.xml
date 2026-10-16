@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.mhsunbreaksimulator.mapper.WeaponTypeAttackMapper">
+
+    <!--
+        武器種から基準攻撃を1件取得
+    -->
+    <select id="findByWeaponType"
+            resultType="com.example.mhsunbreaksimulator.entity.WeaponTypeAttack">
+
+        SELECT
+            weapon_type,
+            base_attack_name,
+            motion_value,
+            element_modifier,
+            hit_count,
+            attack_property,
+            note
+        FROM weapon_type_attack
+        WHERE weapon_type = #{weaponType}
+
+    </select>
+
+</mapper>

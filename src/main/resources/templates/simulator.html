@@ -5,114 +5,52 @@
     <title>装備シミュレーター</title>
 </head>
 <body>
+
     <h1>装備シミュレーター</h1>
 
     <!-- ================================================== -->
     <!-- 武器 -->
     <!-- ================================================== -->
-
     <h2>選択中の武器</h2>
 
     <p th:if="${weapon == null}">
         武器が選択されていません。
-
-        <a th:href="@{/weapon-list(
-            weaponId=${simulatorForm.weaponId},
-            monsterId=${simulatorForm.monsterId},
-            hitzoneId=${simulatorForm.hitzoneId},
-            rampageDecorationId=${simulatorForm.rampageDecorationId},
-            bowChargeId=${simulatorForm.bowChargeId},
-            bowCoatingId=${simulatorForm.bowCoatingId},
-            bowgunAmmoId=${simulatorForm.bowgunAmmoId},
-            headArmorId=${simulatorForm.headArmorId},
-            chestArmorId=${simulatorForm.chestArmorId},
-            armArmorId=${simulatorForm.armArmorId},
-            waistArmorId=${simulatorForm.waistArmorId},
-            legArmorId=${simulatorForm.legArmorId},
-            weaponDecoration1Id=${simulatorForm.weaponDecoration1Id},
-            weaponDecoration2Id=${simulatorForm.weaponDecoration2Id},
-            weaponDecoration3Id=${simulatorForm.weaponDecoration3Id},
-            headDecoration1Id=${simulatorForm.headDecoration1Id},
-            headDecoration2Id=${simulatorForm.headDecoration2Id},
-            headDecoration3Id=${simulatorForm.headDecoration3Id},
-            chestDecoration1Id=${simulatorForm.chestDecoration1Id},
-            chestDecoration2Id=${simulatorForm.chestDecoration2Id},
-            chestDecoration3Id=${simulatorForm.chestDecoration3Id},
-            armDecoration1Id=${simulatorForm.armDecoration1Id},
-            armDecoration2Id=${simulatorForm.armDecoration2Id},
-            armDecoration3Id=${simulatorForm.armDecoration3Id},
-            waistDecoration1Id=${simulatorForm.waistDecoration1Id},
-            waistDecoration2Id=${simulatorForm.waistDecoration2Id},
-            waistDecoration3Id=${simulatorForm.waistDecoration3Id},
-            legDecoration1Id=${simulatorForm.legDecoration1Id},
-            legDecoration2Id=${simulatorForm.legDecoration2Id},
-            legDecoration3Id=${simulatorForm.legDecoration3Id},
-            talismanSkill1Id=${simulatorForm.talismanSkill1Id},
-            talismanSkill1Level=${simulatorForm.talismanSkill1Level},
-            talismanSkill2Id=${simulatorForm.talismanSkill2Id},
-            talismanSkill2Level=${simulatorForm.talismanSkill2Level},
-            talismanSlot1Size=${simulatorForm.talismanSlot1Size},
-            talismanSlot2Size=${simulatorForm.talismanSlot2Size},
-            talismanSlot3Size=${simulatorForm.talismanSlot3Size},
-            talismanDecoration1Id=${simulatorForm.talismanDecoration1Id},
-            talismanDecoration2Id=${simulatorForm.talismanDecoration2Id},
-            talismanDecoration3Id=${simulatorForm.talismanDecoration3Id}
-        )}">武器を選ぶ</a>
+        <button type="button" onclick="goWeaponSelect()">武器を選ぶ</button>
     </p>
 
-    <table border="1" th:if="${weapon != null}">
-        <tr>
-            <th>武器名</th>
-            <td th:text="${weapon.weaponName}"></td>
-        </tr>
+    <div th:if="${weapon != null}">
+        <table border="1">
+            <tr><th>武器名</th><td th:text="${weapon.weaponName}"></td></tr>
+            <tr><th>武器種</th><td th:text="${weapon.weaponType}"></td></tr>
+            <tr><th>攻撃力</th><td th:text="${weapon.attack}"></td></tr>
+            <tr><th>属性</th><td th:text="${weapon.elementType}"></td></tr>
+            <tr><th>属性値</th><td th:text="${weapon.elementValue}"></td></tr>
+            <tr><th>副属性</th><td th:text="${weapon.subElementType}"></td></tr>
+            <tr><th>会心率</th><td><span th:text="${weapon.affinity}"></span>%</td></tr>
+            <tr><th>攻撃属性</th><td th:text="${weapon.attackProperty}"></td></tr>
+        </table>
 
-        <tr>
-            <th>武器種</th>
-            <td th:text="${weapon.weaponType}"></td>
-        </tr>
+        <br>
 
-        <tr>
-            <th>攻撃力</th>
-            <td th:text="${weapon.attack}"></td>
-        </tr>
-
-        <tr>
-            <th>属性</th>
-            <td th:text="${weapon.elementType}"></td>
-        </tr>
-
-        <tr>
-            <th>属性値</th>
-            <td th:text="${weapon.elementValue}"></td>
-        </tr>
-
-        <tr>
-            <th>会心率</th>
-            <td th:text="${weapon.affinity} + '%'"></td>
-        </tr>
-    </table>
-
+        <button type="button" onclick="goWeaponSelect()">
+            武器を選び直す
+        </button>
+    </div>
 
     <br>
-
 
     <!-- ================================================== -->
     <!-- モンスター・部位肉質 -->
     <!-- ================================================== -->
-
     <h2>モンスター・部位肉質</h2>
 
     <p>
-        <label for="monsterSelect">
-            モンスター：
-        </label>
+        <label for="monsterSelect">モンスター：</label>
 
         <select id="monsterSelect"
                 onchange="selectMonster(this.value)">
 
-            <option value="">
-                未選択
-            </option>
+            <option value="">未選択</option>
 
             <option th:each="monster : ${monsters}"
                     th:value="${monster.monsterId}"
@@ -124,29 +62,19 @@
         </select>
     </p>
 
-
     <p th:if="${selectedMonster != null}">
-
         選択中モンスター：
-
-        <strong th:text="${selectedMonster.monsterName}">
-        </strong>
-
+        <strong th:text="${selectedMonster.monsterName}"></strong>
     </p>
 
-
     <p th:if="${selectedMonster != null}">
 
-        <label for="hitzoneSelect">
-            部位：
-        </label>
+        <label for="hitzoneSelect">部位：</label>
 
         <select id="hitzoneSelect"
                 onchange="selectHitzone(this.value)">
 
-            <option value="">
-                未選択
-            </option>
+            <option value="">未選択</option>
 
             <option th:each="hitzone : ${monsterHitzones}"
                     th:value="${hitzone.hitzoneId}"
@@ -156,9 +84,7 @@
             </option>
 
         </select>
-
     </p>
-
 
     <div th:if="${selectedHitzone != null}">
 
@@ -194,26 +120,56 @@
 
     </div>
 
+    <div th:if="${monsterHitzoneValueResult != null
+                 and selectedHitzone != null}">
+
+        <h3>今回使用する肉質</h3>
+
+        <p>
+            物理：
+            <strong th:text="${monsterHitzoneValueResult.physicalHitzone}">
+            </strong>
+
+            （
+            <span th:text="${monsterHitzoneValueResult.physicalHitzoneType}">
+            </span>
+            ）
+        </p>
+
+        <p th:if="${monsterHitzoneValueResult.elemental}">
+            主属性肉質：
+            <strong th:text="${monsterHitzoneValueResult.elementHitzone}">
+            </strong>
+        </p>
+
+        <p th:if="${monsterHitzoneValueResult.subElemental}">
+            副属性肉質：
+            <strong th:text="${monsterHitzoneValueResult.subElementHitzone}">
+            </strong>
+        </p>
+
+    </div>
 
     <br>
 
-
     <!-- ================================================== -->
-    <!-- ボウガンの弾 -->
+    <!-- ボウガン -->
     <!-- ================================================== -->
 
     <div th:if="${weapon != null
                  and (weapon.weaponType == 'ライトボウガン'
                       or weapon.weaponType == 'ヘビィボウガン')}">
 
-        <h3>ボウガンの弾</h3>
+        <h2>ボウガン</h2>
 
-        <p th:if="${bowgunAmmos == null or #lists.isEmpty(bowgunAmmos)}">
+        <p th:if="${bowgunAmmos == null
+                   or #lists.isEmpty(bowgunAmmos)}">
             使用可能な弾データがありません。
         </p>
 
         <table border="1"
-               th:if="${bowgunAmmos != null and not #lists.isEmpty(bowgunAmmos)}">
+               th:if="${bowgunAmmos != null
+                       and !#lists.isEmpty(bowgunAmmos)}">
 
             <tr>
                 <th>選択</th>
@@ -251,35 +207,24 @@
 
         </table>
 
+        <div th:if="${selectedBowgunAmmo != null}">
 
-        <p th:if="${selectedBowgunAmmo != null}">
+            <p>
+                選択中：
 
-            選択中：
+                <strong th:text="${selectedBowgunAmmo.ammoType}">
+                </strong>
 
-            <strong th:text="${selectedBowgunAmmo.ammoType}">
-            </strong>
+                Lv<span th:text="${selectedBowgunAmmo.ammoLevel}">
+                </span>
+            </p>
 
-            Lv<span th:text="${selectedBowgunAmmo.ammoLevel}">
-            </span>
-
-            /
-
-            装填数
-
-            <span th:text="${selectedBowgunAmmo.capacity}">
-            </span>
-
-            <span th:if="${selectedBowgunAmmo.rapidFire}">
-                / 速射対応
-            </span>
-
-        </p>
-
+        </div>
 
         <div th:if="${selectedBowgunAmmo != null
                      and bowgunAmmoModifier != null}">
 
-            <h4>選択中の弾・計算用データ</h4>
+            <h3>ボウガン弾・計算用データ</h3>
 
             <p>
                 1hit物理モーション値：
@@ -307,26 +252,115 @@
 
         </div>
 
+        <div th:if="${selectedBowgunAmmo != null
+                     and bowgunRapidFireModifier != null
+                     and bowgunRapidFireModifier.rapidFire}">
+
+            <h3>速射補正</h3>
+
+            <p>
+                発射数：
+                <strong th:text="${bowgunRapidFireModifier.shotCount}">
+                </strong>
+            </p>
+
+            <p>
+                1発物理倍率：
+                <strong th:text="${bowgunRapidFireModifier.physicalMulPerShot}">
+                </strong>
+            </p>
+
+            <p>
+                1発属性倍率：
+                <strong th:text="${bowgunRapidFireModifier.elementMulPerShot}">
+                </strong>
+            </p>
+
+        </div>
+
+        <div th:if="${bowgunPhysicalDamageResult != null
+                     and selectedBowgunAmmo != null}">
+
+            <h3>ボウガン物理ダメージ計算途中値</h3>
+
+            <p>
+                補正後攻撃力：
+                <strong th:text="${bowgunPhysicalDamageResult.effectiveAttack}">
+                </strong>
+            </p>
+
+            <p>
+                肉質補正前・1hit物理値：
+                <strong th:text="${bowgunPhysicalDamageResult.physicalDamagePerHit}">
+                </strong>
+            </p>
+
+            <p>
+                1発最大物理値：
+                <strong th:text="${bowgunPhysicalDamageResult.maxPhysicalDamage}">
+                </strong>
+            </p>
+
+            <p>
+                弾1個消費あたり最大物理値：
+                <strong th:text="${bowgunPhysicalDamageResult.maxPhysicalDamagePerAmmo}">
+                </strong>
+            </p>
+
+        </div>
+
+        <div th:if="${bowgunElementDamageResult != null
+                     and selectedBowgunAmmo != null}">
+
+            <h3>ボウガン属性ダメージ計算途中値</h3>
+
+            <p>
+                補正後攻撃力：
+                <strong th:text="${bowgunElementDamageResult.effectiveAttack}">
+                </strong>
+            </p>
+
+            <p>
+                肉質補正前・1hit属性値：
+                <strong th:text="${bowgunElementDamageResult.elementDamagePerHit}">
+                </strong>
+            </p>
+
+            <p>
+                1発最大属性値：
+                <strong th:text="${bowgunElementDamageResult.maxElementDamage}">
+                </strong>
+            </p>
+
+            <p>
+                弾1個消費あたり最大属性値：
+                <strong th:text="${bowgunElementDamageResult.maxElementDamagePerAmmo}">
+                </strong>
+            </p>
+
+        </div>
+
     </div>
 
-
-    <br>
-
-
     <!-- ================================================== -->
-    <!-- 弓の溜め段階 -->
+    <!-- 弓 -->
     <!-- ================================================== -->
 
-    <div th:if="${weapon != null and weapon.weaponType == '弓'}">
+    <div th:if="${weapon != null
+                 and weapon.weaponType == '弓'}">
 
-        <h3>弓の溜め段階</h3>
+        <h2>弓</h2>
 
-        <p th:if="${bowCharges == null or #lists.isEmpty(bowCharges)}">
+        <h3>溜め段階</h3>
+
+        <p th:if="${bowCharges == null
+                   or #lists.isEmpty(bowCharges)}">
             溜め段階データがありません。
         </p>
 
         <table border="1"
-               th:if="${bowCharges != null and not #lists.isEmpty(bowCharges)}">
+               th:if="${bowCharges != null
+                       and !#lists.isEmpty(bowCharges)}">
 
             <tr>
                 <th>選択</th>
@@ -359,42 +393,36 @@
                     Lv<span th:text="${charge.shotLevel}"></span>
                 </td>
 
-                <td>
-
-                    <span th:if="${charge.initiallyAvailable}">
-                        通常使用可能
-                    </span>
-
-                    <span th:if="${!charge.initiallyAvailable}">
-                        弓溜め段階解放が必要
-                    </span>
-
+                <td th:text="${charge.initiallyAvailable
+                    ? '通常使用可能'
+                    : '弓溜め段階解放が必要'}">
                 </td>
 
             </tr>
 
         </table>
 
+        <div th:if="${selectedBowCharge != null}">
 
-        <p th:if="${selectedBowCharge != null}">
+            <p>
+                選択中：
 
-            選択中：
+                溜め<span th:text="${selectedBowCharge.chargeLevel}">
+                </span>
 
-            溜め<span th:text="${selectedBowCharge.chargeLevel}">
-            </span>
+                /
 
-            /
+                <span th:text="${selectedBowCharge.shotType}">
+                </span>
 
-            <span th:text="${selectedBowCharge.shotType}">
-            </span>
+                Lv<span th:text="${selectedBowCharge.shotLevel}">
+                </span>
+            </p>
 
-            Lv<span th:text="${selectedBowCharge.shotLevel}">
-            </span>
+        </div>
 
-        </p>
-
-
-        <div th:if="${selectedBowCharge != null and bowChargeModifier != null}">
+        <div th:if="${selectedBowCharge != null
+                     and bowChargeModifier != null}">
 
             <p>
                 溜め物理倍率：
@@ -410,8 +438,8 @@
 
         </div>
 
-
-        <div th:if="${selectedBowCharge != null and bowShotModifier != null}">
+        <div th:if="${selectedBowCharge != null
+                     and bowShotModifier != null}">
 
             <p>
                 矢モーション値（1hit）：
@@ -427,26 +455,11 @@
 
         </div>
 
-    </div>
-
-
-    <br>
-
-
-    <!-- ================================================== -->
-    <!-- 弓のビン -->
-    <!-- ================================================== -->
-
-    <div th:if="${weapon != null and weapon.weaponType == '弓'}">
-
-        <h3>弓のビン</h3>
-
-        <p th:if="${bowCoatings == null or #lists.isEmpty(bowCoatings)}">
-            使用可能なビンデータがありません。
-        </p>
+        <h3>ビン</h3>
 
         <table border="1"
-               th:if="${bowCoatings != null and not #lists.isEmpty(bowCoatings)}">
+               th:if="${bowCoatings != null
+                       and !#lists.isEmpty(bowCoatings)}">
 
             <tr>
                 <th>選択</th>
@@ -467,7 +480,6 @@
                 </td>
 
                 <td>ビンなし</td>
-
                 <td>-</td>
 
             </tr>
@@ -487,38 +499,23 @@
 
                 <td th:text="${coating.coatingType}"></td>
 
-                <td>
-
-                    <span th:if="${coating.isEnhanced}">
-                        強化
-                    </span>
-
-                    <span th:if="${!coating.isEnhanced}">
-                        通常
-                    </span>
-
+                <td th:text="${coating.isEnhanced
+                    ? '強化'
+                    : '通常'}">
                 </td>
 
             </tr>
 
         </table>
 
+        <div th:if="${selectedBowCoating != null
+                     and bowCoatingModifier != null}">
 
-        <p th:if="${selectedBowCoating != null}">
-
-            選択中：
-
-            <span th:text="${selectedBowCoating.coatingType}">
-            </span>
-
-            <span th:if="${selectedBowCoating.isEnhanced}">
-                （強化）
-            </span>
-
-        </p>
-
-
-        <div th:if="${selectedBowCoating != null and bowCoatingModifier != null}">
+            <p>
+                選択中ビン：
+                <strong th:text="${selectedBowCoating.coatingType}">
+                </strong>
+            </p>
 
             <p>
                 ビン物理倍率：
@@ -534,571 +531,359 @@
 
         </div>
 
+        <div th:if="${bowPhysicalModifier != null
+                     and selectedBowCharge != null}">
 
-        <p th:if="${selectedBowCoating == null
-                   and bowCoatings != null
-                   and not #lists.isEmpty(bowCoatings)}">
+            <h3>弓の最終物理係数</h3>
 
-            選択中：ビンなし
+            <p>
+                1hitあたり物理係数：
+                <strong th:text="${bowPhysicalModifier.physicalRatePerHit}">
+                </strong>
+            </p>
 
-        </p>
+            <p>
+                最大ヒット時物理係数：
+                <strong th:text="${bowPhysicalModifier.maxPhysicalRate}">
+                </strong>
+            </p>
 
-    </div>
+            <p>
+                最大ヒット数：
+                <strong th:text="${bowPhysicalModifier.maxHitCount}">
+                </strong>
+            </p>
 
+        </div>
 
-    <div th:if="${weapon != null
-                 and weapon.weaponType == '弓'
-                 and selectedBowCharge != null
-                 and bowPhysicalModifier != null}">
+        <div th:if="${bowPhysicalDamageResult != null
+                     and selectedBowCharge != null}">
 
-        <h3>弓の最終物理係数</h3>
+            <h3>弓の物理ダメージ計算途中値</h3>
 
-        <p>
-            1hitあたり物理係数：
-            <strong th:text="${bowPhysicalModifier.physicalRatePerHit}">
-            </strong>
-        </p>
+            <p>
+                条件付き補正後攻撃力：
+                <strong th:text="${bowPhysicalDamageResult.effectiveAttack}">
+                </strong>
+            </p>
 
-        <p>
-            最大ヒット時物理係数：
-            <strong th:text="${bowPhysicalModifier.maxPhysicalRate}">
-            </strong>
-        </p>
+            <p>
+                肉質補正前・1hit物理値：
+                <strong th:text="${bowPhysicalDamageResult.physicalDamagePerHit}">
+                </strong>
+            </p>
 
-        <p>
-            最大ヒット数：
-            <strong th:text="${bowPhysicalModifier.maxHitCount}">
-            </strong>
-        </p>
+            <p>
+                肉質補正前・最大ヒット物理値：
+                <strong th:text="${bowPhysicalDamageResult.maxPhysicalDamage}">
+                </strong>
+            </p>
 
-    </div>
+        </div>
 
+        <div th:if="${bowElementDamageResult != null
+                     and selectedBowCharge != null}">
 
-    <div th:if="${weapon != null
-                 and weapon.weaponType == '弓'
-                 and selectedBowCharge != null
-                 and bowPhysicalDamageResult != null}">
+            <h3>弓の属性ダメージ計算途中値</h3>
 
-        <h3>弓の物理ダメージ計算途中値</h3>
+            <p>
+                条件付き補正後属性値：
+                <strong th:text="${bowElementDamageResult.effectiveElement}">
+                </strong>
+            </p>
 
-        <p>
-            条件付き補正後攻撃力：
-            <strong th:text="${bowPhysicalDamageResult.effectiveAttack}">
-            </strong>
-        </p>
+            <p>
+                肉質補正前・1hit属性値：
+                <strong th:text="${bowElementDamageResult.elementDamagePerHit}">
+                </strong>
+            </p>
 
-        <p>
-            肉質補正前・1hit物理値：
-            <strong th:text="${bowPhysicalDamageResult.physicalDamagePerHit}">
-            </strong>
-        </p>
+            <p>
+                肉質補正前・最大ヒット属性値：
+                <strong th:text="${bowElementDamageResult.maxElementDamage}">
+                </strong>
+            </p>
 
-        <p>
-            肉質補正前・最大ヒット物理値：
-            <strong th:text="${bowPhysicalDamageResult.maxPhysicalDamage}">
-            </strong>
-        </p>
-
-    </div>
-
-
-    <div th:if="${weapon != null
-                 and weapon.weaponType == '弓'
-                 and selectedBowCharge != null
-                 and bowElementDamageResult != null}">
-
-        <h3>弓の属性ダメージ計算途中値</h3>
-
-        <p>
-            条件付き補正後属性値：
-            <strong th:text="${bowElementDamageResult.effectiveElement}">
-            </strong>
-        </p>
-
-        <p>
-            肉質補正前・1hit属性値：
-            <strong th:text="${bowElementDamageResult.elementDamagePerHit}">
-            </strong>
-        </p>
-
-        <p>
-            肉質補正前・最大ヒット属性値：
-            <strong th:text="${bowElementDamageResult.maxElementDamage}">
-            </strong>
-        </p>
+        </div>
 
     </div>
-
 
     <br>
-
 
     <!-- ================================================== -->
     <!-- 百竜装飾品 -->
     <!-- ================================================== -->
 
-    <h3 th:if="${weapon != null}">
-        百竜装飾品
-    </h3>
+    <div th:if="${weapon != null}">
 
+        <h2>百竜装飾品</h2>
 
-    <table border="1"
-           th:if="${weapon != null}">
+        <table border="1">
 
-        <tr>
-            <th>百竜スロットサイズ</th>
-            <th>百竜装飾品</th>
-            <th>百竜スキル</th>
-            <th>操作</th>
-        </tr>
+            <tr>
+                <th>百竜スロット</th>
+                <th>装飾品</th>
+                <th>百竜スキル</th>
+                <th>操作</th>
+            </tr>
 
-        <tr>
+            <tr>
 
-            <td th:text="${weapon.rampageSlotSize != null
-                ? weapon.rampageSlotSize
-                : 0}">
-            </td>
+                <td th:text="${weapon.rampageSlotSize != null
+                    ? weapon.rampageSlotSize
+                    : 0}">
+                </td>
 
-            <td>
+                <td th:text="${rampageDecoration != null
+                    ? rampageDecoration.decorationName
+                    : '未選択'}">
+                </td>
 
-                <span th:if="${weapon.rampageSlotSize == null
-                             or weapon.rampageSlotSize == 0}">
-                    スロットなし
-                </span>
+                <td th:text="${rampageDecoration != null
+                    ? rampageDecoration.rampageSkillName
+                    : '-'}">
+                </td>
 
-                <span th:if="${weapon.rampageSlotSize != null
-                             and weapon.rampageSlotSize > 0
-                             and rampageDecoration == null}">
-                    未選択
-                </span>
+                <td>
 
-                <span th:if="${rampageDecoration != null}"
-                      th:text="${rampageDecoration.decorationName}">
-                </span>
+                    <button type="button"
+                            th:if="${weapon.rampageSlotSize != null
+                                and weapon.rampageSlotSize > 0}"
+                            onclick="goRampageDecorationSelect()">
 
-            </td>
+                        百竜装飾品を選ぶ
 
-            <td>
+                    </button>
 
-                <span th:if="${rampageDecoration == null}">
-                    -
-                </span>
+                    <button type="button"
+                            th:if="${simulatorForm.rampageDecorationId != null}"
+                            onclick="removeDecoration('rampageDecorationId')">
 
-                <span th:if="${rampageDecoration != null}"
-                      th:text="${rampageDecoration.rampageSkillName}">
-                </span>
+                        外す
 
-            </td>
+                    </button>
 
-            <td>
+                </td>
 
-                <span th:if="${weapon.rampageSlotSize == null
-                             or weapon.rampageSlotSize == 0}">
-                    -
-                </span>
+            </tr>
 
-                <a th:if="${weapon.rampageSlotSize != null
-                           and weapon.rampageSlotSize > 0}"
+        </table>
 
-                   th:href="@{/rampage-decoration-select(
-                       weaponId=${simulatorForm.weaponId},
-                       monsterId=${simulatorForm.monsterId},
-                       hitzoneId=${simulatorForm.hitzoneId},
-                       rampageDecorationId=${simulatorForm.rampageDecorationId},
-                       bowChargeId=${simulatorForm.bowChargeId},
-                       bowCoatingId=${simulatorForm.bowCoatingId},
-                       bowgunAmmoId=${simulatorForm.bowgunAmmoId},
-                       headArmorId=${simulatorForm.headArmorId},
-                       chestArmorId=${simulatorForm.chestArmorId},
-                       armArmorId=${simulatorForm.armArmorId},
-                       waistArmorId=${simulatorForm.waistArmorId},
-                       legArmorId=${simulatorForm.legArmorId},
-                       weaponDecoration1Id=${simulatorForm.weaponDecoration1Id},
-                       weaponDecoration2Id=${simulatorForm.weaponDecoration2Id},
-                       weaponDecoration3Id=${simulatorForm.weaponDecoration3Id},
-                       headDecoration1Id=${simulatorForm.headDecoration1Id},
-                       headDecoration2Id=${simulatorForm.headDecoration2Id},
-                       headDecoration3Id=${simulatorForm.headDecoration3Id},
-                       chestDecoration1Id=${simulatorForm.chestDecoration1Id},
-                       chestDecoration2Id=${simulatorForm.chestDecoration2Id},
-                       chestDecoration3Id=${simulatorForm.chestDecoration3Id},
-                       armDecoration1Id=${simulatorForm.armDecoration1Id},
-                       armDecoration2Id=${simulatorForm.armDecoration2Id},
-                       armDecoration3Id=${simulatorForm.armDecoration3Id},
-                       waistDecoration1Id=${simulatorForm.waistDecoration1Id},
-                       waistDecoration2Id=${simulatorForm.waistDecoration2Id},
-                       waistDecoration3Id=${simulatorForm.waistDecoration3Id},
-                       legDecoration1Id=${simulatorForm.legDecoration1Id},
-                       legDecoration2Id=${simulatorForm.legDecoration2Id},
-                       legDecoration3Id=${simulatorForm.legDecoration3Id},
-                       talismanSkill1Id=${simulatorForm.talismanSkill1Id},
-                       talismanSkill1Level=${simulatorForm.talismanSkill1Level},
-                       talismanSkill2Id=${simulatorForm.talismanSkill2Id},
-                       talismanSkill2Level=${simulatorForm.talismanSkill2Level},
-                       talismanSlot1Size=${simulatorForm.talismanSlot1Size},
-                       talismanSlot2Size=${simulatorForm.talismanSlot2Size},
-                       talismanSlot3Size=${simulatorForm.talismanSlot3Size},
-                       talismanDecoration1Id=${simulatorForm.talismanDecoration1Id},
-                       talismanDecoration2Id=${simulatorForm.talismanDecoration2Id},
-                       talismanDecoration3Id=${simulatorForm.talismanDecoration3Id}
-                   )}">
-
-                    百竜装飾品を選ぶ
-
-                </a>
-
-
-                <button type="button"
-                        th:if="${simulatorForm.rampageDecorationId != null}"
-                        onclick="removeDecoration('rampageDecorationId')">
-
-                    外す
-
-                </button>
-
-            </td>
-
-        </tr>
-
-    </table>
-
+    </div>
 
     <br>
-
 
     <!-- ================================================== -->
     <!-- 武器装飾品 -->
     <!-- ================================================== -->
 
-    <h3 th:if="${weapon != null}">
-        武器スロット
-    </h3>
+    <div th:if="${weapon != null}">
 
+        <h2>武器スロット</h2>
 
-    <table border="1"
-           th:if="${weapon != null}">
+        <table border="1">
 
-        <tr>
-            <th>スロット</th>
-            <th>サイズ</th>
-            <th>装飾品</th>
-            <th>操作</th>
-        </tr>
+            <tr>
+                <th>スロット</th>
+                <th>サイズ</th>
+                <th>装飾品</th>
+                <th>操作</th>
+            </tr>
 
+            <tr>
 
-        <!-- 武器スロット1 -->
+                <td>1</td>
 
-        <tr>
+                <td th:text="${weapon.slot1Size != null
+                    ? weapon.slot1Size
+                    : 0}">
+                </td>
 
-            <td>1</td>
+                <td>
 
-            <td th:text="${weapon.slot1Size}">
-            </td>
-
-            <td>
-
-                <span th:if="${weapon.slot1Size == 0}">
-                    スロットなし
-                </span>
-
-                <span th:if="${weapon.slot1Size > 0
-                             and weaponDecoration1 == null}">
-                    未選択
-                </span>
-
-                <span th:if="${weaponDecoration1 != null}">
-
-                    <span th:text="${weaponDecoration1.skillName}">
+                    <span th:if="${weapon.slot1Size == null
+                                 or weapon.slot1Size == 0}">
+                        スロットなし
                     </span>
 
-                    Lv<span th:text="${weaponDecoration1.skillLevel}">
+                    <span th:if="${weapon.slot1Size != null
+                                 and weapon.slot1Size > 0
+                                 and weaponDecoration1 == null}">
+                        未選択
                     </span>
 
-                </span>
+                    <span th:if="${weaponDecoration1 != null}">
 
-            </td>
+                        <span th:text="${weaponDecoration1.skillName}">
+                        </span>
 
-            <td>
+                        Lv<span th:text="${weaponDecoration1.skillLevel}">
+                        </span>
 
-                <span th:if="${weapon.slot1Size == 0}">
-                    -
-                </span>
-
-                <a th:if="${weapon.slot1Size > 0}"
-
-                   th:href="@{/decoration-select(
-                       slotSize=${weapon.slot1Size},
-                       target='weaponDecoration1Id',
-                       weaponId=${simulatorForm.weaponId},
-                       monsterId=${simulatorForm.monsterId},
-                       hitzoneId=${simulatorForm.hitzoneId},
-                       rampageDecorationId=${simulatorForm.rampageDecorationId},
-                       bowChargeId=${simulatorForm.bowChargeId},
-                       bowCoatingId=${simulatorForm.bowCoatingId},
-                       bowgunAmmoId=${simulatorForm.bowgunAmmoId},
-                       headArmorId=${simulatorForm.headArmorId},
-                       chestArmorId=${simulatorForm.chestArmorId},
-                       armArmorId=${simulatorForm.armArmorId},
-                       waistArmorId=${simulatorForm.waistArmorId},
-                       legArmorId=${simulatorForm.legArmorId},
-                       weaponDecoration1Id=${simulatorForm.weaponDecoration1Id},
-                       weaponDecoration2Id=${simulatorForm.weaponDecoration2Id},
-                       weaponDecoration3Id=${simulatorForm.weaponDecoration3Id},
-                       headDecoration1Id=${simulatorForm.headDecoration1Id},
-                       headDecoration2Id=${simulatorForm.headDecoration2Id},
-                       headDecoration3Id=${simulatorForm.headDecoration3Id},
-                       chestDecoration1Id=${simulatorForm.chestDecoration1Id},
-                       chestDecoration2Id=${simulatorForm.chestDecoration2Id},
-                       chestDecoration3Id=${simulatorForm.chestDecoration3Id},
-                       armDecoration1Id=${simulatorForm.armDecoration1Id},
-                       armDecoration2Id=${simulatorForm.armDecoration2Id},
-                       armDecoration3Id=${simulatorForm.armDecoration3Id},
-                       waistDecoration1Id=${simulatorForm.waistDecoration1Id},
-                       waistDecoration2Id=${simulatorForm.waistDecoration2Id},
-                       waistDecoration3Id=${simulatorForm.waistDecoration3Id},
-                       legDecoration1Id=${simulatorForm.legDecoration1Id},
-                       legDecoration2Id=${simulatorForm.legDecoration2Id},
-                       legDecoration3Id=${simulatorForm.legDecoration3Id},
-                       talismanSkill1Id=${simulatorForm.talismanSkill1Id},
-                       talismanSkill1Level=${simulatorForm.talismanSkill1Level},
-                       talismanSkill2Id=${simulatorForm.talismanSkill2Id},
-                       talismanSkill2Level=${simulatorForm.talismanSkill2Level},
-                       talismanSlot1Size=${simulatorForm.talismanSlot1Size},
-                       talismanSlot2Size=${simulatorForm.talismanSlot2Size},
-                       talismanSlot3Size=${simulatorForm.talismanSlot3Size},
-                       talismanDecoration1Id=${simulatorForm.talismanDecoration1Id},
-                       talismanDecoration2Id=${simulatorForm.talismanDecoration2Id},
-                       talismanDecoration3Id=${simulatorForm.talismanDecoration3Id}
-                   )}">
-
-                    装飾品を選ぶ
-
-                </a>
-
-                <button type="button"
-                        th:if="${simulatorForm.weaponDecoration1Id != null}"
-                        onclick="removeDecoration('weaponDecoration1Id')">
-
-                    外す
-
-                </button>
-
-            </td>
-
-        </tr>
-
-
-        <!-- 武器スロット2 -->
-
-        <tr>
-
-            <td>2</td>
-
-            <td th:text="${weapon.slot2Size}">
-            </td>
-
-            <td>
-
-                <span th:if="${weapon.slot2Size == 0}">
-                    スロットなし
-                </span>
-
-                <span th:if="${weapon.slot2Size > 0
-                             and weaponDecoration2 == null}">
-                    未選択
-                </span>
-
-                <span th:if="${weaponDecoration2 != null}">
-
-                    <span th:text="${weaponDecoration2.skillName}">
                     </span>
 
-                    Lv<span th:text="${weaponDecoration2.skillLevel}">
+                </td>
+
+                <td>
+
+                    <button type="button"
+                            th:if="${weapon.slot1Size != null
+                                   and weapon.slot1Size > 0}"
+                            th:data-target="'weaponDecoration1Id'"
+                            th:data-slot-size="${weapon.slot1Size}"
+                            onclick="goDecorationSelect(
+                                this.dataset.target,
+                                this.dataset.slotSize
+                            )">
+
+                        装飾品を選ぶ
+
+                    </button>
+
+                    <button type="button"
+                            th:if="${simulatorForm.weaponDecoration1Id != null}"
+                            onclick="removeDecoration('weaponDecoration1Id')">
+
+                        外す
+
+                    </button>
+
+                </td>
+
+            </tr>
+
+            <tr>
+
+                <td>2</td>
+
+                <td th:text="${weapon.slot2Size != null
+                    ? weapon.slot2Size
+                    : 0}">
+                </td>
+
+                <td>
+
+                    <span th:if="${weapon.slot2Size == null
+                                 or weapon.slot2Size == 0}">
+                        スロットなし
                     </span>
 
-                </span>
-
-            </td>
-
-            <td>
-
-                <span th:if="${weapon.slot2Size == 0}">
-                    -
-                </span>
-
-                <a th:if="${weapon.slot2Size > 0}"
-
-                   th:href="@{/decoration-select(
-                       slotSize=${weapon.slot2Size},
-                       target='weaponDecoration2Id',
-                       weaponId=${simulatorForm.weaponId},
-                       monsterId=${simulatorForm.monsterId},
-                       hitzoneId=${simulatorForm.hitzoneId},
-                       rampageDecorationId=${simulatorForm.rampageDecorationId},
-                       bowChargeId=${simulatorForm.bowChargeId},
-                       bowCoatingId=${simulatorForm.bowCoatingId},
-                       bowgunAmmoId=${simulatorForm.bowgunAmmoId},
-                       headArmorId=${simulatorForm.headArmorId},
-                       chestArmorId=${simulatorForm.chestArmorId},
-                       armArmorId=${simulatorForm.armArmorId},
-                       waistArmorId=${simulatorForm.waistArmorId},
-                       legArmorId=${simulatorForm.legArmorId},
-                       weaponDecoration1Id=${simulatorForm.weaponDecoration1Id},
-                       weaponDecoration2Id=${simulatorForm.weaponDecoration2Id},
-                       weaponDecoration3Id=${simulatorForm.weaponDecoration3Id},
-                       headDecoration1Id=${simulatorForm.headDecoration1Id},
-                       headDecoration2Id=${simulatorForm.headDecoration2Id},
-                       headDecoration3Id=${simulatorForm.headDecoration3Id},
-                       chestDecoration1Id=${simulatorForm.chestDecoration1Id},
-                       chestDecoration2Id=${simulatorForm.chestDecoration2Id},
-                       chestDecoration3Id=${simulatorForm.chestDecoration3Id},
-                       armDecoration1Id=${simulatorForm.armDecoration1Id},
-                       armDecoration2Id=${simulatorForm.armDecoration2Id},
-                       armDecoration3Id=${simulatorForm.armDecoration3Id},
-                       waistDecoration1Id=${simulatorForm.waistDecoration1Id},
-                       waistDecoration2Id=${simulatorForm.waistDecoration2Id},
-                       waistDecoration3Id=${simulatorForm.waistDecoration3Id},
-                       legDecoration1Id=${simulatorForm.legDecoration1Id},
-                       legDecoration2Id=${simulatorForm.legDecoration2Id},
-                       legDecoration3Id=${simulatorForm.legDecoration3Id},
-                       talismanSkill1Id=${simulatorForm.talismanSkill1Id},
-                       talismanSkill1Level=${simulatorForm.talismanSkill1Level},
-                       talismanSkill2Id=${simulatorForm.talismanSkill2Id},
-                       talismanSkill2Level=${simulatorForm.talismanSkill2Level},
-                       talismanSlot1Size=${simulatorForm.talismanSlot1Size},
-                       talismanSlot2Size=${simulatorForm.talismanSlot2Size},
-                       talismanSlot3Size=${simulatorForm.talismanSlot3Size},
-                       talismanDecoration1Id=${simulatorForm.talismanDecoration1Id},
-                       talismanDecoration2Id=${simulatorForm.talismanDecoration2Id},
-                       talismanDecoration3Id=${simulatorForm.talismanDecoration3Id}
-                   )}">
-
-                    装飾品を選ぶ
-
-                </a>
-
-                <button type="button"
-                        th:if="${simulatorForm.weaponDecoration2Id != null}"
-                        onclick="removeDecoration('weaponDecoration2Id')">
-
-                    外す
-
-                </button>
-
-            </td>
-
-        </tr>
-
-
-        <!-- 武器スロット3 -->
-
-        <tr>
-
-            <td>3</td>
-
-            <td th:text="${weapon.slot3Size}">
-            </td>
-
-            <td>
-
-                <span th:if="${weapon.slot3Size == 0}">
-                    スロットなし
-                </span>
-
-                <span th:if="${weapon.slot3Size > 0
-                             and weaponDecoration3 == null}">
-                    未選択
-                </span>
-
-                <span th:if="${weaponDecoration3 != null}">
-
-                    <span th:text="${weaponDecoration3.skillName}">
+                    <span th:if="${weapon.slot2Size != null
+                                 and weapon.slot2Size > 0
+                                 and weaponDecoration2 == null}">
+                        未選択
                     </span>
 
-                    Lv<span th:text="${weaponDecoration3.skillLevel}">
+                    <span th:if="${weaponDecoration2 != null}">
+
+                        <span th:text="${weaponDecoration2.skillName}">
+                        </span>
+
+                        Lv<span th:text="${weaponDecoration2.skillLevel}">
+                        </span>
+
                     </span>
 
-                </span>
+                </td>
 
-            </td>
+                <td>
 
-            <td>
+                    <button type="button"
+                            th:if="${weapon.slot2Size != null
+                                   and weapon.slot2Size > 0}"
+                            th:data-target="'weaponDecoration2Id'"
+                            th:data-slot-size="${weapon.slot2Size}"
+                            onclick="goDecorationSelect(
+                                this.dataset.target,
+                                this.dataset.slotSize
+                            )">
 
-                <span th:if="${weapon.slot3Size == 0}">
-                    -
-                </span>
+                        装飾品を選ぶ
 
-                <a th:if="${weapon.slot3Size > 0}"
+                    </button>
 
-                   th:href="@{/decoration-select(
-                       slotSize=${weapon.slot3Size},
-                       target='weaponDecoration3Id',
-                       weaponId=${simulatorForm.weaponId},
-                       monsterId=${simulatorForm.monsterId},
-                       hitzoneId=${simulatorForm.hitzoneId},
-                       rampageDecorationId=${simulatorForm.rampageDecorationId},
-                       bowChargeId=${simulatorForm.bowChargeId},
-                       bowCoatingId=${simulatorForm.bowCoatingId},
-                       bowgunAmmoId=${simulatorForm.bowgunAmmoId},
-                       headArmorId=${simulatorForm.headArmorId},
-                       chestArmorId=${simulatorForm.chestArmorId},
-                       armArmorId=${simulatorForm.armArmorId},
-                       waistArmorId=${simulatorForm.waistArmorId},
-                       legArmorId=${simulatorForm.legArmorId},
-                       weaponDecoration1Id=${simulatorForm.weaponDecoration1Id},
-                       weaponDecoration2Id=${simulatorForm.weaponDecoration2Id},
-                       weaponDecoration3Id=${simulatorForm.weaponDecoration3Id},
-                       headDecoration1Id=${simulatorForm.headDecoration1Id},
-                       headDecoration2Id=${simulatorForm.headDecoration2Id},
-                       headDecoration3Id=${simulatorForm.headDecoration3Id},
-                       chestDecoration1Id=${simulatorForm.chestDecoration1Id},
-                       chestDecoration2Id=${simulatorForm.chestDecoration2Id},
-                       chestDecoration3Id=${simulatorForm.chestDecoration3Id},
-                       armDecoration1Id=${simulatorForm.armDecoration1Id},
-                       armDecoration2Id=${simulatorForm.armDecoration2Id},
-                       armDecoration3Id=${simulatorForm.armDecoration3Id},
-                       waistDecoration1Id=${simulatorForm.waistDecoration1Id},
-                       waistDecoration2Id=${simulatorForm.waistDecoration2Id},
-                       waistDecoration3Id=${simulatorForm.waistDecoration3Id},
-                       legDecoration1Id=${simulatorForm.legDecoration1Id},
-                       legDecoration2Id=${simulatorForm.legDecoration2Id},
-                       legDecoration3Id=${simulatorForm.legDecoration3Id},
-                       talismanSkill1Id=${simulatorForm.talismanSkill1Id},
-                       talismanSkill1Level=${simulatorForm.talismanSkill1Level},
-                       talismanSkill2Id=${simulatorForm.talismanSkill2Id},
-                       talismanSkill2Level=${simulatorForm.talismanSkill2Level},
-                       talismanSlot1Size=${simulatorForm.talismanSlot1Size},
-                       talismanSlot2Size=${simulatorForm.talismanSlot2Size},
-                       talismanSlot3Size=${simulatorForm.talismanSlot3Size},
-                       talismanDecoration1Id=${simulatorForm.talismanDecoration1Id},
-                       talismanDecoration2Id=${simulatorForm.talismanDecoration2Id},
-                       talismanDecoration3Id=${simulatorForm.talismanDecoration3Id}
-                   )}">
+                    <button type="button"
+                            th:if="${simulatorForm.weaponDecoration2Id != null}"
+                            onclick="removeDecoration('weaponDecoration2Id')">
 
-                    装飾品を選ぶ
+                        外す
 
-                </a>
+                    </button>
 
-                <button type="button"
-                        th:if="${simulatorForm.weaponDecoration3Id != null}"
-                        onclick="removeDecoration('weaponDecoration3Id')">
+                </td>
 
-                    外す
+            </tr>
 
-                </button>
+            <tr>
 
-            </td>
+                <td>3</td>
 
-        </tr>
+                <td th:text="${weapon.slot3Size != null
+                    ? weapon.slot3Size
+                    : 0}">
+                </td>
 
-    </table>
+                <td>
 
+                    <span th:if="${weapon.slot3Size == null
+                                 or weapon.slot3Size == 0}">
+                        スロットなし
+                    </span>
+
+                    <span th:if="${weapon.slot3Size != null
+                                 and weapon.slot3Size > 0
+                                 and weaponDecoration3 == null}">
+                        未選択
+                    </span>
+
+                    <span th:if="${weaponDecoration3 != null}">
+
+                        <span th:text="${weaponDecoration3.skillName}">
+                        </span>
+
+                        Lv<span th:text="${weaponDecoration3.skillLevel}">
+                        </span>
+
+                    </span>
+
+                </td>
+
+                <td>
+
+                    <button type="button"
+                            th:if="${weapon.slot3Size != null
+                                   and weapon.slot3Size > 0}"
+                            th:data-target="'weaponDecoration3Id'"
+                            th:data-slot-size="${weapon.slot3Size}"
+                            onclick="goDecorationSelect(
+                                this.dataset.target,
+                                this.dataset.slotSize
+                            )">
+
+                        装飾品を選ぶ
+
+                    </button>
+
+                    <button type="button"
+                            th:if="${simulatorForm.weaponDecoration3Id != null}"
+                            onclick="removeDecoration('weaponDecoration3Id')">
+
+                        外す
+
+                    </button>
+
+                </td>
+
+            </tr>
+
+        </table>
+
+    </div>
 
     <br>
 
-
     <!-- ================================================== -->
-    <!-- 防具選択 -->
+    <!-- 防具 -->
     <!-- ================================================== -->
 
     <h2>選択中の防具</h2>
@@ -1111,349 +896,82 @@
             <th>選択</th>
         </tr>
 
-
-        <!-- 頭 -->
-
         <tr>
-
             <td>頭</td>
-
-            <td th:if="${headArmor != null}"
-                th:text="${headArmor.armorName}">
+            <td th:text="${headArmor != null
+                ? headArmor.armorName
+                : '未選択'}">
             </td>
-
-            <td th:if="${headArmor == null}">
-                未選択
-            </td>
-
             <td>
-
-                <a th:href="@{/armor-list(
-                    part='頭',
-                    weaponId=${simulatorForm.weaponId},
-                    monsterId=${simulatorForm.monsterId},
-                    hitzoneId=${simulatorForm.hitzoneId},
-                    rampageDecorationId=${simulatorForm.rampageDecorationId},
-                    bowChargeId=${simulatorForm.bowChargeId},
-                    bowCoatingId=${simulatorForm.bowCoatingId},
-                    bowgunAmmoId=${simulatorForm.bowgunAmmoId},
-                    headArmorId=${simulatorForm.headArmorId},
-                    chestArmorId=${simulatorForm.chestArmorId},
-                    armArmorId=${simulatorForm.armArmorId},
-                    waistArmorId=${simulatorForm.waistArmorId},
-                    legArmorId=${simulatorForm.legArmorId},
-                    weaponDecoration1Id=${simulatorForm.weaponDecoration1Id},
-                    weaponDecoration2Id=${simulatorForm.weaponDecoration2Id},
-                    weaponDecoration3Id=${simulatorForm.weaponDecoration3Id},
-                    headDecoration1Id=${simulatorForm.headDecoration1Id},
-                    headDecoration2Id=${simulatorForm.headDecoration2Id},
-                    headDecoration3Id=${simulatorForm.headDecoration3Id},
-                    chestDecoration1Id=${simulatorForm.chestDecoration1Id},
-                    chestDecoration2Id=${simulatorForm.chestDecoration2Id},
-                    chestDecoration3Id=${simulatorForm.chestDecoration3Id},
-                    armDecoration1Id=${simulatorForm.armDecoration1Id},
-                    armDecoration2Id=${simulatorForm.armDecoration2Id},
-                    armDecoration3Id=${simulatorForm.armDecoration3Id},
-                    waistDecoration1Id=${simulatorForm.waistDecoration1Id},
-                    waistDecoration2Id=${simulatorForm.waistDecoration2Id},
-                    waistDecoration3Id=${simulatorForm.waistDecoration3Id},
-                    legDecoration1Id=${simulatorForm.legDecoration1Id},
-                    legDecoration2Id=${simulatorForm.legDecoration2Id},
-                    legDecoration3Id=${simulatorForm.legDecoration3Id},
-                    talismanSkill1Id=${simulatorForm.talismanSkill1Id},
-                    talismanSkill1Level=${simulatorForm.talismanSkill1Level},
-                    talismanSkill2Id=${simulatorForm.talismanSkill2Id},
-                    talismanSkill2Level=${simulatorForm.talismanSkill2Level},
-                    talismanSlot1Size=${simulatorForm.talismanSlot1Size},
-                    talismanSlot2Size=${simulatorForm.talismanSlot2Size},
-                    talismanSlot3Size=${simulatorForm.talismanSlot3Size},
-                    talismanDecoration1Id=${simulatorForm.talismanDecoration1Id},
-                    talismanDecoration2Id=${simulatorForm.talismanDecoration2Id},
-                    talismanDecoration3Id=${simulatorForm.talismanDecoration3Id}
-                )}">
+                <button type="button"
+                        onclick="goArmorSelect('頭')">
                     選ぶ
-                </a>
-
+                </button>
             </td>
-
         </tr>
 
-
-        <!-- 胴 -->
-
         <tr>
-
             <td>胴</td>
-
-            <td th:if="${chestArmor != null}"
-                th:text="${chestArmor.armorName}">
+            <td th:text="${chestArmor != null
+                ? chestArmor.armorName
+                : '未選択'}">
             </td>
-
-            <td th:if="${chestArmor == null}">
-                未選択
-            </td>
-
             <td>
-
-                <a th:href="@{/armor-list(
-                    part='胴',
-                    weaponId=${simulatorForm.weaponId},
-                    monsterId=${simulatorForm.monsterId},
-                    hitzoneId=${simulatorForm.hitzoneId},
-                    rampageDecorationId=${simulatorForm.rampageDecorationId},
-                    bowChargeId=${simulatorForm.bowChargeId},
-                    bowCoatingId=${simulatorForm.bowCoatingId},
-                    bowgunAmmoId=${simulatorForm.bowgunAmmoId},
-                    headArmorId=${simulatorForm.headArmorId},
-                    chestArmorId=${simulatorForm.chestArmorId},
-                    armArmorId=${simulatorForm.armArmorId},
-                    waistArmorId=${simulatorForm.waistArmorId},
-                    legArmorId=${simulatorForm.legArmorId},
-                    weaponDecoration1Id=${simulatorForm.weaponDecoration1Id},
-                    weaponDecoration2Id=${simulatorForm.weaponDecoration2Id},
-                    weaponDecoration3Id=${simulatorForm.weaponDecoration3Id},
-                    headDecoration1Id=${simulatorForm.headDecoration1Id},
-                    headDecoration2Id=${simulatorForm.headDecoration2Id},
-                    headDecoration3Id=${simulatorForm.headDecoration3Id},
-                    chestDecoration1Id=${simulatorForm.chestDecoration1Id},
-                    chestDecoration2Id=${simulatorForm.chestDecoration2Id},
-                    chestDecoration3Id=${simulatorForm.chestDecoration3Id},
-                    armDecoration1Id=${simulatorForm.armDecoration1Id},
-                    armDecoration2Id=${simulatorForm.armDecoration2Id},
-                    armDecoration3Id=${simulatorForm.armDecoration3Id},
-                    waistDecoration1Id=${simulatorForm.waistDecoration1Id},
-                    waistDecoration2Id=${simulatorForm.waistDecoration2Id},
-                    waistDecoration3Id=${simulatorForm.waistDecoration3Id},
-                    legDecoration1Id=${simulatorForm.legDecoration1Id},
-                    legDecoration2Id=${simulatorForm.legDecoration2Id},
-                    legDecoration3Id=${simulatorForm.legDecoration3Id},
-                    talismanSkill1Id=${simulatorForm.talismanSkill1Id},
-                    talismanSkill1Level=${simulatorForm.talismanSkill1Level},
-                    talismanSkill2Id=${simulatorForm.talismanSkill2Id},
-                    talismanSkill2Level=${simulatorForm.talismanSkill2Level},
-                    talismanSlot1Size=${simulatorForm.talismanSlot1Size},
-                    talismanSlot2Size=${simulatorForm.talismanSlot2Size},
-                    talismanSlot3Size=${simulatorForm.talismanSlot3Size},
-                    talismanDecoration1Id=${simulatorForm.talismanDecoration1Id},
-                    talismanDecoration2Id=${simulatorForm.talismanDecoration2Id},
-                    talismanDecoration3Id=${simulatorForm.talismanDecoration3Id}
-                )}">
+                <button type="button"
+                        onclick="goArmorSelect('胴')">
                     選ぶ
-                </a>
-
+                </button>
             </td>
-
         </tr>
 
-
-        <!-- 腕 -->
-
         <tr>
-
             <td>腕</td>
-
-            <td th:if="${armArmor != null}"
-                th:text="${armArmor.armorName}">
+            <td th:text="${armArmor != null
+                ? armArmor.armorName
+                : '未選択'}">
             </td>
-
-            <td th:if="${armArmor == null}">
-                未選択
-            </td>
-
             <td>
-
-                <a th:href="@{/armor-list(
-                    part='腕',
-                    weaponId=${simulatorForm.weaponId},
-                    monsterId=${simulatorForm.monsterId},
-                    hitzoneId=${simulatorForm.hitzoneId},
-                    rampageDecorationId=${simulatorForm.rampageDecorationId},
-                    bowChargeId=${simulatorForm.bowChargeId},
-                    bowCoatingId=${simulatorForm.bowCoatingId},
-                    bowgunAmmoId=${simulatorForm.bowgunAmmoId},
-                    headArmorId=${simulatorForm.headArmorId},
-                    chestArmorId=${simulatorForm.chestArmorId},
-                    armArmorId=${simulatorForm.armArmorId},
-                    waistArmorId=${simulatorForm.waistArmorId},
-                    legArmorId=${simulatorForm.legArmorId},
-                    weaponDecoration1Id=${simulatorForm.weaponDecoration1Id},
-                    weaponDecoration2Id=${simulatorForm.weaponDecoration2Id},
-                    weaponDecoration3Id=${simulatorForm.weaponDecoration3Id},
-                    headDecoration1Id=${simulatorForm.headDecoration1Id},
-                    headDecoration2Id=${simulatorForm.headDecoration2Id},
-                    headDecoration3Id=${simulatorForm.headDecoration3Id},
-                    chestDecoration1Id=${simulatorForm.chestDecoration1Id},
-                    chestDecoration2Id=${simulatorForm.chestDecoration2Id},
-                    chestDecoration3Id=${simulatorForm.chestDecoration3Id},
-                    armDecoration1Id=${simulatorForm.armDecoration1Id},
-                    armDecoration2Id=${simulatorForm.armDecoration2Id},
-                    armDecoration3Id=${simulatorForm.armDecoration3Id},
-                    waistDecoration1Id=${simulatorForm.waistDecoration1Id},
-                    waistDecoration2Id=${simulatorForm.waistDecoration2Id},
-                    waistDecoration3Id=${simulatorForm.waistDecoration3Id},
-                    legDecoration1Id=${simulatorForm.legDecoration1Id},
-                    legDecoration2Id=${simulatorForm.legDecoration2Id},
-                    legDecoration3Id=${simulatorForm.legDecoration3Id},
-                    talismanSkill1Id=${simulatorForm.talismanSkill1Id},
-                    talismanSkill1Level=${simulatorForm.talismanSkill1Level},
-                    talismanSkill2Id=${simulatorForm.talismanSkill2Id},
-                    talismanSkill2Level=${simulatorForm.talismanSkill2Level},
-                    talismanSlot1Size=${simulatorForm.talismanSlot1Size},
-                    talismanSlot2Size=${simulatorForm.talismanSlot2Size},
-                    talismanSlot3Size=${simulatorForm.talismanSlot3Size},
-                    talismanDecoration1Id=${simulatorForm.talismanDecoration1Id},
-                    talismanDecoration2Id=${simulatorForm.talismanDecoration2Id},
-                    talismanDecoration3Id=${simulatorForm.talismanDecoration3Id}
-                )}">
+                <button type="button"
+                        onclick="goArmorSelect('腕')">
                     選ぶ
-                </a>
-
+                </button>
             </td>
-
         </tr>
 
-
-        <!-- 腰 -->
-
         <tr>
-
             <td>腰</td>
-
-            <td th:if="${waistArmor != null}"
-                th:text="${waistArmor.armorName}">
+            <td th:text="${waistArmor != null
+                ? waistArmor.armorName
+                : '未選択'}">
             </td>
-
-            <td th:if="${waistArmor == null}">
-                未選択
-            </td>
-
             <td>
-
-                <a th:href="@{/armor-list(
-                    part='腰',
-                    weaponId=${simulatorForm.weaponId},
-                    monsterId=${simulatorForm.monsterId},
-                    hitzoneId=${simulatorForm.hitzoneId},
-                    rampageDecorationId=${simulatorForm.rampageDecorationId},
-                    bowChargeId=${simulatorForm.bowChargeId},
-                    bowCoatingId=${simulatorForm.bowCoatingId},
-                    bowgunAmmoId=${simulatorForm.bowgunAmmoId},
-                    headArmorId=${simulatorForm.headArmorId},
-                    chestArmorId=${simulatorForm.chestArmorId},
-                    armArmorId=${simulatorForm.armArmorId},
-                    waistArmorId=${simulatorForm.waistArmorId},
-                    legArmorId=${simulatorForm.legArmorId},
-                    weaponDecoration1Id=${simulatorForm.weaponDecoration1Id},
-                    weaponDecoration2Id=${simulatorForm.weaponDecoration2Id},
-                    weaponDecoration3Id=${simulatorForm.weaponDecoration3Id},
-                    headDecoration1Id=${simulatorForm.headDecoration1Id},
-                    headDecoration2Id=${simulatorForm.headDecoration2Id},
-                    headDecoration3Id=${simulatorForm.headDecoration3Id},
-                    chestDecoration1Id=${simulatorForm.chestDecoration1Id},
-                    chestDecoration2Id=${simulatorForm.chestDecoration2Id},
-                    chestDecoration3Id=${simulatorForm.chestDecoration3Id},
-                    armDecoration1Id=${simulatorForm.armDecoration1Id},
-                    armDecoration2Id=${simulatorForm.armDecoration2Id},
-                    armDecoration3Id=${simulatorForm.armDecoration3Id},
-                    waistDecoration1Id=${simulatorForm.waistDecoration1Id},
-                    waistDecoration2Id=${simulatorForm.waistDecoration2Id},
-                    waistDecoration3Id=${simulatorForm.waistDecoration3Id},
-                    legDecoration1Id=${simulatorForm.legDecoration1Id},
-                    legDecoration2Id=${simulatorForm.legDecoration2Id},
-                    legDecoration3Id=${simulatorForm.legDecoration3Id},
-                    talismanSkill1Id=${simulatorForm.talismanSkill1Id},
-                    talismanSkill1Level=${simulatorForm.talismanSkill1Level},
-                    talismanSkill2Id=${simulatorForm.talismanSkill2Id},
-                    talismanSkill2Level=${simulatorForm.talismanSkill2Level},
-                    talismanSlot1Size=${simulatorForm.talismanSlot1Size},
-                    talismanSlot2Size=${simulatorForm.talismanSlot2Size},
-                    talismanSlot3Size=${simulatorForm.talismanSlot3Size},
-                    talismanDecoration1Id=${simulatorForm.talismanDecoration1Id},
-                    talismanDecoration2Id=${simulatorForm.talismanDecoration2Id},
-                    talismanDecoration3Id=${simulatorForm.talismanDecoration3Id}
-                )}">
+                <button type="button"
+                        onclick="goArmorSelect('腰')">
                     選ぶ
-                </a>
-
+                </button>
             </td>
-
         </tr>
 
-
-        <!-- 脚 -->
-
         <tr>
-
             <td>脚</td>
-
-            <td th:if="${legArmor != null}"
-                th:text="${legArmor.armorName}">
+            <td th:text="${legArmor != null
+                ? legArmor.armorName
+                : '未選択'}">
             </td>
-
-            <td th:if="${legArmor == null}">
-                未選択
-            </td>
-
             <td>
-
-                <a th:href="@{/armor-list(
-                    part='脚',
-                    weaponId=${simulatorForm.weaponId},
-                    monsterId=${simulatorForm.monsterId},
-                    hitzoneId=${simulatorForm.hitzoneId},
-                    rampageDecorationId=${simulatorForm.rampageDecorationId},
-                    bowChargeId=${simulatorForm.bowChargeId},
-                    bowCoatingId=${simulatorForm.bowCoatingId},
-                    bowgunAmmoId=${simulatorForm.bowgunAmmoId},
-                    headArmorId=${simulatorForm.headArmorId},
-                    chestArmorId=${simulatorForm.chestArmorId},
-                    armArmorId=${simulatorForm.armArmorId},
-                    waistArmorId=${simulatorForm.waistArmorId},
-                    legArmorId=${simulatorForm.legArmorId},
-                    weaponDecoration1Id=${simulatorForm.weaponDecoration1Id},
-                    weaponDecoration2Id=${simulatorForm.weaponDecoration2Id},
-                    weaponDecoration3Id=${simulatorForm.weaponDecoration3Id},
-                    headDecoration1Id=${simulatorForm.headDecoration1Id},
-                    headDecoration2Id=${simulatorForm.headDecoration2Id},
-                    headDecoration3Id=${simulatorForm.headDecoration3Id},
-                    chestDecoration1Id=${simulatorForm.chestDecoration1Id},
-                    chestDecoration2Id=${simulatorForm.chestDecoration2Id},
-                    chestDecoration3Id=${simulatorForm.chestDecoration3Id},
-                    armDecoration1Id=${simulatorForm.armDecoration1Id},
-                    armDecoration2Id=${simulatorForm.armDecoration2Id},
-                    armDecoration3Id=${simulatorForm.armDecoration3Id},
-                    waistDecoration1Id=${simulatorForm.waistDecoration1Id},
-                    waistDecoration2Id=${simulatorForm.waistDecoration2Id},
-                    waistDecoration3Id=${simulatorForm.waistDecoration3Id},
-                    legDecoration1Id=${simulatorForm.legDecoration1Id},
-                    legDecoration2Id=${simulatorForm.legDecoration2Id},
-                    legDecoration3Id=${simulatorForm.legDecoration3Id},
-                    talismanSkill1Id=${simulatorForm.talismanSkill1Id},
-                    talismanSkill1Level=${simulatorForm.talismanSkill1Level},
-                    talismanSkill2Id=${simulatorForm.talismanSkill2Id},
-                    talismanSkill2Level=${simulatorForm.talismanSkill2Level},
-                    talismanSlot1Size=${simulatorForm.talismanSlot1Size},
-                    talismanSlot2Size=${simulatorForm.talismanSlot2Size},
-                    talismanSlot3Size=${simulatorForm.talismanSlot3Size},
-                    talismanDecoration1Id=${simulatorForm.talismanDecoration1Id},
-                    talismanDecoration2Id=${simulatorForm.talismanDecoration2Id},
-                    talismanDecoration3Id=${simulatorForm.talismanDecoration3Id}
-                )}">
+                <button type="button"
+                        onclick="goArmorSelect('脚')">
                     選ぶ
-                </a>
-
+                </button>
             </td>
-
         </tr>
 
     </table>
 
-
     <br>
 
-
     <!-- ================================================== -->
-    <!-- 頭防具スロット -->
+    <!-- 頭 -->
     <!-- ================================================== -->
 
     <h3>頭防具スロット</h3>
@@ -1461,7 +979,6 @@
     <p th:if="${headArmor == null}">
         頭防具が選択されていません。
     </p>
-
 
     <table border="1"
            th:if="${headArmor != null}">
@@ -1473,21 +990,24 @@
             <th>操作</th>
         </tr>
 
-
         <tr>
 
             <td>1</td>
 
-            <td th:text="${headArmor.slot1Size}">
+            <td th:text="${headArmor.slot1Size != null
+                ? headArmor.slot1Size
+                : 0}">
             </td>
 
             <td>
 
-                <span th:if="${headArmor.slot1Size == 0}">
+                <span th:if="${headArmor.slot1Size == null
+                             or headArmor.slot1Size == 0}">
                     スロットなし
                 </span>
 
-                <span th:if="${headArmor.slot1Size > 0
+                <span th:if="${headArmor.slot1Size != null
+                             and headArmor.slot1Size > 0
                              and headDecoration1 == null}">
                     未選択
                 </span>
@@ -1506,60 +1026,19 @@
 
             <td>
 
-                <span th:if="${headArmor.slot1Size == 0}">
-                    -
-                </span>
-
-                <a th:if="${headArmor.slot1Size > 0}"
-
-                   th:href="@{/decoration-select(
-                       slotSize=${headArmor.slot1Size},
-                       target='headDecoration1Id',
-                       weaponId=${simulatorForm.weaponId},
-                       monsterId=${simulatorForm.monsterId},
-                       hitzoneId=${simulatorForm.hitzoneId},
-                       rampageDecorationId=${simulatorForm.rampageDecorationId},
-                       bowChargeId=${simulatorForm.bowChargeId},
-                       bowCoatingId=${simulatorForm.bowCoatingId},
-                       bowgunAmmoId=${simulatorForm.bowgunAmmoId},
-                       headArmorId=${simulatorForm.headArmorId},
-                       chestArmorId=${simulatorForm.chestArmorId},
-                       armArmorId=${simulatorForm.armArmorId},
-                       waistArmorId=${simulatorForm.waistArmorId},
-                       legArmorId=${simulatorForm.legArmorId},
-                       weaponDecoration1Id=${simulatorForm.weaponDecoration1Id},
-                       weaponDecoration2Id=${simulatorForm.weaponDecoration2Id},
-                       weaponDecoration3Id=${simulatorForm.weaponDecoration3Id},
-                       headDecoration1Id=${simulatorForm.headDecoration1Id},
-                       headDecoration2Id=${simulatorForm.headDecoration2Id},
-                       headDecoration3Id=${simulatorForm.headDecoration3Id},
-                       chestDecoration1Id=${simulatorForm.chestDecoration1Id},
-                       chestDecoration2Id=${simulatorForm.chestDecoration2Id},
-                       chestDecoration3Id=${simulatorForm.chestDecoration3Id},
-                       armDecoration1Id=${simulatorForm.armDecoration1Id},
-                       armDecoration2Id=${simulatorForm.armDecoration2Id},
-                       armDecoration3Id=${simulatorForm.armDecoration3Id},
-                       waistDecoration1Id=${simulatorForm.waistDecoration1Id},
-                       waistDecoration2Id=${simulatorForm.waistDecoration2Id},
-                       waistDecoration3Id=${simulatorForm.waistDecoration3Id},
-                       legDecoration1Id=${simulatorForm.legDecoration1Id},
-                       legDecoration2Id=${simulatorForm.legDecoration2Id},
-                       legDecoration3Id=${simulatorForm.legDecoration3Id},
-                       talismanSkill1Id=${simulatorForm.talismanSkill1Id},
-                       talismanSkill1Level=${simulatorForm.talismanSkill1Level},
-                       talismanSkill2Id=${simulatorForm.talismanSkill2Id},
-                       talismanSkill2Level=${simulatorForm.talismanSkill2Level},
-                       talismanSlot1Size=${simulatorForm.talismanSlot1Size},
-                       talismanSlot2Size=${simulatorForm.talismanSlot2Size},
-                       talismanSlot3Size=${simulatorForm.talismanSlot3Size},
-                       talismanDecoration1Id=${simulatorForm.talismanDecoration1Id},
-                       talismanDecoration2Id=${simulatorForm.talismanDecoration2Id},
-                       talismanDecoration3Id=${simulatorForm.talismanDecoration3Id}
-                   )}">
+                <button type="button"
+                        th:if="${headArmor.slot1Size != null
+                               and headArmor.slot1Size > 0}"
+                        th:data-target="'headDecoration1Id'"
+                        th:data-slot-size="${headArmor.slot1Size}"
+                        onclick="goDecorationSelect(
+                            this.dataset.target,
+                            this.dataset.slotSize
+                        )">
 
                     装飾品を選ぶ
 
-                </a>
+                </button>
 
                 <button type="button"
                         th:if="${simulatorForm.headDecoration1Id != null}"
@@ -1573,21 +1052,24 @@
 
         </tr>
 
-
         <tr>
 
             <td>2</td>
 
-            <td th:text="${headArmor.slot2Size}">
+            <td th:text="${headArmor.slot2Size != null
+                ? headArmor.slot2Size
+                : 0}">
             </td>
 
             <td>
 
-                <span th:if="${headArmor.slot2Size == 0}">
+                <span th:if="${headArmor.slot2Size == null
+                             or headArmor.slot2Size == 0}">
                     スロットなし
                 </span>
 
-                <span th:if="${headArmor.slot2Size > 0
+                <span th:if="${headArmor.slot2Size != null
+                             and headArmor.slot2Size > 0
                              and headDecoration2 == null}">
                     未選択
                 </span>
@@ -1606,60 +1088,19 @@
 
             <td>
 
-                <span th:if="${headArmor.slot2Size == 0}">
-                    -
-                </span>
-
-                <a th:if="${headArmor.slot2Size > 0}"
-
-                   th:href="@{/decoration-select(
-                       slotSize=${headArmor.slot2Size},
-                       target='headDecoration2Id',
-                       weaponId=${simulatorForm.weaponId},
-                       monsterId=${simulatorForm.monsterId},
-                       hitzoneId=${simulatorForm.hitzoneId},
-                       rampageDecorationId=${simulatorForm.rampageDecorationId},
-                       bowChargeId=${simulatorForm.bowChargeId},
-                       bowCoatingId=${simulatorForm.bowCoatingId},
-                       bowgunAmmoId=${simulatorForm.bowgunAmmoId},
-                       headArmorId=${simulatorForm.headArmorId},
-                       chestArmorId=${simulatorForm.chestArmorId},
-                       armArmorId=${simulatorForm.armArmorId},
-                       waistArmorId=${simulatorForm.waistArmorId},
-                       legArmorId=${simulatorForm.legArmorId},
-                       weaponDecoration1Id=${simulatorForm.weaponDecoration1Id},
-                       weaponDecoration2Id=${simulatorForm.weaponDecoration2Id},
-                       weaponDecoration3Id=${simulatorForm.weaponDecoration3Id},
-                       headDecoration1Id=${simulatorForm.headDecoration1Id},
-                       headDecoration2Id=${simulatorForm.headDecoration2Id},
-                       headDecoration3Id=${simulatorForm.headDecoration3Id},
-                       chestDecoration1Id=${simulatorForm.chestDecoration1Id},
-                       chestDecoration2Id=${simulatorForm.chestDecoration2Id},
-                       chestDecoration3Id=${simulatorForm.chestDecoration3Id},
-                       armDecoration1Id=${simulatorForm.armDecoration1Id},
-                       armDecoration2Id=${simulatorForm.armDecoration2Id},
-                       armDecoration3Id=${simulatorForm.armDecoration3Id},
-                       waistDecoration1Id=${simulatorForm.waistDecoration1Id},
-                       waistDecoration2Id=${simulatorForm.waistDecoration2Id},
-                       waistDecoration3Id=${simulatorForm.waistDecoration3Id},
-                       legDecoration1Id=${simulatorForm.legDecoration1Id},
-                       legDecoration2Id=${simulatorForm.legDecoration2Id},
-                       legDecoration3Id=${simulatorForm.legDecoration3Id},
-                       talismanSkill1Id=${simulatorForm.talismanSkill1Id},
-                       talismanSkill1Level=${simulatorForm.talismanSkill1Level},
-                       talismanSkill2Id=${simulatorForm.talismanSkill2Id},
-                       talismanSkill2Level=${simulatorForm.talismanSkill2Level},
-                       talismanSlot1Size=${simulatorForm.talismanSlot1Size},
-                       talismanSlot2Size=${simulatorForm.talismanSlot2Size},
-                       talismanSlot3Size=${simulatorForm.talismanSlot3Size},
-                       talismanDecoration1Id=${simulatorForm.talismanDecoration1Id},
-                       talismanDecoration2Id=${simulatorForm.talismanDecoration2Id},
-                       talismanDecoration3Id=${simulatorForm.talismanDecoration3Id}
-                   )}">
+                <button type="button"
+                        th:if="${headArmor.slot2Size != null
+                               and headArmor.slot2Size > 0}"
+                        th:data-target="'headDecoration2Id'"
+                        th:data-slot-size="${headArmor.slot2Size}"
+                        onclick="goDecorationSelect(
+                            this.dataset.target,
+                            this.dataset.slotSize
+                        )">
 
                     装飾品を選ぶ
 
-                </a>
+                </button>
 
                 <button type="button"
                         th:if="${simulatorForm.headDecoration2Id != null}"
@@ -1673,21 +1114,24 @@
 
         </tr>
 
-
         <tr>
 
             <td>3</td>
 
-            <td th:text="${headArmor.slot3Size}">
+            <td th:text="${headArmor.slot3Size != null
+                ? headArmor.slot3Size
+                : 0}">
             </td>
 
             <td>
 
-                <span th:if="${headArmor.slot3Size == 0}">
+                <span th:if="${headArmor.slot3Size == null
+                             or headArmor.slot3Size == 0}">
                     スロットなし
                 </span>
 
-                <span th:if="${headArmor.slot3Size > 0
+                <span th:if="${headArmor.slot3Size != null
+                             and headArmor.slot3Size > 0
                              and headDecoration3 == null}">
                     未選択
                 </span>
@@ -1706,60 +1150,19 @@
 
             <td>
 
-                <span th:if="${headArmor.slot3Size == 0}">
-                    -
-                </span>
-
-                <a th:if="${headArmor.slot3Size > 0}"
-
-                   th:href="@{/decoration-select(
-                       slotSize=${headArmor.slot3Size},
-                       target='headDecoration3Id',
-                       weaponId=${simulatorForm.weaponId},
-                       monsterId=${simulatorForm.monsterId},
-                       hitzoneId=${simulatorForm.hitzoneId},
-                       rampageDecorationId=${simulatorForm.rampageDecorationId},
-                       bowChargeId=${simulatorForm.bowChargeId},
-                       bowCoatingId=${simulatorForm.bowCoatingId},
-                       bowgunAmmoId=${simulatorForm.bowgunAmmoId},
-                       headArmorId=${simulatorForm.headArmorId},
-                       chestArmorId=${simulatorForm.chestArmorId},
-                       armArmorId=${simulatorForm.armArmorId},
-                       waistArmorId=${simulatorForm.waistArmorId},
-                       legArmorId=${simulatorForm.legArmorId},
-                       weaponDecoration1Id=${simulatorForm.weaponDecoration1Id},
-                       weaponDecoration2Id=${simulatorForm.weaponDecoration2Id},
-                       weaponDecoration3Id=${simulatorForm.weaponDecoration3Id},
-                       headDecoration1Id=${simulatorForm.headDecoration1Id},
-                       headDecoration2Id=${simulatorForm.headDecoration2Id},
-                       headDecoration3Id=${simulatorForm.headDecoration3Id},
-                       chestDecoration1Id=${simulatorForm.chestDecoration1Id},
-                       chestDecoration2Id=${simulatorForm.chestDecoration2Id},
-                       chestDecoration3Id=${simulatorForm.chestDecoration3Id},
-                       armDecoration1Id=${simulatorForm.armDecoration1Id},
-                       armDecoration2Id=${simulatorForm.armDecoration2Id},
-                       armDecoration3Id=${simulatorForm.armDecoration3Id},
-                       waistDecoration1Id=${simulatorForm.waistDecoration1Id},
-                       waistDecoration2Id=${simulatorForm.waistDecoration2Id},
-                       waistDecoration3Id=${simulatorForm.waistDecoration3Id},
-                       legDecoration1Id=${simulatorForm.legDecoration1Id},
-                       legDecoration2Id=${simulatorForm.legDecoration2Id},
-                       legDecoration3Id=${simulatorForm.legDecoration3Id},
-                       talismanSkill1Id=${simulatorForm.talismanSkill1Id},
-                       talismanSkill1Level=${simulatorForm.talismanSkill1Level},
-                       talismanSkill2Id=${simulatorForm.talismanSkill2Id},
-                       talismanSkill2Level=${simulatorForm.talismanSkill2Level},
-                       talismanSlot1Size=${simulatorForm.talismanSlot1Size},
-                       talismanSlot2Size=${simulatorForm.talismanSlot2Size},
-                       talismanSlot3Size=${simulatorForm.talismanSlot3Size},
-                       talismanDecoration1Id=${simulatorForm.talismanDecoration1Id},
-                       talismanDecoration2Id=${simulatorForm.talismanDecoration2Id},
-                       talismanDecoration3Id=${simulatorForm.talismanDecoration3Id}
-                   )}">
+                <button type="button"
+                        th:if="${headArmor.slot3Size != null
+                               and headArmor.slot3Size > 0}"
+                        th:data-target="'headDecoration3Id'"
+                        th:data-slot-size="${headArmor.slot3Size}"
+                        onclick="goDecorationSelect(
+                            this.dataset.target,
+                            this.dataset.slotSize
+                        )">
 
                     装飾品を選ぶ
 
-                </a>
+                </button>
 
                 <button type="button"
                         th:if="${simulatorForm.headDecoration3Id != null}"
@@ -1775,12 +1178,10 @@
 
     </table>
 
-
     <br>
 
-
     <!-- ================================================== -->
-    <!-- 胴防具スロット -->
+    <!-- 胴 -->
     <!-- ================================================== -->
 
     <h3>胴防具スロット</h3>
@@ -1788,7 +1189,6 @@
     <p th:if="${chestArmor == null}">
         胴防具が選択されていません。
     </p>
-
 
     <table border="1"
            th:if="${chestArmor != null}">
@@ -1800,300 +1200,159 @@
             <th>操作</th>
         </tr>
 
-
         <tr>
 
             <td>1</td>
 
-            <td th:text="${chestArmor.slot1Size}">
+            <td th:text="${chestArmor.slot1Size != null
+                ? chestArmor.slot1Size
+                : 0}">
             </td>
 
             <td>
 
-                <span th:if="${chestArmor.slot1Size == 0}">
+                <span th:if="${chestArmor.slot1Size == null
+                             or chestArmor.slot1Size == 0}">
                     スロットなし
                 </span>
 
-                <span th:if="${chestArmor.slot1Size > 0
+                <span th:if="${chestArmor.slot1Size != null
+                             and chestArmor.slot1Size > 0
                              and chestDecoration1 == null}">
                     未選択
                 </span>
 
                 <span th:if="${chestDecoration1 != null}">
-
-                    <span th:text="${chestDecoration1.skillName}">
-                    </span>
-
-                    Lv<span th:text="${chestDecoration1.skillLevel}">
-                    </span>
-
+                    <span th:text="${chestDecoration1.skillName}"></span>
+                    Lv<span th:text="${chestDecoration1.skillLevel}"></span>
                 </span>
 
             </td>
 
             <td>
 
-                <span th:if="${chestArmor.slot1Size == 0}">
-                    -
-                </span>
-
-                <a th:if="${chestArmor.slot1Size > 0}"
-
-                   th:href="@{/decoration-select(
-                       slotSize=${chestArmor.slot1Size},
-                       target='chestDecoration1Id',
-                       weaponId=${simulatorForm.weaponId},
-                       monsterId=${simulatorForm.monsterId},
-                       hitzoneId=${simulatorForm.hitzoneId},
-                       rampageDecorationId=${simulatorForm.rampageDecorationId},
-                       bowChargeId=${simulatorForm.bowChargeId},
-                       bowCoatingId=${simulatorForm.bowCoatingId},
-                       bowgunAmmoId=${simulatorForm.bowgunAmmoId},
-                       headArmorId=${simulatorForm.headArmorId},
-                       chestArmorId=${simulatorForm.chestArmorId},
-                       armArmorId=${simulatorForm.armArmorId},
-                       waistArmorId=${simulatorForm.waistArmorId},
-                       legArmorId=${simulatorForm.legArmorId},
-                       weaponDecoration1Id=${simulatorForm.weaponDecoration1Id},
-                       weaponDecoration2Id=${simulatorForm.weaponDecoration2Id},
-                       weaponDecoration3Id=${simulatorForm.weaponDecoration3Id},
-                       headDecoration1Id=${simulatorForm.headDecoration1Id},
-                       headDecoration2Id=${simulatorForm.headDecoration2Id},
-                       headDecoration3Id=${simulatorForm.headDecoration3Id},
-                       chestDecoration1Id=${simulatorForm.chestDecoration1Id},
-                       chestDecoration2Id=${simulatorForm.chestDecoration2Id},
-                       chestDecoration3Id=${simulatorForm.chestDecoration3Id},
-                       armDecoration1Id=${simulatorForm.armDecoration1Id},
-                       armDecoration2Id=${simulatorForm.armDecoration2Id},
-                       armDecoration3Id=${simulatorForm.armDecoration3Id},
-                       waistDecoration1Id=${simulatorForm.waistDecoration1Id},
-                       waistDecoration2Id=${simulatorForm.waistDecoration2Id},
-                       waistDecoration3Id=${simulatorForm.waistDecoration3Id},
-                       legDecoration1Id=${simulatorForm.legDecoration1Id},
-                       legDecoration2Id=${simulatorForm.legDecoration2Id},
-                       legDecoration3Id=${simulatorForm.legDecoration3Id},
-                       talismanSkill1Id=${simulatorForm.talismanSkill1Id},
-                       talismanSkill1Level=${simulatorForm.talismanSkill1Level},
-                       talismanSkill2Id=${simulatorForm.talismanSkill2Id},
-                       talismanSkill2Level=${simulatorForm.talismanSkill2Level},
-                       talismanSlot1Size=${simulatorForm.talismanSlot1Size},
-                       talismanSlot2Size=${simulatorForm.talismanSlot2Size},
-                       talismanSlot3Size=${simulatorForm.talismanSlot3Size},
-                       talismanDecoration1Id=${simulatorForm.talismanDecoration1Id},
-                       talismanDecoration2Id=${simulatorForm.talismanDecoration2Id},
-                       talismanDecoration3Id=${simulatorForm.talismanDecoration3Id}
-                   )}">
-
+                <button type="button"
+                        th:if="${chestArmor.slot1Size != null
+                               and chestArmor.slot1Size > 0}"
+                        th:data-target="'chestDecoration1Id'"
+                        th:data-slot-size="${chestArmor.slot1Size}"
+                        onclick="goDecorationSelect(
+                            this.dataset.target,
+                            this.dataset.slotSize
+                        )">
                     装飾品を選ぶ
-
-                </a>
+                </button>
 
                 <button type="button"
                         th:if="${simulatorForm.chestDecoration1Id != null}"
                         onclick="removeDecoration('chestDecoration1Id')">
-
                     外す
-
                 </button>
 
             </td>
 
         </tr>
-
 
         <tr>
 
             <td>2</td>
 
-            <td th:text="${chestArmor.slot2Size}">
+            <td th:text="${chestArmor.slot2Size != null
+                ? chestArmor.slot2Size
+                : 0}">
             </td>
 
             <td>
 
-                <span th:if="${chestArmor.slot2Size == 0}">
+                <span th:if="${chestArmor.slot2Size == null
+                             or chestArmor.slot2Size == 0}">
                     スロットなし
                 </span>
 
-                <span th:if="${chestArmor.slot2Size > 0
+                <span th:if="${chestArmor.slot2Size != null
+                             and chestArmor.slot2Size > 0
                              and chestDecoration2 == null}">
                     未選択
                 </span>
 
                 <span th:if="${chestDecoration2 != null}">
-
-                    <span th:text="${chestDecoration2.skillName}">
-                    </span>
-
-                    Lv<span th:text="${chestDecoration2.skillLevel}">
-                    </span>
-
+                    <span th:text="${chestDecoration2.skillName}"></span>
+                    Lv<span th:text="${chestDecoration2.skillLevel}"></span>
                 </span>
 
             </td>
 
             <td>
 
-                <span th:if="${chestArmor.slot2Size == 0}">
-                    -
-                </span>
-
-                <a th:if="${chestArmor.slot2Size > 0}"
-
-                   th:href="@{/decoration-select(
-                       slotSize=${chestArmor.slot2Size},
-                       target='chestDecoration2Id',
-                       weaponId=${simulatorForm.weaponId},
-                       monsterId=${simulatorForm.monsterId},
-                       hitzoneId=${simulatorForm.hitzoneId},
-                       rampageDecorationId=${simulatorForm.rampageDecorationId},
-                       bowChargeId=${simulatorForm.bowChargeId},
-                       bowCoatingId=${simulatorForm.bowCoatingId},
-                       bowgunAmmoId=${simulatorForm.bowgunAmmoId},
-                       headArmorId=${simulatorForm.headArmorId},
-                       chestArmorId=${simulatorForm.chestArmorId},
-                       armArmorId=${simulatorForm.armArmorId},
-                       waistArmorId=${simulatorForm.waistArmorId},
-                       legArmorId=${simulatorForm.legArmorId},
-                       weaponDecoration1Id=${simulatorForm.weaponDecoration1Id},
-                       weaponDecoration2Id=${simulatorForm.weaponDecoration2Id},
-                       weaponDecoration3Id=${simulatorForm.weaponDecoration3Id},
-                       headDecoration1Id=${simulatorForm.headDecoration1Id},
-                       headDecoration2Id=${simulatorForm.headDecoration2Id},
-                       headDecoration3Id=${simulatorForm.headDecoration3Id},
-                       chestDecoration1Id=${simulatorForm.chestDecoration1Id},
-                       chestDecoration2Id=${simulatorForm.chestDecoration2Id},
-                       chestDecoration3Id=${simulatorForm.chestDecoration3Id},
-                       armDecoration1Id=${simulatorForm.armDecoration1Id},
-                       armDecoration2Id=${simulatorForm.armDecoration2Id},
-                       armDecoration3Id=${simulatorForm.armDecoration3Id},
-                       waistDecoration1Id=${simulatorForm.waistDecoration1Id},
-                       waistDecoration2Id=${simulatorForm.waistDecoration2Id},
-                       waistDecoration3Id=${simulatorForm.waistDecoration3Id},
-                       legDecoration1Id=${simulatorForm.legDecoration1Id},
-                       legDecoration2Id=${simulatorForm.legDecoration2Id},
-                       legDecoration3Id=${simulatorForm.legDecoration3Id},
-                       talismanSkill1Id=${simulatorForm.talismanSkill1Id},
-                       talismanSkill1Level=${simulatorForm.talismanSkill1Level},
-                       talismanSkill2Id=${simulatorForm.talismanSkill2Id},
-                       talismanSkill2Level=${simulatorForm.talismanSkill2Level},
-                       talismanSlot1Size=${simulatorForm.talismanSlot1Size},
-                       talismanSlot2Size=${simulatorForm.talismanSlot2Size},
-                       talismanSlot3Size=${simulatorForm.talismanSlot3Size},
-                       talismanDecoration1Id=${simulatorForm.talismanDecoration1Id},
-                       talismanDecoration2Id=${simulatorForm.talismanDecoration2Id},
-                       talismanDecoration3Id=${simulatorForm.talismanDecoration3Id}
-                   )}">
-
+                <button type="button"
+                        th:if="${chestArmor.slot2Size != null
+                               and chestArmor.slot2Size > 0}"
+                        th:data-target="'chestDecoration2Id'"
+                        th:data-slot-size="${chestArmor.slot2Size}"
+                        onclick="goDecorationSelect(
+                            this.dataset.target,
+                            this.dataset.slotSize
+                        )">
                     装飾品を選ぶ
-
-                </a>
+                </button>
 
                 <button type="button"
                         th:if="${simulatorForm.chestDecoration2Id != null}"
                         onclick="removeDecoration('chestDecoration2Id')">
-
                     外す
-
                 </button>
 
             </td>
 
         </tr>
 
-
         <tr>
 
             <td>3</td>
 
-            <td th:text="${chestArmor.slot3Size}">
+            <td th:text="${chestArmor.slot3Size != null
+                ? chestArmor.slot3Size
+                : 0}">
             </td>
 
             <td>
 
-                <span th:if="${chestArmor.slot3Size == 0}">
+                <span th:if="${chestArmor.slot3Size == null
+                             or chestArmor.slot3Size == 0}">
                     スロットなし
                 </span>
 
-                <span th:if="${chestArmor.slot3Size > 0
+                <span th:if="${chestArmor.slot3Size != null
+                             and chestArmor.slot3Size > 0
                              and chestDecoration3 == null}">
                     未選択
                 </span>
 
                 <span th:if="${chestDecoration3 != null}">
-
-                    <span th:text="${chestDecoration3.skillName}">
-                    </span>
-
-                    Lv<span th:text="${chestDecoration3.skillLevel}">
-                    </span>
-
+                    <span th:text="${chestDecoration3.skillName}"></span>
+                    Lv<span th:text="${chestDecoration3.skillLevel}"></span>
                 </span>
 
             </td>
 
             <td>
 
-                <span th:if="${chestArmor.slot3Size == 0}">
-                    -
-                </span>
-
-                <a th:if="${chestArmor.slot3Size > 0}"
-
-                   th:href="@{/decoration-select(
-                       slotSize=${chestArmor.slot3Size},
-                       target='chestDecoration3Id',
-                       weaponId=${simulatorForm.weaponId},
-                       monsterId=${simulatorForm.monsterId},
-                       hitzoneId=${simulatorForm.hitzoneId},
-                       rampageDecorationId=${simulatorForm.rampageDecorationId},
-                       bowChargeId=${simulatorForm.bowChargeId},
-                       bowCoatingId=${simulatorForm.bowCoatingId},
-                       bowgunAmmoId=${simulatorForm.bowgunAmmoId},
-                       headArmorId=${simulatorForm.headArmorId},
-                       chestArmorId=${simulatorForm.chestArmorId},
-                       armArmorId=${simulatorForm.armArmorId},
-                       waistArmorId=${simulatorForm.waistArmorId},
-                       legArmorId=${simulatorForm.legArmorId},
-                       weaponDecoration1Id=${simulatorForm.weaponDecoration1Id},
-                       weaponDecoration2Id=${simulatorForm.weaponDecoration2Id},
-                       weaponDecoration3Id=${simulatorForm.weaponDecoration3Id},
-                       headDecoration1Id=${simulatorForm.headDecoration1Id},
-                       headDecoration2Id=${simulatorForm.headDecoration2Id},
-                       headDecoration3Id=${simulatorForm.headDecoration3Id},
-                       chestDecoration1Id=${simulatorForm.chestDecoration1Id},
-                       chestDecoration2Id=${simulatorForm.chestDecoration2Id},
-                       chestDecoration3Id=${simulatorForm.chestDecoration3Id},
-                       armDecoration1Id=${simulatorForm.armDecoration1Id},
-                       armDecoration2Id=${simulatorForm.armDecoration2Id},
-                       armDecoration3Id=${simulatorForm.armDecoration3Id},
-                       waistDecoration1Id=${simulatorForm.waistDecoration1Id},
-                       waistDecoration2Id=${simulatorForm.waistDecoration2Id},
-                       waistDecoration3Id=${simulatorForm.waistDecoration3Id},
-                       legDecoration1Id=${simulatorForm.legDecoration1Id},
-                       legDecoration2Id=${simulatorForm.legDecoration2Id},
-                       legDecoration3Id=${simulatorForm.legDecoration3Id},
-                       talismanSkill1Id=${simulatorForm.talismanSkill1Id},
-                       talismanSkill1Level=${simulatorForm.talismanSkill1Level},
-                       talismanSkill2Id=${simulatorForm.talismanSkill2Id},
-                       talismanSkill2Level=${simulatorForm.talismanSkill2Level},
-                       talismanSlot1Size=${simulatorForm.talismanSlot1Size},
-                       talismanSlot2Size=${simulatorForm.talismanSlot2Size},
-                       talismanSlot3Size=${simulatorForm.talismanSlot3Size},
-                       talismanDecoration1Id=${simulatorForm.talismanDecoration1Id},
-                       talismanDecoration2Id=${simulatorForm.talismanDecoration2Id},
-                       talismanDecoration3Id=${simulatorForm.talismanDecoration3Id}
-                   )}">
-
+                <button type="button"
+                        th:if="${chestArmor.slot3Size != null
+                               and chestArmor.slot3Size > 0}"
+                        th:data-target="'chestDecoration3Id'"
+                        th:data-slot-size="${chestArmor.slot3Size}"
+                        onclick="goDecorationSelect(
+                            this.dataset.target,
+                            this.dataset.slotSize
+                        )">
                     装飾品を選ぶ
-
-                </a>
+                </button>
 
                 <button type="button"
                         th:if="${simulatorForm.chestDecoration3Id != null}"
                         onclick="removeDecoration('chestDecoration3Id')">
-
                     外す
-
                 </button>
 
             </td>
@@ -2102,12 +1361,10 @@
 
     </table>
 
-
     <br>
 
-
     <!-- ================================================== -->
-    <!-- 腕防具スロット -->
+    <!-- 腕 -->
     <!-- ================================================== -->
 
     <h3>腕防具スロット</h3>
@@ -2115,7 +1372,6 @@
     <p th:if="${armArmor == null}">
         腕防具が選択されていません。
     </p>
-
 
     <table border="1"
            th:if="${armArmor != null}">
@@ -2127,300 +1383,159 @@
             <th>操作</th>
         </tr>
 
-
         <tr>
 
             <td>1</td>
 
-            <td th:text="${armArmor.slot1Size}">
+            <td th:text="${armArmor.slot1Size != null
+                ? armArmor.slot1Size
+                : 0}">
             </td>
 
             <td>
 
-                <span th:if="${armArmor.slot1Size == 0}">
+                <span th:if="${armArmor.slot1Size == null
+                             or armArmor.slot1Size == 0}">
                     スロットなし
                 </span>
 
-                <span th:if="${armArmor.slot1Size > 0
+                <span th:if="${armArmor.slot1Size != null
+                             and armArmor.slot1Size > 0
                              and armDecoration1 == null}">
                     未選択
                 </span>
 
                 <span th:if="${armDecoration1 != null}">
-
-                    <span th:text="${armDecoration1.skillName}">
-                    </span>
-
-                    Lv<span th:text="${armDecoration1.skillLevel}">
-                    </span>
-
+                    <span th:text="${armDecoration1.skillName}"></span>
+                    Lv<span th:text="${armDecoration1.skillLevel}"></span>
                 </span>
 
             </td>
 
             <td>
 
-                <span th:if="${armArmor.slot1Size == 0}">
-                    -
-                </span>
-
-                <a th:if="${armArmor.slot1Size > 0}"
-
-                   th:href="@{/decoration-select(
-                       slotSize=${armArmor.slot1Size},
-                       target='armDecoration1Id',
-                       weaponId=${simulatorForm.weaponId},
-                       monsterId=${simulatorForm.monsterId},
-                       hitzoneId=${simulatorForm.hitzoneId},
-                       rampageDecorationId=${simulatorForm.rampageDecorationId},
-                       bowChargeId=${simulatorForm.bowChargeId},
-                       bowCoatingId=${simulatorForm.bowCoatingId},
-                       bowgunAmmoId=${simulatorForm.bowgunAmmoId},
-                       headArmorId=${simulatorForm.headArmorId},
-                       chestArmorId=${simulatorForm.chestArmorId},
-                       armArmorId=${simulatorForm.armArmorId},
-                       waistArmorId=${simulatorForm.waistArmorId},
-                       legArmorId=${simulatorForm.legArmorId},
-                       weaponDecoration1Id=${simulatorForm.weaponDecoration1Id},
-                       weaponDecoration2Id=${simulatorForm.weaponDecoration2Id},
-                       weaponDecoration3Id=${simulatorForm.weaponDecoration3Id},
-                       headDecoration1Id=${simulatorForm.headDecoration1Id},
-                       headDecoration2Id=${simulatorForm.headDecoration2Id},
-                       headDecoration3Id=${simulatorForm.headDecoration3Id},
-                       chestDecoration1Id=${simulatorForm.chestDecoration1Id},
-                       chestDecoration2Id=${simulatorForm.chestDecoration2Id},
-                       chestDecoration3Id=${simulatorForm.chestDecoration3Id},
-                       armDecoration1Id=${simulatorForm.armDecoration1Id},
-                       armDecoration2Id=${simulatorForm.armDecoration2Id},
-                       armDecoration3Id=${simulatorForm.armDecoration3Id},
-                       waistDecoration1Id=${simulatorForm.waistDecoration1Id},
-                       waistDecoration2Id=${simulatorForm.waistDecoration2Id},
-                       waistDecoration3Id=${simulatorForm.waistDecoration3Id},
-                       legDecoration1Id=${simulatorForm.legDecoration1Id},
-                       legDecoration2Id=${simulatorForm.legDecoration2Id},
-                       legDecoration3Id=${simulatorForm.legDecoration3Id},
-                       talismanSkill1Id=${simulatorForm.talismanSkill1Id},
-                       talismanSkill1Level=${simulatorForm.talismanSkill1Level},
-                       talismanSkill2Id=${simulatorForm.talismanSkill2Id},
-                       talismanSkill2Level=${simulatorForm.talismanSkill2Level},
-                       talismanSlot1Size=${simulatorForm.talismanSlot1Size},
-                       talismanSlot2Size=${simulatorForm.talismanSlot2Size},
-                       talismanSlot3Size=${simulatorForm.talismanSlot3Size},
-                       talismanDecoration1Id=${simulatorForm.talismanDecoration1Id},
-                       talismanDecoration2Id=${simulatorForm.talismanDecoration2Id},
-                       talismanDecoration3Id=${simulatorForm.talismanDecoration3Id}
-                   )}">
-
+                <button type="button"
+                        th:if="${armArmor.slot1Size != null
+                               and armArmor.slot1Size > 0}"
+                        th:data-target="'armDecoration1Id'"
+                        th:data-slot-size="${armArmor.slot1Size}"
+                        onclick="goDecorationSelect(
+                            this.dataset.target,
+                            this.dataset.slotSize
+                        )">
                     装飾品を選ぶ
-
-                </a>
+                </button>
 
                 <button type="button"
                         th:if="${simulatorForm.armDecoration1Id != null}"
                         onclick="removeDecoration('armDecoration1Id')">
-
                     外す
-
                 </button>
 
             </td>
 
         </tr>
-
 
         <tr>
 
             <td>2</td>
 
-            <td th:text="${armArmor.slot2Size}">
+            <td th:text="${armArmor.slot2Size != null
+                ? armArmor.slot2Size
+                : 0}">
             </td>
 
             <td>
 
-                <span th:if="${armArmor.slot2Size == 0}">
+                <span th:if="${armArmor.slot2Size == null
+                             or armArmor.slot2Size == 0}">
                     スロットなし
                 </span>
 
-                <span th:if="${armArmor.slot2Size > 0
+                <span th:if="${armArmor.slot2Size != null
+                             and armArmor.slot2Size > 0
                              and armDecoration2 == null}">
                     未選択
                 </span>
 
                 <span th:if="${armDecoration2 != null}">
-
-                    <span th:text="${armDecoration2.skillName}">
-                    </span>
-
-                    Lv<span th:text="${armDecoration2.skillLevel}">
-                    </span>
-
+                    <span th:text="${armDecoration2.skillName}"></span>
+                    Lv<span th:text="${armDecoration2.skillLevel}"></span>
                 </span>
 
             </td>
 
             <td>
 
-                <span th:if="${armArmor.slot2Size == 0}">
-                    -
-                </span>
-
-                <a th:if="${armArmor.slot2Size > 0}"
-
-                   th:href="@{/decoration-select(
-                       slotSize=${armArmor.slot2Size},
-                       target='armDecoration2Id',
-                       weaponId=${simulatorForm.weaponId},
-                       monsterId=${simulatorForm.monsterId},
-                       hitzoneId=${simulatorForm.hitzoneId},
-                       rampageDecorationId=${simulatorForm.rampageDecorationId},
-                       bowChargeId=${simulatorForm.bowChargeId},
-                       bowCoatingId=${simulatorForm.bowCoatingId},
-                       bowgunAmmoId=${simulatorForm.bowgunAmmoId},
-                       headArmorId=${simulatorForm.headArmorId},
-                       chestArmorId=${simulatorForm.chestArmorId},
-                       armArmorId=${simulatorForm.armArmorId},
-                       waistArmorId=${simulatorForm.waistArmorId},
-                       legArmorId=${simulatorForm.legArmorId},
-                       weaponDecoration1Id=${simulatorForm.weaponDecoration1Id},
-                       weaponDecoration2Id=${simulatorForm.weaponDecoration2Id},
-                       weaponDecoration3Id=${simulatorForm.weaponDecoration3Id},
-                       headDecoration1Id=${simulatorForm.headDecoration1Id},
-                       headDecoration2Id=${simulatorForm.headDecoration2Id},
-                       headDecoration3Id=${simulatorForm.headDecoration3Id},
-                       chestDecoration1Id=${simulatorForm.chestDecoration1Id},
-                       chestDecoration2Id=${simulatorForm.chestDecoration2Id},
-                       chestDecoration3Id=${simulatorForm.chestDecoration3Id},
-                       armDecoration1Id=${simulatorForm.armDecoration1Id},
-                       armDecoration2Id=${simulatorForm.armDecoration2Id},
-                       armDecoration3Id=${simulatorForm.armDecoration3Id},
-                       waistDecoration1Id=${simulatorForm.waistDecoration1Id},
-                       waistDecoration2Id=${simulatorForm.waistDecoration2Id},
-                       waistDecoration3Id=${simulatorForm.waistDecoration3Id},
-                       legDecoration1Id=${simulatorForm.legDecoration1Id},
-                       legDecoration2Id=${simulatorForm.legDecoration2Id},
-                       legDecoration3Id=${simulatorForm.legDecoration3Id},
-                       talismanSkill1Id=${simulatorForm.talismanSkill1Id},
-                       talismanSkill1Level=${simulatorForm.talismanSkill1Level},
-                       talismanSkill2Id=${simulatorForm.talismanSkill2Id},
-                       talismanSkill2Level=${simulatorForm.talismanSkill2Level},
-                       talismanSlot1Size=${simulatorForm.talismanSlot1Size},
-                       talismanSlot2Size=${simulatorForm.talismanSlot2Size},
-                       talismanSlot3Size=${simulatorForm.talismanSlot3Size},
-                       talismanDecoration1Id=${simulatorForm.talismanDecoration1Id},
-                       talismanDecoration2Id=${simulatorForm.talismanDecoration2Id},
-                       talismanDecoration3Id=${simulatorForm.talismanDecoration3Id}
-                   )}">
-
+                <button type="button"
+                        th:if="${armArmor.slot2Size != null
+                               and armArmor.slot2Size > 0}"
+                        th:data-target="'armDecoration2Id'"
+                        th:data-slot-size="${armArmor.slot2Size}"
+                        onclick="goDecorationSelect(
+                            this.dataset.target,
+                            this.dataset.slotSize
+                        )">
                     装飾品を選ぶ
-
-                </a>
+                </button>
 
                 <button type="button"
                         th:if="${simulatorForm.armDecoration2Id != null}"
                         onclick="removeDecoration('armDecoration2Id')">
-
                     外す
-
                 </button>
 
             </td>
 
         </tr>
 
-
         <tr>
 
             <td>3</td>
 
-            <td th:text="${armArmor.slot3Size}">
+            <td th:text="${armArmor.slot3Size != null
+                ? armArmor.slot3Size
+                : 0}">
             </td>
 
             <td>
 
-                <span th:if="${armArmor.slot3Size == 0}">
+                <span th:if="${armArmor.slot3Size == null
+                             or armArmor.slot3Size == 0}">
                     スロットなし
                 </span>
 
-                <span th:if="${armArmor.slot3Size > 0
+                <span th:if="${armArmor.slot3Size != null
+                             and armArmor.slot3Size > 0
                              and armDecoration3 == null}">
                     未選択
                 </span>
 
                 <span th:if="${armDecoration3 != null}">
-
-                    <span th:text="${armDecoration3.skillName}">
-                    </span>
-
-                    Lv<span th:text="${armDecoration3.skillLevel}">
-                    </span>
-
+                    <span th:text="${armDecoration3.skillName}"></span>
+                    Lv<span th:text="${armDecoration3.skillLevel}"></span>
                 </span>
 
             </td>
 
             <td>
 
-                <span th:if="${armArmor.slot3Size == 0}">
-                    -
-                </span>
-
-                <a th:if="${armArmor.slot3Size > 0}"
-
-                   th:href="@{/decoration-select(
-                       slotSize=${armArmor.slot3Size},
-                       target='armDecoration3Id',
-                       weaponId=${simulatorForm.weaponId},
-                       monsterId=${simulatorForm.monsterId},
-                       hitzoneId=${simulatorForm.hitzoneId},
-                       rampageDecorationId=${simulatorForm.rampageDecorationId},
-                       bowChargeId=${simulatorForm.bowChargeId},
-                       bowCoatingId=${simulatorForm.bowCoatingId},
-                       bowgunAmmoId=${simulatorForm.bowgunAmmoId},
-                       headArmorId=${simulatorForm.headArmorId},
-                       chestArmorId=${simulatorForm.chestArmorId},
-                       armArmorId=${simulatorForm.armArmorId},
-                       waistArmorId=${simulatorForm.waistArmorId},
-                       legArmorId=${simulatorForm.legArmorId},
-                       weaponDecoration1Id=${simulatorForm.weaponDecoration1Id},
-                       weaponDecoration2Id=${simulatorForm.weaponDecoration2Id},
-                       weaponDecoration3Id=${simulatorForm.weaponDecoration3Id},
-                       headDecoration1Id=${simulatorForm.headDecoration1Id},
-                       headDecoration2Id=${simulatorForm.headDecoration2Id},
-                       headDecoration3Id=${simulatorForm.headDecoration3Id},
-                       chestDecoration1Id=${simulatorForm.chestDecoration1Id},
-                       chestDecoration2Id=${simulatorForm.chestDecoration2Id},
-                       chestDecoration3Id=${simulatorForm.chestDecoration3Id},
-                       armDecoration1Id=${simulatorForm.armDecoration1Id},
-                       armDecoration2Id=${simulatorForm.armDecoration2Id},
-                       armDecoration3Id=${simulatorForm.armDecoration3Id},
-                       waistDecoration1Id=${simulatorForm.waistDecoration1Id},
-                       waistDecoration2Id=${simulatorForm.waistDecoration2Id},
-                       waistDecoration3Id=${simulatorForm.waistDecoration3Id},
-                       legDecoration1Id=${simulatorForm.legDecoration1Id},
-                       legDecoration2Id=${simulatorForm.legDecoration2Id},
-                       legDecoration3Id=${simulatorForm.legDecoration3Id},
-                       talismanSkill1Id=${simulatorForm.talismanSkill1Id},
-                       talismanSkill1Level=${simulatorForm.talismanSkill1Level},
-                       talismanSkill2Id=${simulatorForm.talismanSkill2Id},
-                       talismanSkill2Level=${simulatorForm.talismanSkill2Level},
-                       talismanSlot1Size=${simulatorForm.talismanSlot1Size},
-                       talismanSlot2Size=${simulatorForm.talismanSlot2Size},
-                       talismanSlot3Size=${simulatorForm.talismanSlot3Size},
-                       talismanDecoration1Id=${simulatorForm.talismanDecoration1Id},
-                       talismanDecoration2Id=${simulatorForm.talismanDecoration2Id},
-                       talismanDecoration3Id=${simulatorForm.talismanDecoration3Id}
-                   )}">
-
+                <button type="button"
+                        th:if="${armArmor.slot3Size != null
+                               and armArmor.slot3Size > 0}"
+                        th:data-target="'armDecoration3Id'"
+                        th:data-slot-size="${armArmor.slot3Size}"
+                        onclick="goDecorationSelect(
+                            this.dataset.target,
+                            this.dataset.slotSize
+                        )">
                     装飾品を選ぶ
-
-                </a>
+                </button>
 
                 <button type="button"
                         th:if="${simulatorForm.armDecoration3Id != null}"
                         onclick="removeDecoration('armDecoration3Id')">
-
                     外す
-
                 </button>
 
             </td>
@@ -2429,12 +1544,10 @@
 
     </table>
 
-
     <br>
 
-
     <!-- ================================================== -->
-    <!-- 腰防具スロット -->
+    <!-- 腰 -->
     <!-- ================================================== -->
 
     <h3>腰防具スロット</h3>
@@ -2442,7 +1555,6 @@
     <p th:if="${waistArmor == null}">
         腰防具が選択されていません。
     </p>
-
 
     <table border="1"
            th:if="${waistArmor != null}">
@@ -2454,300 +1566,159 @@
             <th>操作</th>
         </tr>
 
-
         <tr>
 
             <td>1</td>
 
-            <td th:text="${waistArmor.slot1Size}">
+            <td th:text="${waistArmor.slot1Size != null
+                ? waistArmor.slot1Size
+                : 0}">
             </td>
 
             <td>
 
-                <span th:if="${waistArmor.slot1Size == 0}">
+                <span th:if="${waistArmor.slot1Size == null
+                             or waistArmor.slot1Size == 0}">
                     スロットなし
                 </span>
 
-                <span th:if="${waistArmor.slot1Size > 0
+                <span th:if="${waistArmor.slot1Size != null
+                             and waistArmor.slot1Size > 0
                              and waistDecoration1 == null}">
                     未選択
                 </span>
 
                 <span th:if="${waistDecoration1 != null}">
-
-                    <span th:text="${waistDecoration1.skillName}">
-                    </span>
-
-                    Lv<span th:text="${waistDecoration1.skillLevel}">
-                    </span>
-
+                    <span th:text="${waistDecoration1.skillName}"></span>
+                    Lv<span th:text="${waistDecoration1.skillLevel}"></span>
                 </span>
 
             </td>
 
             <td>
 
-                <span th:if="${waistArmor.slot1Size == 0}">
-                    -
-                </span>
-
-                <a th:if="${waistArmor.slot1Size > 0}"
-
-                   th:href="@{/decoration-select(
-                       slotSize=${waistArmor.slot1Size},
-                       target='waistDecoration1Id',
-                       weaponId=${simulatorForm.weaponId},
-                       monsterId=${simulatorForm.monsterId},
-                       hitzoneId=${simulatorForm.hitzoneId},
-                       rampageDecorationId=${simulatorForm.rampageDecorationId},
-                       bowChargeId=${simulatorForm.bowChargeId},
-                       bowCoatingId=${simulatorForm.bowCoatingId},
-                       bowgunAmmoId=${simulatorForm.bowgunAmmoId},
-                       headArmorId=${simulatorForm.headArmorId},
-                       chestArmorId=${simulatorForm.chestArmorId},
-                       armArmorId=${simulatorForm.armArmorId},
-                       waistArmorId=${simulatorForm.waistArmorId},
-                       legArmorId=${simulatorForm.legArmorId},
-                       weaponDecoration1Id=${simulatorForm.weaponDecoration1Id},
-                       weaponDecoration2Id=${simulatorForm.weaponDecoration2Id},
-                       weaponDecoration3Id=${simulatorForm.weaponDecoration3Id},
-                       headDecoration1Id=${simulatorForm.headDecoration1Id},
-                       headDecoration2Id=${simulatorForm.headDecoration2Id},
-                       headDecoration3Id=${simulatorForm.headDecoration3Id},
-                       chestDecoration1Id=${simulatorForm.chestDecoration1Id},
-                       chestDecoration2Id=${simulatorForm.chestDecoration2Id},
-                       chestDecoration3Id=${simulatorForm.chestDecoration3Id},
-                       armDecoration1Id=${simulatorForm.armDecoration1Id},
-                       armDecoration2Id=${simulatorForm.armDecoration2Id},
-                       armDecoration3Id=${simulatorForm.armDecoration3Id},
-                       waistDecoration1Id=${simulatorForm.waistDecoration1Id},
-                       waistDecoration2Id=${simulatorForm.waistDecoration2Id},
-                       waistDecoration3Id=${simulatorForm.waistDecoration3Id},
-                       legDecoration1Id=${simulatorForm.legDecoration1Id},
-                       legDecoration2Id=${simulatorForm.legDecoration2Id},
-                       legDecoration3Id=${simulatorForm.legDecoration3Id},
-                       talismanSkill1Id=${simulatorForm.talismanSkill1Id},
-                       talismanSkill1Level=${simulatorForm.talismanSkill1Level},
-                       talismanSkill2Id=${simulatorForm.talismanSkill2Id},
-                       talismanSkill2Level=${simulatorForm.talismanSkill2Level},
-                       talismanSlot1Size=${simulatorForm.talismanSlot1Size},
-                       talismanSlot2Size=${simulatorForm.talismanSlot2Size},
-                       talismanSlot3Size=${simulatorForm.talismanSlot3Size},
-                       talismanDecoration1Id=${simulatorForm.talismanDecoration1Id},
-                       talismanDecoration2Id=${simulatorForm.talismanDecoration2Id},
-                       talismanDecoration3Id=${simulatorForm.talismanDecoration3Id}
-                   )}">
-
+                <button type="button"
+                        th:if="${waistArmor.slot1Size != null
+                               and waistArmor.slot1Size > 0}"
+                        th:data-target="'waistDecoration1Id'"
+                        th:data-slot-size="${waistArmor.slot1Size}"
+                        onclick="goDecorationSelect(
+                            this.dataset.target,
+                            this.dataset.slotSize
+                        )">
                     装飾品を選ぶ
-
-                </a>
+                </button>
 
                 <button type="button"
                         th:if="${simulatorForm.waistDecoration1Id != null}"
                         onclick="removeDecoration('waistDecoration1Id')">
-
                     外す
-
                 </button>
 
             </td>
 
         </tr>
-
 
         <tr>
 
             <td>2</td>
 
-            <td th:text="${waistArmor.slot2Size}">
+            <td th:text="${waistArmor.slot2Size != null
+                ? waistArmor.slot2Size
+                : 0}">
             </td>
 
             <td>
 
-                <span th:if="${waistArmor.slot2Size == 0}">
+                <span th:if="${waistArmor.slot2Size == null
+                             or waistArmor.slot2Size == 0}">
                     スロットなし
                 </span>
 
-                <span th:if="${waistArmor.slot2Size > 0
+                <span th:if="${waistArmor.slot2Size != null
+                             and waistArmor.slot2Size > 0
                              and waistDecoration2 == null}">
                     未選択
                 </span>
 
                 <span th:if="${waistDecoration2 != null}">
-
-                    <span th:text="${waistDecoration2.skillName}">
-                    </span>
-
-                    Lv<span th:text="${waistDecoration2.skillLevel}">
-                    </span>
-
+                    <span th:text="${waistDecoration2.skillName}"></span>
+                    Lv<span th:text="${waistDecoration2.skillLevel}"></span>
                 </span>
 
             </td>
 
             <td>
 
-                <span th:if="${waistArmor.slot2Size == 0}">
-                    -
-                </span>
-
-                <a th:if="${waistArmor.slot2Size > 0}"
-
-                   th:href="@{/decoration-select(
-                       slotSize=${waistArmor.slot2Size},
-                       target='waistDecoration2Id',
-                       weaponId=${simulatorForm.weaponId},
-                       monsterId=${simulatorForm.monsterId},
-                       hitzoneId=${simulatorForm.hitzoneId},
-                       rampageDecorationId=${simulatorForm.rampageDecorationId},
-                       bowChargeId=${simulatorForm.bowChargeId},
-                       bowCoatingId=${simulatorForm.bowCoatingId},
-                       bowgunAmmoId=${simulatorForm.bowgunAmmoId},
-                       headArmorId=${simulatorForm.headArmorId},
-                       chestArmorId=${simulatorForm.chestArmorId},
-                       armArmorId=${simulatorForm.armArmorId},
-                       waistArmorId=${simulatorForm.waistArmorId},
-                       legArmorId=${simulatorForm.legArmorId},
-                       weaponDecoration1Id=${simulatorForm.weaponDecoration1Id},
-                       weaponDecoration2Id=${simulatorForm.weaponDecoration2Id},
-                       weaponDecoration3Id=${simulatorForm.weaponDecoration3Id},
-                       headDecoration1Id=${simulatorForm.headDecoration1Id},
-                       headDecoration2Id=${simulatorForm.headDecoration2Id},
-                       headDecoration3Id=${simulatorForm.headDecoration3Id},
-                       chestDecoration1Id=${simulatorForm.chestDecoration1Id},
-                       chestDecoration2Id=${simulatorForm.chestDecoration2Id},
-                       chestDecoration3Id=${simulatorForm.chestDecoration3Id},
-                       armDecoration1Id=${simulatorForm.armDecoration1Id},
-                       armDecoration2Id=${simulatorForm.armDecoration2Id},
-                       armDecoration3Id=${simulatorForm.armDecoration3Id},
-                       waistDecoration1Id=${simulatorForm.waistDecoration1Id},
-                       waistDecoration2Id=${simulatorForm.waistDecoration2Id},
-                       waistDecoration3Id=${simulatorForm.waistDecoration3Id},
-                       legDecoration1Id=${simulatorForm.legDecoration1Id},
-                       legDecoration2Id=${simulatorForm.legDecoration2Id},
-                       legDecoration3Id=${simulatorForm.legDecoration3Id},
-                       talismanSkill1Id=${simulatorForm.talismanSkill1Id},
-                       talismanSkill1Level=${simulatorForm.talismanSkill1Level},
-                       talismanSkill2Id=${simulatorForm.talismanSkill2Id},
-                       talismanSkill2Level=${simulatorForm.talismanSkill2Level},
-                       talismanSlot1Size=${simulatorForm.talismanSlot1Size},
-                       talismanSlot2Size=${simulatorForm.talismanSlot2Size},
-                       talismanSlot3Size=${simulatorForm.talismanSlot3Size},
-                       talismanDecoration1Id=${simulatorForm.talismanDecoration1Id},
-                       talismanDecoration2Id=${simulatorForm.talismanDecoration2Id},
-                       talismanDecoration3Id=${simulatorForm.talismanDecoration3Id}
-                   )}">
-
+                <button type="button"
+                        th:if="${waistArmor.slot2Size != null
+                               and waistArmor.slot2Size > 0}"
+                        th:data-target="'waistDecoration2Id'"
+                        th:data-slot-size="${waistArmor.slot2Size}"
+                        onclick="goDecorationSelect(
+                            this.dataset.target,
+                            this.dataset.slotSize
+                        )">
                     装飾品を選ぶ
-
-                </a>
+                </button>
 
                 <button type="button"
                         th:if="${simulatorForm.waistDecoration2Id != null}"
                         onclick="removeDecoration('waistDecoration2Id')">
-
                     外す
-
                 </button>
 
             </td>
 
         </tr>
 
-
         <tr>
 
             <td>3</td>
 
-            <td th:text="${waistArmor.slot3Size}">
+            <td th:text="${waistArmor.slot3Size != null
+                ? waistArmor.slot3Size
+                : 0}">
             </td>
 
             <td>
 
-                <span th:if="${waistArmor.slot3Size == 0}">
+                <span th:if="${waistArmor.slot3Size == null
+                             or waistArmor.slot3Size == 0}">
                     スロットなし
                 </span>
 
-                <span th:if="${waistArmor.slot3Size > 0
+                <span th:if="${waistArmor.slot3Size != null
+                             and waistArmor.slot3Size > 0
                              and waistDecoration3 == null}">
                     未選択
                 </span>
 
                 <span th:if="${waistDecoration3 != null}">
-
-                    <span th:text="${waistDecoration3.skillName}">
-                    </span>
-
-                    Lv<span th:text="${waistDecoration3.skillLevel}">
-                    </span>
-
+                    <span th:text="${waistDecoration3.skillName}"></span>
+                    Lv<span th:text="${waistDecoration3.skillLevel}"></span>
                 </span>
 
             </td>
 
             <td>
 
-                <span th:if="${waistArmor.slot3Size == 0}">
-                    -
-                </span>
-
-                <a th:if="${waistArmor.slot3Size > 0}"
-
-                   th:href="@{/decoration-select(
-                       slotSize=${waistArmor.slot3Size},
-                       target='waistDecoration3Id',
-                       weaponId=${simulatorForm.weaponId},
-                       monsterId=${simulatorForm.monsterId},
-                       hitzoneId=${simulatorForm.hitzoneId},
-                       rampageDecorationId=${simulatorForm.rampageDecorationId},
-                       bowChargeId=${simulatorForm.bowChargeId},
-                       bowCoatingId=${simulatorForm.bowCoatingId},
-                       bowgunAmmoId=${simulatorForm.bowgunAmmoId},
-                       headArmorId=${simulatorForm.headArmorId},
-                       chestArmorId=${simulatorForm.chestArmorId},
-                       armArmorId=${simulatorForm.armArmorId},
-                       waistArmorId=${simulatorForm.waistArmorId},
-                       legArmorId=${simulatorForm.legArmorId},
-                       weaponDecoration1Id=${simulatorForm.weaponDecoration1Id},
-                       weaponDecoration2Id=${simulatorForm.weaponDecoration2Id},
-                       weaponDecoration3Id=${simulatorForm.weaponDecoration3Id},
-                       headDecoration1Id=${simulatorForm.headDecoration1Id},
-                       headDecoration2Id=${simulatorForm.headDecoration2Id},
-                       headDecoration3Id=${simulatorForm.headDecoration3Id},
-                       chestDecoration1Id=${simulatorForm.chestDecoration1Id},
-                       chestDecoration2Id=${simulatorForm.chestDecoration2Id},
-                       chestDecoration3Id=${simulatorForm.chestDecoration3Id},
-                       armDecoration1Id=${simulatorForm.armDecoration1Id},
-                       armDecoration2Id=${simulatorForm.armDecoration2Id},
-                       armDecoration3Id=${simulatorForm.armDecoration3Id},
-                       waistDecoration1Id=${simulatorForm.waistDecoration1Id},
-                       waistDecoration2Id=${simulatorForm.waistDecoration2Id},
-                       waistDecoration3Id=${simulatorForm.waistDecoration3Id},
-                       legDecoration1Id=${simulatorForm.legDecoration1Id},
-                       legDecoration2Id=${simulatorForm.legDecoration2Id},
-                       legDecoration3Id=${simulatorForm.legDecoration3Id},
-                       talismanSkill1Id=${simulatorForm.talismanSkill1Id},
-                       talismanSkill1Level=${simulatorForm.talismanSkill1Level},
-                       talismanSkill2Id=${simulatorForm.talismanSkill2Id},
-                       talismanSkill2Level=${simulatorForm.talismanSkill2Level},
-                       talismanSlot1Size=${simulatorForm.talismanSlot1Size},
-                       talismanSlot2Size=${simulatorForm.talismanSlot2Size},
-                       talismanSlot3Size=${simulatorForm.talismanSlot3Size},
-                       talismanDecoration1Id=${simulatorForm.talismanDecoration1Id},
-                       talismanDecoration2Id=${simulatorForm.talismanDecoration2Id},
-                       talismanDecoration3Id=${simulatorForm.talismanDecoration3Id}
-                   )}">
-
+                <button type="button"
+                        th:if="${waistArmor.slot3Size != null
+                               and waistArmor.slot3Size > 0}"
+                        th:data-target="'waistDecoration3Id'"
+                        th:data-slot-size="${waistArmor.slot3Size}"
+                        onclick="goDecorationSelect(
+                            this.dataset.target,
+                            this.dataset.slotSize
+                        )">
                     装飾品を選ぶ
-
-                </a>
+                </button>
 
                 <button type="button"
                         th:if="${simulatorForm.waistDecoration3Id != null}"
                         onclick="removeDecoration('waistDecoration3Id')">
-
                     外す
-
                 </button>
 
             </td>
@@ -2756,12 +1727,10 @@
 
     </table>
 
-
     <br>
 
-
     <!-- ================================================== -->
-    <!-- 脚防具スロット -->
+    <!-- 脚 -->
     <!-- ================================================== -->
 
     <h3>脚防具スロット</h3>
@@ -2769,7 +1738,6 @@
     <p th:if="${legArmor == null}">
         脚防具が選択されていません。
     </p>
-
 
     <table border="1"
            th:if="${legArmor != null}">
@@ -2781,321 +1749,159 @@
             <th>操作</th>
         </tr>
 
-
-        <!-- 脚スロット1 -->
-
         <tr>
 
             <td>1</td>
 
-            <td th:text="${legArmor.slot1Size}">
+            <td th:text="${legArmor.slot1Size != null
+                ? legArmor.slot1Size
+                : 0}">
             </td>
 
             <td>
 
-                <span th:if="${legArmor.slot1Size == 0}">
+                <span th:if="${legArmor.slot1Size == null
+                             or legArmor.slot1Size == 0}">
                     スロットなし
                 </span>
 
-                <span th:if="${legArmor.slot1Size > 0
+                <span th:if="${legArmor.slot1Size != null
+                             and legArmor.slot1Size > 0
                              and legDecoration1 == null}">
                     未選択
                 </span>
 
                 <span th:if="${legDecoration1 != null}">
-
-                    <span th:text="${legDecoration1.skillName}">
-                    </span>
-
-                    Lv<span th:text="${legDecoration1.skillLevel}">
-                    </span>
-
-                    （必要スロット
-                    <span th:text="${legDecoration1.requiredSlotSize}">
-                    </span>
-                    ）
-
+                    <span th:text="${legDecoration1.skillName}"></span>
+                    Lv<span th:text="${legDecoration1.skillLevel}"></span>
                 </span>
 
             </td>
 
             <td>
 
-                <span th:if="${legArmor.slot1Size == 0}">
-                    -
-                </span>
-
-                <a th:if="${legArmor.slot1Size > 0}"
-
-                   th:href="@{/decoration-select(
-                       slotSize=${legArmor.slot1Size},
-                       target='legDecoration1Id',
-                       weaponId=${simulatorForm.weaponId},
-                       monsterId=${simulatorForm.monsterId},
-                       hitzoneId=${simulatorForm.hitzoneId},
-                       rampageDecorationId=${simulatorForm.rampageDecorationId},
-                       bowChargeId=${simulatorForm.bowChargeId},
-                       bowCoatingId=${simulatorForm.bowCoatingId},
-                       bowgunAmmoId=${simulatorForm.bowgunAmmoId},
-                       headArmorId=${simulatorForm.headArmorId},
-                       chestArmorId=${simulatorForm.chestArmorId},
-                       armArmorId=${simulatorForm.armArmorId},
-                       waistArmorId=${simulatorForm.waistArmorId},
-                       legArmorId=${simulatorForm.legArmorId},
-                       weaponDecoration1Id=${simulatorForm.weaponDecoration1Id},
-                       weaponDecoration2Id=${simulatorForm.weaponDecoration2Id},
-                       weaponDecoration3Id=${simulatorForm.weaponDecoration3Id},
-                       headDecoration1Id=${simulatorForm.headDecoration1Id},
-                       headDecoration2Id=${simulatorForm.headDecoration2Id},
-                       headDecoration3Id=${simulatorForm.headDecoration3Id},
-                       chestDecoration1Id=${simulatorForm.chestDecoration1Id},
-                       chestDecoration2Id=${simulatorForm.chestDecoration2Id},
-                       chestDecoration3Id=${simulatorForm.chestDecoration3Id},
-                       armDecoration1Id=${simulatorForm.armDecoration1Id},
-                       armDecoration2Id=${simulatorForm.armDecoration2Id},
-                       armDecoration3Id=${simulatorForm.armDecoration3Id},
-                       waistDecoration1Id=${simulatorForm.waistDecoration1Id},
-                       waistDecoration2Id=${simulatorForm.waistDecoration2Id},
-                       waistDecoration3Id=${simulatorForm.waistDecoration3Id},
-                       legDecoration1Id=${simulatorForm.legDecoration1Id},
-                       legDecoration2Id=${simulatorForm.legDecoration2Id},
-                       legDecoration3Id=${simulatorForm.legDecoration3Id},
-                       talismanSkill1Id=${simulatorForm.talismanSkill1Id},
-                       talismanSkill1Level=${simulatorForm.talismanSkill1Level},
-                       talismanSkill2Id=${simulatorForm.talismanSkill2Id},
-                       talismanSkill2Level=${simulatorForm.talismanSkill2Level},
-                       talismanSlot1Size=${simulatorForm.talismanSlot1Size},
-                       talismanSlot2Size=${simulatorForm.talismanSlot2Size},
-                       talismanSlot3Size=${simulatorForm.talismanSlot3Size},
-                       talismanDecoration1Id=${simulatorForm.talismanDecoration1Id},
-                       talismanDecoration2Id=${simulatorForm.talismanDecoration2Id},
-                       talismanDecoration3Id=${simulatorForm.talismanDecoration3Id}
-                   )}">
-
+                <button type="button"
+                        th:if="${legArmor.slot1Size != null
+                               and legArmor.slot1Size > 0}"
+                        th:data-target="'legDecoration1Id'"
+                        th:data-slot-size="${legArmor.slot1Size}"
+                        onclick="goDecorationSelect(
+                            this.dataset.target,
+                            this.dataset.slotSize
+                        )">
                     装飾品を選ぶ
-
-                </a>
+                </button>
 
                 <button type="button"
                         th:if="${simulatorForm.legDecoration1Id != null}"
                         onclick="removeDecoration('legDecoration1Id')">
-
                     外す
-
                 </button>
 
             </td>
 
         </tr>
-
-
-        <!-- 脚スロット2 -->
 
         <tr>
 
             <td>2</td>
 
-            <td th:text="${legArmor.slot2Size}">
+            <td th:text="${legArmor.slot2Size != null
+                ? legArmor.slot2Size
+                : 0}">
             </td>
 
             <td>
 
-                <span th:if="${legArmor.slot2Size == 0}">
+                <span th:if="${legArmor.slot2Size == null
+                             or legArmor.slot2Size == 0}">
                     スロットなし
                 </span>
 
-                <span th:if="${legArmor.slot2Size > 0
+                <span th:if="${legArmor.slot2Size != null
+                             and legArmor.slot2Size > 0
                              and legDecoration2 == null}">
                     未選択
                 </span>
 
                 <span th:if="${legDecoration2 != null}">
-
-                    <span th:text="${legDecoration2.skillName}">
-                    </span>
-
-                    Lv<span th:text="${legDecoration2.skillLevel}">
-                    </span>
-
-                    （必要スロット
-                    <span th:text="${legDecoration2.requiredSlotSize}">
-                    </span>
-                    ）
-
+                    <span th:text="${legDecoration2.skillName}"></span>
+                    Lv<span th:text="${legDecoration2.skillLevel}"></span>
                 </span>
 
             </td>
 
             <td>
 
-                <span th:if="${legArmor.slot2Size == 0}">
-                    -
-                </span>
-
-                <a th:if="${legArmor.slot2Size > 0}"
-
-                   th:href="@{/decoration-select(
-                       slotSize=${legArmor.slot2Size},
-                       target='legDecoration2Id',
-                       weaponId=${simulatorForm.weaponId},
-                       monsterId=${simulatorForm.monsterId},
-                       hitzoneId=${simulatorForm.hitzoneId},
-                       rampageDecorationId=${simulatorForm.rampageDecorationId},
-                       bowChargeId=${simulatorForm.bowChargeId},
-                       bowCoatingId=${simulatorForm.bowCoatingId},
-                       bowgunAmmoId=${simulatorForm.bowgunAmmoId},
-                       headArmorId=${simulatorForm.headArmorId},
-                       chestArmorId=${simulatorForm.chestArmorId},
-                       armArmorId=${simulatorForm.armArmorId},
-                       waistArmorId=${simulatorForm.waistArmorId},
-                       legArmorId=${simulatorForm.legArmorId},
-                       weaponDecoration1Id=${simulatorForm.weaponDecoration1Id},
-                       weaponDecoration2Id=${simulatorForm.weaponDecoration2Id},
-                       weaponDecoration3Id=${simulatorForm.weaponDecoration3Id},
-                       headDecoration1Id=${simulatorForm.headDecoration1Id},
-                       headDecoration2Id=${simulatorForm.headDecoration2Id},
-                       headDecoration3Id=${simulatorForm.headDecoration3Id},
-                       chestDecoration1Id=${simulatorForm.chestDecoration1Id},
-                       chestDecoration2Id=${simulatorForm.chestDecoration2Id},
-                       chestDecoration3Id=${simulatorForm.chestDecoration3Id},
-                       armDecoration1Id=${simulatorForm.armDecoration1Id},
-                       armDecoration2Id=${simulatorForm.armDecoration2Id},
-                       armDecoration3Id=${simulatorForm.armDecoration3Id},
-                       waistDecoration1Id=${simulatorForm.waistDecoration1Id},
-                       waistDecoration2Id=${simulatorForm.waistDecoration2Id},
-                       waistDecoration3Id=${simulatorForm.waistDecoration3Id},
-                       legDecoration1Id=${simulatorForm.legDecoration1Id},
-                       legDecoration2Id=${simulatorForm.legDecoration2Id},
-                       legDecoration3Id=${simulatorForm.legDecoration3Id},
-                       talismanSkill1Id=${simulatorForm.talismanSkill1Id},
-                       talismanSkill1Level=${simulatorForm.talismanSkill1Level},
-                       talismanSkill2Id=${simulatorForm.talismanSkill2Id},
-                       talismanSkill2Level=${simulatorForm.talismanSkill2Level},
-                       talismanSlot1Size=${simulatorForm.talismanSlot1Size},
-                       talismanSlot2Size=${simulatorForm.talismanSlot2Size},
-                       talismanSlot3Size=${simulatorForm.talismanSlot3Size},
-                       talismanDecoration1Id=${simulatorForm.talismanDecoration1Id},
-                       talismanDecoration2Id=${simulatorForm.talismanDecoration2Id},
-                       talismanDecoration3Id=${simulatorForm.talismanDecoration3Id}
-                   )}">
-
+                <button type="button"
+                        th:if="${legArmor.slot2Size != null
+                               and legArmor.slot2Size > 0}"
+                        th:data-target="'legDecoration2Id'"
+                        th:data-slot-size="${legArmor.slot2Size}"
+                        onclick="goDecorationSelect(
+                            this.dataset.target,
+                            this.dataset.slotSize
+                        )">
                     装飾品を選ぶ
-
-                </a>
+                </button>
 
                 <button type="button"
                         th:if="${simulatorForm.legDecoration2Id != null}"
                         onclick="removeDecoration('legDecoration2Id')">
-
                     外す
-
                 </button>
 
             </td>
 
         </tr>
 
-
-        <!-- 脚スロット3 -->
-
         <tr>
 
             <td>3</td>
 
-            <td th:text="${legArmor.slot3Size}">
+            <td th:text="${legArmor.slot3Size != null
+                ? legArmor.slot3Size
+                : 0}">
             </td>
 
             <td>
 
-                <span th:if="${legArmor.slot3Size == 0}">
+                <span th:if="${legArmor.slot3Size == null
+                             or legArmor.slot3Size == 0}">
                     スロットなし
                 </span>
 
-                <span th:if="${legArmor.slot3Size > 0
+                <span th:if="${legArmor.slot3Size != null
+                             and legArmor.slot3Size > 0
                              and legDecoration3 == null}">
                     未選択
                 </span>
 
                 <span th:if="${legDecoration3 != null}">
-
-                    <span th:text="${legDecoration3.skillName}">
-                    </span>
-
-                    Lv<span th:text="${legDecoration3.skillLevel}">
-                    </span>
-
-                    （必要スロット
-                    <span th:text="${legDecoration3.requiredSlotSize}">
-                    </span>
-                    ）
-
+                    <span th:text="${legDecoration3.skillName}"></span>
+                    Lv<span th:text="${legDecoration3.skillLevel}"></span>
                 </span>
 
             </td>
 
             <td>
 
-                <span th:if="${legArmor.slot3Size == 0}">
-                    -
-                </span>
-
-                <a th:if="${legArmor.slot3Size > 0}"
-
-                   th:href="@{/decoration-select(
-                       slotSize=${legArmor.slot3Size},
-                       target='legDecoration3Id',
-                       weaponId=${simulatorForm.weaponId},
-                       monsterId=${simulatorForm.monsterId},
-                       hitzoneId=${simulatorForm.hitzoneId},
-                       rampageDecorationId=${simulatorForm.rampageDecorationId},
-                       bowChargeId=${simulatorForm.bowChargeId},
-                       bowCoatingId=${simulatorForm.bowCoatingId},
-                       bowgunAmmoId=${simulatorForm.bowgunAmmoId},
-                       headArmorId=${simulatorForm.headArmorId},
-                       chestArmorId=${simulatorForm.chestArmorId},
-                       armArmorId=${simulatorForm.armArmorId},
-                       waistArmorId=${simulatorForm.waistArmorId},
-                       legArmorId=${simulatorForm.legArmorId},
-                       weaponDecoration1Id=${simulatorForm.weaponDecoration1Id},
-                       weaponDecoration2Id=${simulatorForm.weaponDecoration2Id},
-                       weaponDecoration3Id=${simulatorForm.weaponDecoration3Id},
-                       headDecoration1Id=${simulatorForm.headDecoration1Id},
-                       headDecoration2Id=${simulatorForm.headDecoration2Id},
-                       headDecoration3Id=${simulatorForm.headDecoration3Id},
-                       chestDecoration1Id=${simulatorForm.chestDecoration1Id},
-                       chestDecoration2Id=${simulatorForm.chestDecoration2Id},
-                       chestDecoration3Id=${simulatorForm.chestDecoration3Id},
-                       armDecoration1Id=${simulatorForm.armDecoration1Id},
-                       armDecoration2Id=${simulatorForm.armDecoration2Id},
-                       armDecoration3Id=${simulatorForm.armDecoration3Id},
-                       waistDecoration1Id=${simulatorForm.waistDecoration1Id},
-                       waistDecoration2Id=${simulatorForm.waistDecoration2Id},
-                       waistDecoration3Id=${simulatorForm.waistDecoration3Id},
-                       legDecoration1Id=${simulatorForm.legDecoration1Id},
-                       legDecoration2Id=${simulatorForm.legDecoration2Id},
-                       legDecoration3Id=${simulatorForm.legDecoration3Id},
-                       talismanSkill1Id=${simulatorForm.talismanSkill1Id},
-                       talismanSkill1Level=${simulatorForm.talismanSkill1Level},
-                       talismanSkill2Id=${simulatorForm.talismanSkill2Id},
-                       talismanSkill2Level=${simulatorForm.talismanSkill2Level},
-                       talismanSlot1Size=${simulatorForm.talismanSlot1Size},
-                       talismanSlot2Size=${simulatorForm.talismanSlot2Size},
-                       talismanSlot3Size=${simulatorForm.talismanSlot3Size},
-                       talismanDecoration1Id=${simulatorForm.talismanDecoration1Id},
-                       talismanDecoration2Id=${simulatorForm.talismanDecoration2Id},
-                       talismanDecoration3Id=${simulatorForm.talismanDecoration3Id}
-                   )}">
-
+                <button type="button"
+                        th:if="${legArmor.slot3Size != null
+                               and legArmor.slot3Size > 0}"
+                        th:data-target="'legDecoration3Id'"
+                        th:data-slot-size="${legArmor.slot3Size}"
+                        onclick="goDecorationSelect(
+                            this.dataset.target,
+                            this.dataset.slotSize
+                        )">
                     装飾品を選ぶ
-
-                </a>
+                </button>
 
                 <button type="button"
                         th:if="${simulatorForm.legDecoration3Id != null}"
                         onclick="removeDecoration('legDecoration3Id')">
-
                     外す
-
                 </button>
 
             </td>
@@ -3104,16 +1910,13 @@
 
     </table>
 
-
     <br>
-
 
     <!-- ================================================== -->
     <!-- 護石 -->
     <!-- ================================================== -->
 
     <h2>護石</h2>
-
 
     <table border="1">
 
@@ -3146,7 +1949,6 @@
 
         </tr>
 
-
         <tr>
 
             <td>スキル2</td>
@@ -3170,7 +1972,6 @@
             </td>
 
         </tr>
-
 
         <tr>
 
@@ -3203,12 +2004,14 @@
 
     </table>
 
-
     <br>
 
+    <button type="button"
+            onclick="goTalisman()">
+        護石を編集
+    </button>
 
     <h3>護石スロット</h3>
-
 
     <table border="1">
 
@@ -3218,7 +2021,6 @@
             <th>装飾品</th>
             <th>操作</th>
         </tr>
-
 
         <tr>
 
@@ -3243,89 +2045,35 @@
                 </span>
 
                 <span th:if="${talismanDecoration1 != null}">
-
-                    <span th:text="${talismanDecoration1.skillName}">
-                    </span>
-
-                    Lv<span th:text="${talismanDecoration1.skillLevel}">
-                    </span>
-
+                    <span th:text="${talismanDecoration1.skillName}"></span>
+                    Lv<span th:text="${talismanDecoration1.skillLevel}"></span>
                 </span>
 
             </td>
 
             <td>
 
-                <span th:if="${simulatorForm.talismanSlot1Size == null
-                             or simulatorForm.talismanSlot1Size == 0}">
-                    -
-                </span>
-
-                <a th:if="${simulatorForm.talismanSlot1Size != null
-                           and simulatorForm.talismanSlot1Size > 0}"
-
-                   th:href="@{/decoration-select(
-                       slotSize=${simulatorForm.talismanSlot1Size},
-                       target='talismanDecoration1Id',
-                       weaponId=${simulatorForm.weaponId},
-                       monsterId=${simulatorForm.monsterId},
-                       hitzoneId=${simulatorForm.hitzoneId},
-                       rampageDecorationId=${simulatorForm.rampageDecorationId},
-                       bowChargeId=${simulatorForm.bowChargeId},
-                       bowCoatingId=${simulatorForm.bowCoatingId},
-                       bowgunAmmoId=${simulatorForm.bowgunAmmoId},
-                       headArmorId=${simulatorForm.headArmorId},
-                       chestArmorId=${simulatorForm.chestArmorId},
-                       armArmorId=${simulatorForm.armArmorId},
-                       waistArmorId=${simulatorForm.waistArmorId},
-                       legArmorId=${simulatorForm.legArmorId},
-                       weaponDecoration1Id=${simulatorForm.weaponDecoration1Id},
-                       weaponDecoration2Id=${simulatorForm.weaponDecoration2Id},
-                       weaponDecoration3Id=${simulatorForm.weaponDecoration3Id},
-                       headDecoration1Id=${simulatorForm.headDecoration1Id},
-                       headDecoration2Id=${simulatorForm.headDecoration2Id},
-                       headDecoration3Id=${simulatorForm.headDecoration3Id},
-                       chestDecoration1Id=${simulatorForm.chestDecoration1Id},
-                       chestDecoration2Id=${simulatorForm.chestDecoration2Id},
-                       chestDecoration3Id=${simulatorForm.chestDecoration3Id},
-                       armDecoration1Id=${simulatorForm.armDecoration1Id},
-                       armDecoration2Id=${simulatorForm.armDecoration2Id},
-                       armDecoration3Id=${simulatorForm.armDecoration3Id},
-                       waistDecoration1Id=${simulatorForm.waistDecoration1Id},
-                       waistDecoration2Id=${simulatorForm.waistDecoration2Id},
-                       waistDecoration3Id=${simulatorForm.waistDecoration3Id},
-                       legDecoration1Id=${simulatorForm.legDecoration1Id},
-                       legDecoration2Id=${simulatorForm.legDecoration2Id},
-                       legDecoration3Id=${simulatorForm.legDecoration3Id},
-                       talismanSkill1Id=${simulatorForm.talismanSkill1Id},
-                       talismanSkill1Level=${simulatorForm.talismanSkill1Level},
-                       talismanSkill2Id=${simulatorForm.talismanSkill2Id},
-                       talismanSkill2Level=${simulatorForm.talismanSkill2Level},
-                       talismanSlot1Size=${simulatorForm.talismanSlot1Size},
-                       talismanSlot2Size=${simulatorForm.talismanSlot2Size},
-                       talismanSlot3Size=${simulatorForm.talismanSlot3Size},
-                       talismanDecoration1Id=${simulatorForm.talismanDecoration1Id},
-                       talismanDecoration2Id=${simulatorForm.talismanDecoration2Id},
-                       talismanDecoration3Id=${simulatorForm.talismanDecoration3Id}
-                   )}">
-
+                <button type="button"
+                        th:if="${simulatorForm.talismanSlot1Size != null
+                               and simulatorForm.talismanSlot1Size > 0}"
+                        th:data-target="'talismanDecoration1Id'"
+                        th:data-slot-size="${simulatorForm.talismanSlot1Size}"
+                        onclick="goDecorationSelect(
+                            this.dataset.target,
+                            this.dataset.slotSize
+                        )">
                     装飾品を選ぶ
-
-                </a>
-
+                </button>
 
                 <button type="button"
                         th:if="${simulatorForm.talismanDecoration1Id != null}"
                         onclick="removeDecoration('talismanDecoration1Id')">
-
                     外す
-
                 </button>
 
             </td>
 
         </tr>
-
 
         <tr>
 
@@ -3350,89 +2098,35 @@
                 </span>
 
                 <span th:if="${talismanDecoration2 != null}">
-
-                    <span th:text="${talismanDecoration2.skillName}">
-                    </span>
-
-                    Lv<span th:text="${talismanDecoration2.skillLevel}">
-                    </span>
-
+                    <span th:text="${talismanDecoration2.skillName}"></span>
+                    Lv<span th:text="${talismanDecoration2.skillLevel}"></span>
                 </span>
 
             </td>
 
             <td>
 
-                <span th:if="${simulatorForm.talismanSlot2Size == null
-                             or simulatorForm.talismanSlot2Size == 0}">
-                    -
-                </span>
-
-                <a th:if="${simulatorForm.talismanSlot2Size != null
-                           and simulatorForm.talismanSlot2Size > 0}"
-
-                   th:href="@{/decoration-select(
-                       slotSize=${simulatorForm.talismanSlot2Size},
-                       target='talismanDecoration2Id',
-                       weaponId=${simulatorForm.weaponId},
-                       monsterId=${simulatorForm.monsterId},
-                       hitzoneId=${simulatorForm.hitzoneId},
-                       rampageDecorationId=${simulatorForm.rampageDecorationId},
-                       bowChargeId=${simulatorForm.bowChargeId},
-                       bowCoatingId=${simulatorForm.bowCoatingId},
-                       bowgunAmmoId=${simulatorForm.bowgunAmmoId},
-                       headArmorId=${simulatorForm.headArmorId},
-                       chestArmorId=${simulatorForm.chestArmorId},
-                       armArmorId=${simulatorForm.armArmorId},
-                       waistArmorId=${simulatorForm.waistArmorId},
-                       legArmorId=${simulatorForm.legArmorId},
-                       weaponDecoration1Id=${simulatorForm.weaponDecoration1Id},
-                       weaponDecoration2Id=${simulatorForm.weaponDecoration2Id},
-                       weaponDecoration3Id=${simulatorForm.weaponDecoration3Id},
-                       headDecoration1Id=${simulatorForm.headDecoration1Id},
-                       headDecoration2Id=${simulatorForm.headDecoration2Id},
-                       headDecoration3Id=${simulatorForm.headDecoration3Id},
-                       chestDecoration1Id=${simulatorForm.chestDecoration1Id},
-                       chestDecoration2Id=${simulatorForm.chestDecoration2Id},
-                       chestDecoration3Id=${simulatorForm.chestDecoration3Id},
-                       armDecoration1Id=${simulatorForm.armDecoration1Id},
-                       armDecoration2Id=${simulatorForm.armDecoration2Id},
-                       armDecoration3Id=${simulatorForm.armDecoration3Id},
-                       waistDecoration1Id=${simulatorForm.waistDecoration1Id},
-                       waistDecoration2Id=${simulatorForm.waistDecoration2Id},
-                       waistDecoration3Id=${simulatorForm.waistDecoration3Id},
-                       legDecoration1Id=${simulatorForm.legDecoration1Id},
-                       legDecoration2Id=${simulatorForm.legDecoration2Id},
-                       legDecoration3Id=${simulatorForm.legDecoration3Id},
-                       talismanSkill1Id=${simulatorForm.talismanSkill1Id},
-                       talismanSkill1Level=${simulatorForm.talismanSkill1Level},
-                       talismanSkill2Id=${simulatorForm.talismanSkill2Id},
-                       talismanSkill2Level=${simulatorForm.talismanSkill2Level},
-                       talismanSlot1Size=${simulatorForm.talismanSlot1Size},
-                       talismanSlot2Size=${simulatorForm.talismanSlot2Size},
-                       talismanSlot3Size=${simulatorForm.talismanSlot3Size},
-                       talismanDecoration1Id=${simulatorForm.talismanDecoration1Id},
-                       talismanDecoration2Id=${simulatorForm.talismanDecoration2Id},
-                       talismanDecoration3Id=${simulatorForm.talismanDecoration3Id}
-                   )}">
-
+                <button type="button"
+                        th:if="${simulatorForm.talismanSlot2Size != null
+                               and simulatorForm.talismanSlot2Size > 0}"
+                        th:data-target="'talismanDecoration2Id'"
+                        th:data-slot-size="${simulatorForm.talismanSlot2Size}"
+                        onclick="goDecorationSelect(
+                            this.dataset.target,
+                            this.dataset.slotSize
+                        )">
                     装飾品を選ぶ
-
-                </a>
-
+                </button>
 
                 <button type="button"
                         th:if="${simulatorForm.talismanDecoration2Id != null}"
                         onclick="removeDecoration('talismanDecoration2Id')">
-
                     外す
-
                 </button>
 
             </td>
 
         </tr>
-
 
         <tr>
 
@@ -3457,83 +2151,30 @@
                 </span>
 
                 <span th:if="${talismanDecoration3 != null}">
-
-                    <span th:text="${talismanDecoration3.skillName}">
-                    </span>
-
-                    Lv<span th:text="${talismanDecoration3.skillLevel}">
-                    </span>
-
+                    <span th:text="${talismanDecoration3.skillName}"></span>
+                    Lv<span th:text="${talismanDecoration3.skillLevel}"></span>
                 </span>
 
             </td>
 
             <td>
 
-                <span th:if="${simulatorForm.talismanSlot3Size == null
-                             or simulatorForm.talismanSlot3Size == 0}">
-                    -
-                </span>
-
-                <a th:if="${simulatorForm.talismanSlot3Size != null
-                           and simulatorForm.talismanSlot3Size > 0}"
-
-                   th:href="@{/decoration-select(
-                       slotSize=${simulatorForm.talismanSlot3Size},
-                       target='talismanDecoration3Id',
-                       weaponId=${simulatorForm.weaponId},
-                       monsterId=${simulatorForm.monsterId},
-                       hitzoneId=${simulatorForm.hitzoneId},
-                       rampageDecorationId=${simulatorForm.rampageDecorationId},
-                       bowChargeId=${simulatorForm.bowChargeId},
-                       bowCoatingId=${simulatorForm.bowCoatingId},
-                       bowgunAmmoId=${simulatorForm.bowgunAmmoId},
-                       headArmorId=${simulatorForm.headArmorId},
-                       chestArmorId=${simulatorForm.chestArmorId},
-                       armArmorId=${simulatorForm.armArmorId},
-                       waistArmorId=${simulatorForm.waistArmorId},
-                       legArmorId=${simulatorForm.legArmorId},
-                       weaponDecoration1Id=${simulatorForm.weaponDecoration1Id},
-                       weaponDecoration2Id=${simulatorForm.weaponDecoration2Id},
-                       weaponDecoration3Id=${simulatorForm.weaponDecoration3Id},
-                       headDecoration1Id=${simulatorForm.headDecoration1Id},
-                       headDecoration2Id=${simulatorForm.headDecoration2Id},
-                       headDecoration3Id=${simulatorForm.headDecoration3Id},
-                       chestDecoration1Id=${simulatorForm.chestDecoration1Id},
-                       chestDecoration2Id=${simulatorForm.chestDecoration2Id},
-                       chestDecoration3Id=${simulatorForm.chestDecoration3Id},
-                       armDecoration1Id=${simulatorForm.armDecoration1Id},
-                       armDecoration2Id=${simulatorForm.armDecoration2Id},
-                       armDecoration3Id=${simulatorForm.armDecoration3Id},
-                       waistDecoration1Id=${simulatorForm.waistDecoration1Id},
-                       waistDecoration2Id=${simulatorForm.waistDecoration2Id},
-                       waistDecoration3Id=${simulatorForm.waistDecoration3Id},
-                       legDecoration1Id=${simulatorForm.legDecoration1Id},
-                       legDecoration2Id=${simulatorForm.legDecoration2Id},
-                       legDecoration3Id=${simulatorForm.legDecoration3Id},
-                       talismanSkill1Id=${simulatorForm.talismanSkill1Id},
-                       talismanSkill1Level=${simulatorForm.talismanSkill1Level},
-                       talismanSkill2Id=${simulatorForm.talismanSkill2Id},
-                       talismanSkill2Level=${simulatorForm.talismanSkill2Level},
-                       talismanSlot1Size=${simulatorForm.talismanSlot1Size},
-                       talismanSlot2Size=${simulatorForm.talismanSlot2Size},
-                       talismanSlot3Size=${simulatorForm.talismanSlot3Size},
-                       talismanDecoration1Id=${simulatorForm.talismanDecoration1Id},
-                       talismanDecoration2Id=${simulatorForm.talismanDecoration2Id},
-                       talismanDecoration3Id=${simulatorForm.talismanDecoration3Id}
-                   )}">
-
+                <button type="button"
+                        th:if="${simulatorForm.talismanSlot3Size != null
+                               and simulatorForm.talismanSlot3Size > 0}"
+                        th:data-target="'talismanDecoration3Id'"
+                        th:data-slot-size="${simulatorForm.talismanSlot3Size}"
+                        onclick="goDecorationSelect(
+                            this.dataset.target,
+                            this.dataset.slotSize
+                        )">
                     装飾品を選ぶ
-
-                </a>
-
+                </button>
 
                 <button type="button"
                         th:if="${simulatorForm.talismanDecoration3Id != null}"
                         onclick="removeDecoration('talismanDecoration3Id')">
-
                     外す
-
                 </button>
 
             </td>
@@ -3542,18 +2183,7 @@
 
     </table>
 
-
     <br>
-
-
-    <a th:href="${talismanUrl}">
-        護石を編集
-    </a>
-
-
-    <br>
-    <br>
-
 
     <!-- ================================================== -->
     <!-- 発動スキル -->
@@ -3561,13 +2191,14 @@
 
     <h2>発動スキル合計</h2>
 
-    <div th:if="${skillTotals.isEmpty()}">
-        <p>発動スキルはありません。</p>
-    </div>
-
+    <p th:if="${skillTotals == null
+               or #lists.isEmpty(skillTotals)}">
+        発動スキルはありません。
+    </p>
 
     <table border="1"
-           th:if="${!skillTotals.isEmpty()}">
+           th:if="${skillTotals != null
+                   and !#lists.isEmpty(skillTotals)}">
 
         <tr>
             <th>スキル名</th>
@@ -3581,13 +2212,12 @@
 
     </table>
 
-
     <!-- ================================================== -->
-    <!-- 条件付きスキル状態選択 -->
+    <!-- 条件付きスキル -->
     <!-- ================================================== -->
 
     <div th:if="${skillStateSelections != null
-                 and !skillStateSelections.isEmpty()}">
+                 and !#lists.isEmpty(skillStateSelections)}">
 
         <h2>条件付きスキル設定</h2>
 
@@ -3603,17 +2233,14 @@
 
             </h3>
 
-
             <p th:if="${selection.conditionText != null
                        and !selection.conditionText.isBlank()}">
 
                 条件：
-
                 <span th:text="${selection.conditionText}">
                 </span>
 
             </p>
-
 
             <div th:each="state : ${selection.states}">
 
@@ -3625,7 +2252,10 @@
                            th:checked="${param['skillState_' + selection.skillId] != null
                                ? param['skillState_' + selection.skillId][0] == state.stateCode
                                : state.stateCode == 'INACTIVE'}"
-                           onchange="selectSkillState(this.name, this.value)">
+                           onchange="selectSkillState(
+                               this.name,
+                               this.value
+                           )">
 
                     <span th:text="${state.stateName}">
                     </span>
@@ -3636,115 +2266,341 @@
 
             </div>
 
-
-            <div th:if="${selectedSkillEffects != null
-                         and selectedSkillEffects[selection.skillId] != null}"
-
-                 th:with="selectedEffect=${selectedSkillEffects[selection.skillId]}">
-
-                <p>
-
-                    Java側で選択中：
-
-                    <strong th:text="${selectedEffect.stateName}">
-                    </strong>
-
-                    （<span th:text="${selectedEffect.stateCode}">
-                    </span>）
-
-                </p>
-
-
-                <p>
-
-                    攻撃力加算：
-
-                    <span th:text="${selectedEffect.attackAdd != null
-                        ? selectedEffect.attackAdd
-                        : 0}">
-                    </span>
-
-                    /
-
-                    属性値加算：
-
-                    <span th:text="${selectedEffect.elementAdd != null
-                        ? selectedEffect.elementAdd
-                        : 0}">
-                    </span>
-
-                </p>
-
-            </div>
-
-
-            <br>
-
         </div>
 
     </div>
 
-
     <div th:if="${conditionalSkillModifierTotal != null}">
 
-        <h3>条件付きスキル補正合計</h3>
+        <h2>条件付きスキル補正合計</h2>
 
-        <p>
-            攻撃力加算合計：
-            <strong th:text="${conditionalSkillModifierTotal.attackAdd}">
-            </strong>
-        </p>
+        <table border="1">
 
-        <p>
-            攻撃力倍率合計：
-            <strong th:text="${conditionalSkillModifierTotal.attackMul}">
-            </strong>
-        </p>
+            <tr>
+                <th>項目</th>
+                <th>値</th>
+            </tr>
 
-        <p>
-            属性値加算合計：
-            <strong th:text="${conditionalSkillModifierTotal.elementAdd}">
-            </strong>
-        </p>
+            <tr>
+                <td>攻撃力加算</td>
+                <td th:text="${conditionalSkillModifierTotal.attackAdd}"></td>
+            </tr>
 
-        <p>
-            属性値倍率合計：
-            <strong th:text="${conditionalSkillModifierTotal.elementMul}">
-            </strong>
-        </p>
+            <tr>
+                <td>攻撃力倍率</td>
+                <td th:text="${conditionalSkillModifierTotal.attackMul}"></td>
+            </tr>
 
-        <p>
-            会心率加算合計：
-            <strong th:text="${conditionalSkillModifierTotal.affinityAdd}">
-            </strong>
-        </p>
+            <tr>
+                <td>属性値加算</td>
+                <td th:text="${conditionalSkillModifierTotal.elementAdd}"></td>
+            </tr>
 
-        <p>
-            会心ダメージ倍率合計：
-            <strong th:text="${conditionalSkillModifierTotal.critDamageMul}">
-            </strong>
-        </p>
+            <tr>
+                <td>属性値倍率</td>
+                <td th:text="${conditionalSkillModifierTotal.elementMul}"></td>
+            </tr>
 
-        <p>
-            物理ダメージ倍率合計：
-            <strong th:text="${conditionalSkillModifierTotal.physicalDamageMul}">
-            </strong>
-        </p>
+            <tr>
+                <td>会心率加算</td>
+                <td th:text="${conditionalSkillModifierTotal.affinityAdd}"></td>
+            </tr>
 
-        <p>
-            属性ダメージ倍率合計：
-            <strong th:text="${conditionalSkillModifierTotal.elementDamageMul}">
-            </strong>
-        </p>
+            <tr>
+                <td>会心ダメージ倍率</td>
+                <td th:text="${conditionalSkillModifierTotal.critDamageMul}"></td>
+            </tr>
 
-        <p>
-            属性会心ダメージ倍率合計：
-            <strong th:text="${conditionalSkillModifierTotal.elementCritDamageMul}">
-            </strong>
-        </p>
+            <tr>
+                <td>物理ダメージ倍率</td>
+                <td th:text="${conditionalSkillModifierTotal.physicalDamageMul}"></td>
+            </tr>
+
+            <tr>
+                <td>属性ダメージ倍率</td>
+                <td th:text="${conditionalSkillModifierTotal.elementDamageMul}"></td>
+            </tr>
+
+            <tr>
+                <td>属性会心倍率</td>
+                <td th:text="${conditionalSkillModifierTotal.elementCritDamageMul}"></td>
+            </tr>
+
+        </table>
 
     </div>
 
+    <!-- ================================================== -->
+    <!-- 弱点・会心 -->
+    <!-- ================================================== -->
+
+    <div th:if="${selectedHitzone != null
+                 and monsterWeakpointResult != null}">
+
+        <h2>弱点・会心判定</h2>
+
+        <table border="1">
+
+            <tr>
+                <th>項目</th>
+                <th>結果</th>
+            </tr>
+
+            <tr>
+
+                <td>物理弱点（45以上）</td>
+
+                <td th:text="${monsterWeakpointResult.physicalWeakpoint
+                    ? '○'
+                    : '-'}">
+                </td>
+
+            </tr>
+
+            <tr>
+
+                <td>主属性弱点（20以上）</td>
+
+                <td th:text="${monsterWeakpointResult.elementWeakpoint
+                    ? '○'
+                    : '-'}">
+                </td>
+
+            </tr>
+
+            <tr th:if="${monsterWeakpointResult.subElemental}">
+
+                <td>副属性弱点（20以上）</td>
+
+                <td th:text="${monsterWeakpointResult.subElementWeakpoint
+                    ? '○'
+                    : '-'}">
+                </td>
+
+            </tr>
+
+            <tr th:if="${criticalModifierResult != null}">
+
+                <td>最終会心率</td>
+
+                <td>
+                    <span th:text="${criticalModifierResult.finalAffinity}">
+                    </span>%
+                </td>
+
+            </tr>
+
+            <tr th:if="${criticalModifierResult != null}">
+
+                <td>プラス会心物理倍率</td>
+
+                <td th:text="${criticalModifierResult.positiveCriticalDamageMul}">
+                </td>
+
+            </tr>
+
+            <tr th:if="${criticalModifierResult != null}">
+
+                <td>会心撃【属性】倍率</td>
+
+                <td th:text="${criticalModifierResult.positiveElementCriticalDamageMul}">
+                </td>
+
+            </tr>
+
+        </table>
+
+    </div>
+
+    <!-- ================================================== -->
+    <!-- 物理肉質適用後 -->
+    <!-- ================================================== -->
+
+    <div th:if="${physicalHitzoneDamageResult != null}">
+
+        <h2>物理肉質適用後</h2>
+
+        <table border="1">
+
+            <tr>
+                <th>項目</th>
+                <th>値</th>
+            </tr>
+
+            <tr>
+                <td>使用物理肉質</td>
+                <td th:text="${physicalHitzoneDamageResult.physicalHitzone}">
+                </td>
+            </tr>
+
+            <tr>
+                <td>非会心・1hit</td>
+                <td th:text="${physicalHitzoneDamageResult.normalPhysicalDamagePerHit}">
+                </td>
+            </tr>
+
+            <tr>
+                <td>プラス会心・1hit</td>
+                <td th:text="${physicalHitzoneDamageResult.positiveCriticalPhysicalDamagePerHit}">
+                </td>
+            </tr>
+
+            <tr>
+                <td>マイナス会心・1hit</td>
+                <td th:text="${physicalHitzoneDamageResult.negativeCriticalPhysicalDamagePerHit}">
+                </td>
+            </tr>
+
+        </table>
+
+    </div>
+
+    <!-- ================================================== -->
+    <!-- 属性肉質適用後 -->
+    <!-- ================================================== -->
+
+    <div th:if="${elementHitzoneDamageResult != null}">
+
+        <h2>属性肉質適用後</h2>
+
+        <table border="1">
+
+            <tr>
+                <th>項目</th>
+                <th>値</th>
+            </tr>
+
+            <tr>
+                <td>使用属性肉質</td>
+                <td th:text="${elementHitzoneDamageResult.elementHitzone}">
+                </td>
+            </tr>
+
+            <tr>
+                <td>弱点特効【属性】倍率</td>
+                <td th:text="${elementHitzoneDamageResult.weakpointElementDamageMul}">
+                </td>
+            </tr>
+
+            <tr>
+                <td>非会心・1hit</td>
+                <td th:text="${elementHitzoneDamageResult.normalElementDamagePerHit}">
+                </td>
+            </tr>
+
+            <tr>
+                <td>プラス会心・1hit</td>
+                <td th:text="${elementHitzoneDamageResult.positiveCriticalElementDamagePerHit}">
+                </td>
+            </tr>
+
+        </table>
+
+    </div>
+
+    <!-- ================================================== -->
+    <!-- 最終ダメージ -->
+    <!-- ================================================== -->
+
+    <div th:if="${finalDamageResult != null}">
+
+        <h2>最終ダメージ</h2>
+
+        <p th:if="${selectedMonster != null
+                   and selectedHitzone != null}">
+
+            対象：
+
+            <strong th:text="${selectedMonster.monsterName}">
+            </strong>
+
+            /
+
+            <strong th:text="${selectedHitzone.partName}">
+            </strong>
+
+        </p>
+
+        <p th:if="${criticalModifierResult != null}">
+
+            最終会心率：
+
+            <strong th:text="${criticalModifierResult.finalAffinity}">
+            </strong>%
+
+        </p>
+
+        <table border="1">
+
+            <tr>
+                <th>パターン</th>
+                <th>物理</th>
+                <th>属性</th>
+                <th>合計</th>
+            </tr>
+
+            <tr>
+
+                <td>非会心</td>
+
+                <td th:text="${finalDamageResult.normalPhysicalDamage}">
+                </td>
+
+                <td th:text="${finalDamageResult.normalElementDamage}">
+                </td>
+
+                <td>
+
+                    <strong th:text="${finalDamageResult.normalTotalDamage}">
+                    </strong>
+
+                </td>
+
+            </tr>
+
+            <tr>
+
+                <td>プラス会心</td>
+
+                <td th:text="${finalDamageResult.positiveCriticalPhysicalDamage}">
+                </td>
+
+                <td th:text="${finalDamageResult.positiveCriticalElementDamage}">
+                </td>
+
+                <td>
+
+                    <strong th:text="${finalDamageResult.positiveCriticalTotalDamage}">
+                    </strong>
+
+                </td>
+
+            </tr>
+
+            <tr>
+
+                <td>マイナス会心</td>
+
+                <td th:text="${finalDamageResult.negativeCriticalPhysicalDamage}">
+                </td>
+
+                <td th:text="${finalDamageResult.negativeCriticalElementDamage}">
+                </td>
+
+                <td>
+
+                    <strong th:text="${finalDamageResult.negativeCriticalTotalDamage}">
+                    </strong>
+
+                </td>
+
+            </tr>
+
+        </table>
+
+    </div>
+
+    <br>
 
     <!-- ================================================== -->
     <!-- 最終防御力・属性耐性 -->
@@ -3763,7 +2619,6 @@
 
             <tr>
                 <td>防御力</td>
-
                 <td>
                     <strong th:text="${defenseResistanceResult.finalDefense}">
                     </strong>
@@ -3772,7 +2627,6 @@
 
             <tr>
                 <td>火耐性</td>
-
                 <td>
                     <strong th:text="${defenseResistanceResult.finalFireRes}">
                     </strong>
@@ -3781,7 +2635,6 @@
 
             <tr>
                 <td>水耐性</td>
-
                 <td>
                     <strong th:text="${defenseResistanceResult.finalWaterRes}">
                     </strong>
@@ -3790,7 +2643,6 @@
 
             <tr>
                 <td>雷耐性</td>
-
                 <td>
                     <strong th:text="${defenseResistanceResult.finalThunderRes}">
                     </strong>
@@ -3799,7 +2651,6 @@
 
             <tr>
                 <td>氷耐性</td>
-
                 <td>
                     <strong th:text="${defenseResistanceResult.finalIceRes}">
                     </strong>
@@ -3808,7 +2659,6 @@
 
             <tr>
                 <td>龍耐性</td>
-
                 <td>
                     <strong th:text="${defenseResistanceResult.finalDragonRes}">
                     </strong>
@@ -3819,61 +2669,108 @@
 
     </div>
 
-
     <br>
 
-
-    <a th:href="@{/weapon-list(
-            weaponId=${simulatorForm.weaponId},
-            monsterId=${simulatorForm.monsterId},
-            hitzoneId=${simulatorForm.hitzoneId},
-            rampageDecorationId=${simulatorForm.rampageDecorationId},
-            bowChargeId=${simulatorForm.bowChargeId},
-            bowCoatingId=${simulatorForm.bowCoatingId},
-            bowgunAmmoId=${simulatorForm.bowgunAmmoId},
-            headArmorId=${simulatorForm.headArmorId},
-            chestArmorId=${simulatorForm.chestArmorId},
-            armArmorId=${simulatorForm.armArmorId},
-            waistArmorId=${simulatorForm.waistArmorId},
-            legArmorId=${simulatorForm.legArmorId},
-            weaponDecoration1Id=${simulatorForm.weaponDecoration1Id},
-            weaponDecoration2Id=${simulatorForm.weaponDecoration2Id},
-            weaponDecoration3Id=${simulatorForm.weaponDecoration3Id},
-            headDecoration1Id=${simulatorForm.headDecoration1Id},
-            headDecoration2Id=${simulatorForm.headDecoration2Id},
-            headDecoration3Id=${simulatorForm.headDecoration3Id},
-            chestDecoration1Id=${simulatorForm.chestDecoration1Id},
-            chestDecoration2Id=${simulatorForm.chestDecoration2Id},
-            chestDecoration3Id=${simulatorForm.chestDecoration3Id},
-            armDecoration1Id=${simulatorForm.armDecoration1Id},
-            armDecoration2Id=${simulatorForm.armDecoration2Id},
-            armDecoration3Id=${simulatorForm.armDecoration3Id},
-            waistDecoration1Id=${simulatorForm.waistDecoration1Id},
-            waistDecoration2Id=${simulatorForm.waistDecoration2Id},
-            waistDecoration3Id=${simulatorForm.waistDecoration3Id},
-            legDecoration1Id=${simulatorForm.legDecoration1Id},
-            legDecoration2Id=${simulatorForm.legDecoration2Id},
-            legDecoration3Id=${simulatorForm.legDecoration3Id},
-            talismanSkill1Id=${simulatorForm.talismanSkill1Id},
-            talismanSkill1Level=${simulatorForm.talismanSkill1Level},
-            talismanSkill2Id=${simulatorForm.talismanSkill2Id},
-            talismanSkill2Level=${simulatorForm.talismanSkill2Level},
-            talismanSlot1Size=${simulatorForm.talismanSlot1Size},
-            talismanSlot2Size=${simulatorForm.talismanSlot2Size},
-            talismanSlot3Size=${simulatorForm.talismanSlot3Size},
-            talismanDecoration1Id=${simulatorForm.talismanDecoration1Id},
-            talismanDecoration2Id=${simulatorForm.talismanDecoration2Id},
-            talismanDecoration3Id=${simulatorForm.talismanDecoration3Id}
-        )}">
-
+    <button type="button"
+            onclick="goWeaponSelect()">
         武器を選び直す
-
-    </a>
-
+    </button>
 
     <script>
 
-        function removeDecoration(parameterName) {
+        function currentUrlFor(path) {
+
+            const url
+                    = new URL(
+                            window.location.href
+                    );
+
+            url.pathname
+                    = path;
+
+            return url;
+        }
+
+
+        function goWeaponSelect() {
+
+            const url
+                    = currentUrlFor(
+                            "/weapon-list"
+                    );
+
+            window.location.href
+                    = url.toString();
+        }
+
+
+        function goArmorSelect(part) {
+
+            const url
+                    = currentUrlFor(
+                            "/armor-list"
+                    );
+
+            url.searchParams.set(
+                    "part",
+                    part
+            );
+
+            window.location.href
+                    = url.toString();
+        }
+
+
+        function goDecorationSelect(
+                target,
+                slotSize) {
+
+            const url
+                    = currentUrlFor(
+                            "/decoration-select"
+                    );
+
+            url.searchParams.set(
+                    "target",
+                    target
+            );
+
+            url.searchParams.set(
+                    "slotSize",
+                    slotSize
+            );
+
+            window.location.href
+                    = url.toString();
+        }
+
+
+        function goRampageDecorationSelect() {
+
+            const url
+                    = currentUrlFor(
+                            "/rampage-decoration-select"
+                    );
+
+            window.location.href
+                    = url.toString();
+        }
+
+
+        function goTalisman() {
+
+            const url
+                    = currentUrlFor(
+                            "/talisman"
+                    );
+
+            window.location.href
+                    = url.toString();
+        }
+
+
+        function removeDecoration(
+                parameterName) {
 
             const url
                     = new URL(
@@ -3889,7 +2786,8 @@
         }
 
 
-        function selectMonster(monsterId) {
+        function selectMonster(
+                monsterId) {
 
             const url
                     = new URL(
@@ -3912,11 +2810,6 @@
             }
 
 
-            /*
-             * モンスターを変更した場合、
-             * 以前選択していた部位は
-             * 別モンスターの部位になる可能性があるため削除する。
-             */
             url.searchParams.delete(
                     "hitzoneId"
             );
@@ -3927,7 +2820,8 @@
         }
 
 
-        function selectHitzone(hitzoneId) {
+        function selectHitzone(
+                hitzoneId) {
 
             const url
                     = new URL(
@@ -3955,7 +2849,8 @@
         }
 
 
-        function selectBowgunAmmo(bowgunAmmoId) {
+        function selectBowgunAmmo(
+                bowgunAmmoId) {
 
             const url
                     = new URL(
@@ -3972,7 +2867,8 @@
         }
 
 
-        function selectBowCharge(bowChargeId) {
+        function selectBowCharge(
+                bowChargeId) {
 
             const url
                     = new URL(
@@ -3989,7 +2885,8 @@
         }
 
 
-        function selectBowCoating(bowCoatingId) {
+        function selectBowCoating(
+                bowCoatingId) {
 
             const url
                     = new URL(
