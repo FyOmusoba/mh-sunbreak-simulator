@@ -12,6 +12,7 @@ import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
+import com.example.mhsunbreaksimulator.dto.BowElementDamageResult;
 import com.example.mhsunbreaksimulator.dto.BowPhysicalDamageResult;
 import com.example.mhsunbreaksimulator.dto.BowPhysicalModifier;
 import com.example.mhsunbreaksimulator.dto.BowgunAmmoModifier;
@@ -23,20 +24,25 @@ import com.example.mhsunbreaksimulator.dto.CriticalModifierResult;
 import com.example.mhsunbreaksimulator.dto.ElementHitzoneDamageResult;
 import com.example.mhsunbreaksimulator.dto.FinalDamageResult;
 import com.example.mhsunbreaksimulator.dto.MonsterHitzoneValueResult;
+import com.example.mhsunbreaksimulator.dto.MonsterWeakpointResult;
 import com.example.mhsunbreaksimulator.dto.PhysicalHitzoneDamageResult;
 import com.example.mhsunbreaksimulator.dto.ShotSkillModifier;
 import com.example.mhsunbreaksimulator.dto.WeakpointSkillModifier;
 import com.example.mhsunbreaksimulator.entity.BowCharge;
 import com.example.mhsunbreaksimulator.entity.BowgunAmmo;
+import com.example.mhsunbreaksimulator.entity.MonsterHitzone;
 import com.example.mhsunbreaksimulator.entity.SkillEffectState;
 import com.example.mhsunbreaksimulator.entity.Weapon;
 import com.example.mhsunbreaksimulator.service.BowPhysicalDamageService;
 import com.example.mhsunbreaksimulator.service.BowgunElementDamageService;
 import com.example.mhsunbreaksimulator.service.BowgunPhysicalDamageService;
+import com.example.mhsunbreaksimulator.service.CriticalModifierService;
 import com.example.mhsunbreaksimulator.service.ElementHitzoneDamageService;
 import com.example.mhsunbreaksimulator.service.FinalDamageService;
+import com.example.mhsunbreaksimulator.service.MonsterWeakpointService;
 import com.example.mhsunbreaksimulator.service.PhysicalHitzoneDamageService;
 import com.example.mhsunbreaksimulator.service.ShotSkillModifierService;
+import com.example.mhsunbreaksimulator.service.WeakpointSkillModifierService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -58,6 +64,12 @@ public class ShotDamageWebConfig
     private final ElementHitzoneDamageService elementHitzoneDamageService;
 
     private final FinalDamageService finalDamageService;
+
+    private final MonsterWeakpointService monsterWeakpointService;
+
+    private final WeakpointSkillModifierService weakpointSkillModifierService;
+
+    private final CriticalModifierService criticalModifierService;
 
 
     @Override
@@ -205,12 +217,26 @@ public class ShotDamageWebConfig
                     resolvedSkillEffects,
                     conditionalSkillModifierTotal
             );
+
+
+            /*
+             * ボウガンでは、
+             * 武器本体ではなく
+             * 選択中の属性弾を基準に
+             * 属性肉質・弱点判定を更新する。
+             */
+            applyBowgunElementContext(
+                    model,
+                    weapon,
+                    resolvedSkillEffects,
+                    conditionalSkillModifierTotal
+            );
         }
 
 
         /*
          * =================================================
-         * 肉質・最終ダメージを再計算
+         * 肉質・最終ダメージ再計算
          * =================================================
          */
         recalculateFinalDamage(
@@ -274,7 +300,7 @@ public class ShotDamageWebConfig
 
 
         /*
-         * 弓物理を再計算
+         * 弓物理再計算
          */
         BowPhysicalDamageResult bowPhysicalDamageResult
                 = bowPhysicalDamageService.calculate(
@@ -408,13 +434,312 @@ public class ShotDamageWebConfig
 
     /*
      * =====================================================
+     * ボウガン属性弾用
+     * 肉質・弱点判定更新
+     * =====================================================
+     *
+     * ボウガン本体は基本的に無属性。
+     *
+     * そのため、
+     *
+     * 火炎弾
+     * 水冷弾
+     * 電撃弾
+     * 氷結弾
+     * 滅龍弾
+     *
+     * などを撃つ場合は、
+     * 武器本体ではなく弾種から
+     * 使用する属性を決定する必要がある。
+     */
+    private void applyBowgunElementContext(
+            Map<String, Object> model,
+            Weapon weapon,
+            Map<Integer, SkillEffectState> resolvedSkillEffects,
+            ConditionalSkillModifierTotal conditionalSkillModifierTotal) {
+
+        Object ammoObject
+                = model.get(
+                        "selectedBowgunAmmo"
+                );
+
+
+        if (!(ammoObject
+                instanceof BowgunAmmo selectedBowgunAmmo)) {
+
+            return;
+        }
+
+
+        /*
+         * 弾から五属性を取得。
+         *
+         * 非属性弾ならnull。
+         */
+        String ammoElementType
+                = resolveBowgunAmmoElementType(
+                        selectedBowgunAmmo
+                                .getAmmoType()
+                );
+
+
+        /*
+         * 非属性弾の場合は、
+         * Controller側の通常結果をそのまま使用。
+         */
+        if (ammoElementType == null) {
+
+            return;
+        }
+
+
+        Object selectedHitzoneObject
+                = model.get(
+                        "selectedHitzone"
+                );
+
+
+        if (!(selectedHitzoneObject
+                instanceof MonsterHitzone selectedHitzone)) {
+
+            return;
+        }
+
+
+        Object hitzoneValueObject
+                = model.get(
+                        "monsterHitzoneValueResult"
+                );
+
+
+        if (!(hitzoneValueObject
+                instanceof MonsterHitzoneValueResult hitzoneValueResult)) {
+
+            return;
+        }
+
+
+        /*
+         * =================================================
+         * 弾属性を主属性として設定
+         * =================================================
+         */
+        hitzoneValueResult.setElementType(
+                ammoElementType
+        );
+
+
+        hitzoneValueResult.setElemental(
+                true
+        );
+
+
+        hitzoneValueResult.setElementHitzone(
+                resolveElementHitzone(
+                        ammoElementType,
+                        selectedHitzone
+                )
+        );
+
+
+        model.put(
+                "monsterHitzoneValueResult",
+                hitzoneValueResult
+        );
+
+
+        /*
+         * =================================================
+         * 属性弱点判定再計算
+         * =================================================
+         */
+        MonsterWeakpointResult monsterWeakpointResult
+                = monsterWeakpointService.calculate(
+                        hitzoneValueResult
+                );
+
+
+        model.put(
+                "monsterWeakpointResult",
+                monsterWeakpointResult
+        );
+
+
+        /*
+         * =================================================
+         * 弱点特効
+         * 弱点特効【属性】
+         * 再計算
+         * =================================================
+         */
+        WeakpointSkillModifier weakpointSkillModifier
+                = weakpointSkillModifierService.calculate(
+                        monsterWeakpointResult,
+                        resolvedSkillEffects
+                );
+
+
+        model.put(
+                "weakpointSkillModifier",
+                weakpointSkillModifier
+        );
+
+
+        /*
+         * =================================================
+         * 会心率再計算
+         * =================================================
+         *
+         * 弱点特効の物理判定自体は同じだが、
+         * WeakpointSkillModifierを作り直したため
+         * CriticalModifierも同期して更新する。
+         */
+        CriticalModifierResult criticalModifierResult
+                = criticalModifierService.calculate(
+                        weapon.getAffinity(),
+                        conditionalSkillModifierTotal,
+                        weakpointSkillModifier
+                );
+
+
+        model.put(
+                "criticalModifierResult",
+                criticalModifierResult
+        );
+    }
+
+
+    /*
+     * =====================================================
+     * ボウガン弾 → 五属性
+     * =====================================================
+     */
+    private String resolveBowgunAmmoElementType(
+            String ammoType) {
+
+        if (ammoType == null) {
+
+            return null;
+        }
+
+
+        switch (ammoType) {
+
+        case "火炎弾":
+        case "貫通火炎弾":
+
+            return "火";
+
+
+        case "水冷弾":
+        case "貫通水冷弾":
+
+            return "水";
+
+
+        case "電撃弾":
+        case "貫通電撃弾":
+
+            return "雷";
+
+
+        case "氷結弾":
+        case "貫通氷結弾":
+
+            return "氷";
+
+
+        case "滅龍弾":
+        case "貫通滅龍弾":
+
+            return "龍";
+
+
+        default:
+
+            return null;
+        }
+    }
+
+
+    /*
+     * =====================================================
+     * 属性 → モンスター肉質
+     * =====================================================
+     */
+    private int resolveElementHitzone(
+            String elementType,
+            MonsterHitzone hitzone) {
+
+        if (elementType == null
+                || hitzone == null) {
+
+            return 0;
+        }
+
+
+        Integer value;
+
+
+        switch (elementType) {
+
+        case "火":
+
+            value = hitzone.getFire();
+
+            break;
+
+
+        case "水":
+
+            value = hitzone.getWater();
+
+            break;
+
+
+        case "雷":
+
+            value = hitzone.getThunder();
+
+            break;
+
+
+        case "氷":
+
+            value = hitzone.getIce();
+
+            break;
+
+
+        case "龍":
+
+            value = hitzone.getDragon();
+
+            break;
+
+
+        default:
+
+            value = 0;
+
+            break;
+        }
+
+
+        return value == null
+                ? 0
+                : value;
+    }
+
+
+    /*
+     * =====================================================
      * 肉質適用後・最終ダメージ
      * =====================================================
      */
     private void recalculateFinalDamage(
             Map<String, Object> model,
             Weapon weapon) {
-
         MonsterHitzoneValueResult monsterHitzoneValueResult
                 = null;
 
@@ -434,8 +759,7 @@ public class ShotDamageWebConfig
 
 
         /*
-         * 部位未選択なら、
-         * 肉質後計算はしない。
+         * 部位未選択なら肉質後計算なし。
          */
         if (monsterHitzoneValueResult == null) {
 
@@ -572,8 +896,7 @@ public class ShotDamageWebConfig
 
 
         /*
-         * 弓属性は今回変更していないため、
-         * Controllerで計算済みの値をそのまま使用。
+         * 弓
          */
         if ("弓".equals(
                 weapon.getWeaponType()
@@ -586,7 +909,7 @@ public class ShotDamageWebConfig
 
 
             if (resultObject
-                    instanceof com.example.mhsunbreaksimulator.dto.BowElementDamageResult result) {
+                    instanceof BowElementDamageResult result) {
 
                 elementDamageBeforeHitzone
                         = result.getElementDamagePerHit();
@@ -595,8 +918,7 @@ public class ShotDamageWebConfig
 
 
         /*
-         * ボウガン属性は
-         * ShotSkillModifier反映後の結果を使用。
+         * ボウガン
          */
         else {
 
@@ -625,7 +947,8 @@ public class ShotDamageWebConfig
 
 
         if (elementDamageBeforeHitzone != null
-                && monsterHitzoneValueResult.isElemental()) {
+                && monsterHitzoneValueResult
+                        .isElemental()) {
 
             BigDecimal weakpointElementDamageMul
                     = BigDecimal.ONE;
