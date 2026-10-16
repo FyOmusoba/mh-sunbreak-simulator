@@ -8,15 +8,15 @@ import com.example.mhsunbreaksimulator.dto.BowgunAmmoModifier;
 import com.example.mhsunbreaksimulator.dto.BowgunElementDamageResult;
 import com.example.mhsunbreaksimulator.dto.BowgunRapidFireModifier;
 import com.example.mhsunbreaksimulator.dto.ConditionalSkillModifierTotal;
+import com.example.mhsunbreaksimulator.dto.ShotSkillModifier;
 
 @Service
 public class BowgunElementDamageService {
 
     /*
-     * 既存の3引数版。
-     *
-     * 速射補正なしとして
-     * 4引数版を呼び出す。
+     * =====================================================
+     * 既存3引数版
+     * =====================================================
      */
     public BowgunElementDamageResult calculate(
             Integer weaponAttack,
@@ -27,13 +27,16 @@ public class BowgunElementDamageService {
                 weaponAttack,
                 bowgunAmmoModifier,
                 conditionalSkillModifierTotal,
+                null,
                 null
         );
     }
 
 
     /*
-     * 速射補正対応版
+     * =====================================================
+     * 既存4引数版
+     * =====================================================
      */
     public BowgunElementDamageResult calculate(
             Integer weaponAttack,
@@ -41,92 +44,207 @@ public class BowgunElementDamageService {
             ConditionalSkillModifierTotal conditionalSkillModifierTotal,
             BowgunRapidFireModifier rapidFireModifier) {
 
+        return calculate(
+                weaponAttack,
+                bowgunAmmoModifier,
+                conditionalSkillModifierTotal,
+                rapidFireModifier,
+                null
+        );
+    }
+
+
+    /*
+     * =====================================================
+     * 新5引数版
+     * =====================================================
+     *
+     * ShotSkillModifierによって、
+     * 速射強化などの属性側倍率を適用する。
+     */
+    public BowgunElementDamageResult calculate(
+            Integer weaponAttack,
+            BowgunAmmoModifier bowgunAmmoModifier,
+            ConditionalSkillModifierTotal conditionalSkillModifierTotal,
+            BowgunRapidFireModifier rapidFireModifier,
+            ShotSkillModifier shotSkillModifier) {
+
         BowgunElementDamageResult result
                 = new BowgunElementDamageResult();
 
 
+        /*
+         * =================================================
+         * 必須値確認
+         * =================================================
+         */
         if (weaponAttack == null
                 || bowgunAmmoModifier == null
-                || bowgunAmmoModifier.getElementMotionValuePerHit() == null
-                || bowgunAmmoModifier.getElementMotionValuePerHit()
-                        .compareTo(BigDecimal.ZERO) <= 0
-                || bowgunAmmoModifier.getMaxHitCount() == null
-                || bowgunAmmoModifier.getMaxHitCount() <= 0) {
+                || bowgunAmmoModifier
+                        .getElementMotionValuePerHit() == null
+                || bowgunAmmoModifier
+                        .getElementMotionValuePerHit()
+                        .compareTo(
+                                BigDecimal.ZERO
+                        ) <= 0
+                || bowgunAmmoModifier
+                        .getMaxHitCount() == null
+                || bowgunAmmoModifier
+                        .getMaxHitCount() <= 0) {
 
             return result;
         }
 
 
+        /*
+         * =================================================
+         * 基礎攻撃力
+         * =================================================
+         */
         BigDecimal baseAttack
                 = BigDecimal.valueOf(
                         weaponAttack
                 );
 
 
+        /*
+         * =================================================
+         * 攻撃力加算
+         * =================================================
+         */
         BigDecimal attackAdd
                 = conditionalSkillModifierTotal == null
-                        || conditionalSkillModifierTotal.getAttackAdd() == null
+                        || conditionalSkillModifierTotal
+                                .getAttackAdd() == null
+
                                 ? BigDecimal.ZERO
-                                : conditionalSkillModifierTotal.getAttackAdd();
-
-
-        BigDecimal attackMul
-                = conditionalSkillModifierTotal == null
-                        || conditionalSkillModifierTotal.getAttackMul() == null
-                                ? BigDecimal.ONE
-                                : conditionalSkillModifierTotal.getAttackMul();
-
-
-        BigDecimal elementAdd
-                = conditionalSkillModifierTotal == null
-                        || conditionalSkillModifierTotal.getElementAdd() == null
-                                ? BigDecimal.ZERO
-                                : conditionalSkillModifierTotal.getElementAdd();
-
-
-        BigDecimal elementMul
-                = conditionalSkillModifierTotal == null
-                        || conditionalSkillModifierTotal.getElementMul() == null
-                                ? BigDecimal.ONE
-                                : conditionalSkillModifierTotal.getElementMul();
-
-
-        BigDecimal elementDamageMul
-                = conditionalSkillModifierTotal == null
-                        || conditionalSkillModifierTotal.getElementDamageMul() == null
-                                ? BigDecimal.ONE
-                                : conditionalSkillModifierTotal.getElementDamageMul();
+                                : conditionalSkillModifierTotal
+                                        .getAttackAdd();
 
 
         /*
-         * 速射1発ごとの属性補正
+         * =================================================
+         * 攻撃力倍率
+         * =================================================
+         */
+        BigDecimal attackMul
+                = conditionalSkillModifierTotal == null
+                        || conditionalSkillModifierTotal
+                                .getAttackMul() == null
+
+                                ? BigDecimal.ONE
+                                : conditionalSkillModifierTotal
+                                        .getAttackMul();
+
+
+        /*
+         * =================================================
+         * 属性値加算
+         * =================================================
+         */
+        BigDecimal elementAdd
+                = conditionalSkillModifierTotal == null
+                        || conditionalSkillModifierTotal
+                                .getElementAdd() == null
+
+                                ? BigDecimal.ZERO
+                                : conditionalSkillModifierTotal
+                                        .getElementAdd();
+
+
+        /*
+         * =================================================
+         * 属性値倍率
+         * =================================================
+         */
+        BigDecimal elementMul
+                = conditionalSkillModifierTotal == null
+                        || conditionalSkillModifierTotal
+                                .getElementMul() == null
+
+                                ? BigDecimal.ONE
+                                : conditionalSkillModifierTotal
+                                        .getElementMul();
+
+
+        /*
+         * =================================================
+         * 一般属性ダメージ倍率
+         * =================================================
+         */
+        BigDecimal elementDamageMul
+                = conditionalSkillModifierTotal == null
+                        || conditionalSkillModifierTotal
+                                .getElementDamageMul() == null
+
+                                ? BigDecimal.ONE
+                                : conditionalSkillModifierTotal
+                                        .getElementDamageMul();
+
+
+        /*
+         * =================================================
+         * 射撃スキル
+         * 属性倍率
+         * =================================================
          *
-         * 非速射：1.00
-         * 速射　：0.50
+         * 現段階では主に速射強化用。
+         *
+         * 非対象
+         * → 1.00
+         */
+        BigDecimal shotElementMultiplier
+                = shotSkillModifier == null
+                        || shotSkillModifier
+                                .getElementMultiplier() == null
+
+                                ? BigDecimal.ONE
+                                : shotSkillModifier
+                                        .getElementMultiplier();
+
+
+        /*
+         * =================================================
+         * 速射1発ごとの属性補正
+         * =================================================
+         *
+         * 非速射
+         * → 1.00
+         *
+         * 速射
+         * → 0.50
          */
         BigDecimal rapidFireElementMul
                 = rapidFireModifier == null
-                        || rapidFireModifier.getElementMulPerShot() == null
+                        || rapidFireModifier
+                                .getElementMulPerShot() == null
+
                                 ? BigDecimal.ONE
-                                : rapidFireModifier.getElementMulPerShot();
+                                : rapidFireModifier
+                                        .getElementMulPerShot();
 
 
         /*
+         * =================================================
          * 1回の射撃操作で発射される弾数
-         *
-         * 非速射：1
-         * 速射　：3
+         * =================================================
          */
         int shotCount
                 = rapidFireModifier == null
-                        || rapidFireModifier.getShotCount() == null
-                        || rapidFireModifier.getShotCount() <= 0
+                        || rapidFireModifier
+                                .getShotCount() == null
+                        || rapidFireModifier
+                                .getShotCount() <= 0
+
                                 ? 1
-                                : rapidFireModifier.getShotCount();
+                                : rapidFireModifier
+                                        .getShotCount();
 
 
         /*
-         * 条件付き補正後攻撃力
+         * =================================================
+         * 補正後攻撃力
+         * =================================================
          */
         BigDecimal effectiveAttack
                 = baseAttack
@@ -139,9 +257,11 @@ public class BowgunElementDamageService {
 
 
         /*
+         * =================================================
          * 属性弾の補正後属性値
+         * =================================================
          *
-         * 元属性値
+         * 元属性MV
          * × 属性倍率
          * ＋ 属性加算
          */
@@ -157,13 +277,30 @@ public class BowgunElementDamageService {
 
 
         /*
-         * 肉質補正前・1hit属性値
+         * =================================================
+         * 肉質適用前
+         * 1hit属性値
+         * =================================================
          *
          * 補正後攻撃力
-         * × 補正後属性値
-         * ÷ 100
-         * × 属性ダメージ補正
-         * × 速射属性補正
+         *
+         * ×
+         *
+         * 補正後属性値
+         *
+         * ÷100
+         *
+         * ×
+         *
+         * 一般属性ダメージ倍率
+         *
+         * ×
+         *
+         * 速射1発補正
+         *
+         * ×
+         *
+         * 射撃スキル属性倍率
          */
         BigDecimal elementDamagePerHit
                 = effectiveAttack
@@ -178,32 +315,31 @@ public class BowgunElementDamageService {
                         )
                         .multiply(
                                 rapidFireElementMul
+                        )
+                        .multiply(
+                                shotElementMultiplier
                         );
 
 
         /*
-         * 1発の弾が最大ヒットした場合の属性値
-         *
-         * 通常属性弾なら1hit。
-         * 貫通属性弾では複数hit。
+         * =================================================
+         * 1発最大属性値
+         * =================================================
          */
         BigDecimal maxElementDamage
                 = elementDamagePerHit
                         .multiply(
                                 BigDecimal.valueOf(
-                                        bowgunAmmoModifier.getMaxHitCount()
+                                        bowgunAmmoModifier
+                                                .getMaxHitCount()
                                 )
                         );
 
 
         /*
-         * 弾1個消費あたりの最大属性値
-         *
-         * 非速射：
-         * maxElementDamage × 1
-         *
-         * 速射：
-         * maxElementDamage × 3
+         * =================================================
+         * 弾1個消費あたり最大属性値
+         * =================================================
          */
         BigDecimal maxElementDamagePerAmmo
                 = maxElementDamage
@@ -214,21 +350,30 @@ public class BowgunElementDamageService {
                         );
 
 
+        /*
+         * =================================================
+         * 結果
+         * =================================================
+         */
         result.setEffectiveAttack(
                 effectiveAttack
         );
+
 
         result.setElementDamagePerHit(
                 elementDamagePerHit
         );
 
+
         result.setMaxElementDamage(
                 maxElementDamage
         );
 
+
         result.setShotCount(
                 shotCount
         );
+
 
         result.setMaxElementDamagePerAmmo(
                 maxElementDamagePerAmmo

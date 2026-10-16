@@ -1,6 +1,7 @@
 package com.example.mhsunbreaksimulator.controller;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -24,28 +25,59 @@ import lombok.RequiredArgsConstructor;
 public class DecorationController {
 
     private final DecorationService decorationService;
+
     private final WeaponService weaponService;
+
     private final ArmorService armorService;
 
+
+    /*
+     * =====================================================
+     * 装飾品一覧
+     * =====================================================
+     */
     @GetMapping("/decoration-list")
     public String showDecorationList(
-            @RequestParam(required = false) Integer requiredSlotSize,
+            @RequestParam(required = false)
+            Integer requiredSlotSize,
             Model model) {
 
         List<Decoration> decorations;
 
         if (requiredSlotSize == null) {
-            decorations = decorationService.findAll();
+
+            decorations
+                    = decorationService.findAll();
+
         } else {
-            decorations = decorationService.findByRequiredSlotSize(requiredSlotSize);
+
+            decorations
+                    = decorationService.findByRequiredSlotSize(
+                            requiredSlotSize
+                    );
         }
 
-        model.addAttribute("decorations", decorations);
-        model.addAttribute("selectedRequiredSlotSize", requiredSlotSize);
+
+        model.addAttribute(
+                "decorations",
+                decorations
+        );
+
+        model.addAttribute(
+                "selectedRequiredSlotSize",
+                requiredSlotSize
+        );
+
 
         return "decoration-list";
     }
 
+
+    /*
+     * =====================================================
+     * シミュレーター用装飾品選択
+     * =====================================================
+     */
     @GetMapping("/decoration-select")
     public String showDecorationSelect(
             @RequestParam Integer slotSize,
@@ -54,25 +86,54 @@ public class DecorationController {
             Model model) {
 
         List<Decoration> decorations
-                = decorationService.findUsableBySlotSize(slotSize);
+                = decorationService.findUsableBySlotSize(
+                        slotSize
+                );
 
-        model.addAttribute("decorations", decorations);
-        model.addAttribute("slotSize", slotSize);
-        model.addAttribute("target", target);
-        model.addAttribute("simulatorForm", simulatorForm);
+
+        model.addAttribute(
+                "decorations",
+                decorations
+        );
+
+        model.addAttribute(
+                "slotSize",
+                slotSize
+        );
+
+        model.addAttribute(
+                "target",
+                target
+        );
+
+        model.addAttribute(
+                "simulatorForm",
+                simulatorForm
+        );
+
 
         return "decoration-select";
     }
 
+
+    /*
+     * =====================================================
+     * 装飾品適用
+     * =====================================================
+     */
     @GetMapping("/decoration-apply")
     public String applyDecoration(
             @RequestParam Integer decorationId,
             @RequestParam String target,
+            @RequestParam Map<String, String> requestParams,
             @ModelAttribute SimulatorForm simulatorForm,
             RedirectAttributes redirectAttributes) {
 
         Decoration decoration
-                = decorationService.findById(decorationId);
+                = decorationService.findById(
+                        decorationId
+                );
+
 
         int actualSlotSize
                 = getActualSlotSize(
@@ -80,10 +141,12 @@ public class DecorationController {
                         simulatorForm
                 );
 
+
         if (decoration != null
                 && actualSlotSize > 0
                 && decoration.getRequiredSlotSize() != null
-                && decoration.getRequiredSlotSize() <= actualSlotSize) {
+                && decoration.getRequiredSlotSize()
+                        <= actualSlotSize) {
 
             applyDecorationToTarget(
                     decorationId,
@@ -92,128 +155,290 @@ public class DecorationController {
             );
         }
 
+
+        /*
+         * 条件付きスキルの選択状態は
+         * SimulatorFormには存在しないため、
+         * リクエストから別途引き継ぐ。
+         */
+        preserveSkillStateParameters(
+                requestParams,
+                redirectAttributes
+        );
+
+
+        /*
+         * SimulatorFormで管理している
+         * シミュレーター状態をすべて引き継ぐ。
+         */
         addSimulatorAttributes(
                 simulatorForm,
                 redirectAttributes
         );
 
+
         return "redirect:/simulator";
     }
 
+
+    /*
+     * =====================================================
+     * 選択した装飾品を対象スロットへ設定
+     * =====================================================
+     */
     private void applyDecorationToTarget(
             Integer decorationId,
             String target,
             SimulatorForm simulatorForm) {
 
+        if (target == null
+                || target.isBlank()) {
+
+            return;
+        }
+
+
         switch (target) {
 
         case "weaponDecoration1Id":
-            simulatorForm.setWeaponDecoration1Id(decorationId);
+
+            simulatorForm.setWeaponDecoration1Id(
+                    decorationId
+            );
+
             break;
+
 
         case "weaponDecoration2Id":
-            simulatorForm.setWeaponDecoration2Id(decorationId);
+
+            simulatorForm.setWeaponDecoration2Id(
+                    decorationId
+            );
+
             break;
+
 
         case "weaponDecoration3Id":
-            simulatorForm.setWeaponDecoration3Id(decorationId);
+
+            simulatorForm.setWeaponDecoration3Id(
+                    decorationId
+            );
+
             break;
+
 
         case "headDecoration1Id":
-            simulatorForm.setHeadDecoration1Id(decorationId);
+
+            simulatorForm.setHeadDecoration1Id(
+                    decorationId
+            );
+
             break;
+
 
         case "headDecoration2Id":
-            simulatorForm.setHeadDecoration2Id(decorationId);
+
+            simulatorForm.setHeadDecoration2Id(
+                    decorationId
+            );
+
             break;
+
 
         case "headDecoration3Id":
-            simulatorForm.setHeadDecoration3Id(decorationId);
+
+            simulatorForm.setHeadDecoration3Id(
+                    decorationId
+            );
+
             break;
+
 
         case "chestDecoration1Id":
-            simulatorForm.setChestDecoration1Id(decorationId);
+
+            simulatorForm.setChestDecoration1Id(
+                    decorationId
+            );
+
             break;
+
 
         case "chestDecoration2Id":
-            simulatorForm.setChestDecoration2Id(decorationId);
+
+            simulatorForm.setChestDecoration2Id(
+                    decorationId
+            );
+
             break;
+
 
         case "chestDecoration3Id":
-            simulatorForm.setChestDecoration3Id(decorationId);
+
+            simulatorForm.setChestDecoration3Id(
+                    decorationId
+            );
+
             break;
+
 
         case "armDecoration1Id":
-            simulatorForm.setArmDecoration1Id(decorationId);
+
+            simulatorForm.setArmDecoration1Id(
+                    decorationId
+            );
+
             break;
+
 
         case "armDecoration2Id":
-            simulatorForm.setArmDecoration2Id(decorationId);
+
+            simulatorForm.setArmDecoration2Id(
+                    decorationId
+            );
+
             break;
+
 
         case "armDecoration3Id":
-            simulatorForm.setArmDecoration3Id(decorationId);
+
+            simulatorForm.setArmDecoration3Id(
+                    decorationId
+            );
+
             break;
+
 
         case "waistDecoration1Id":
-            simulatorForm.setWaistDecoration1Id(decorationId);
+
+            simulatorForm.setWaistDecoration1Id(
+                    decorationId
+            );
+
             break;
+
 
         case "waistDecoration2Id":
-            simulatorForm.setWaistDecoration2Id(decorationId);
+
+            simulatorForm.setWaistDecoration2Id(
+                    decorationId
+            );
+
             break;
+
 
         case "waistDecoration3Id":
-            simulatorForm.setWaistDecoration3Id(decorationId);
+
+            simulatorForm.setWaistDecoration3Id(
+                    decorationId
+            );
+
             break;
+
 
         case "legDecoration1Id":
-            simulatorForm.setLegDecoration1Id(decorationId);
+
+            simulatorForm.setLegDecoration1Id(
+                    decorationId
+            );
+
             break;
+
 
         case "legDecoration2Id":
-            simulatorForm.setLegDecoration2Id(decorationId);
+
+            simulatorForm.setLegDecoration2Id(
+                    decorationId
+            );
+
             break;
+
 
         case "legDecoration3Id":
-            simulatorForm.setLegDecoration3Id(decorationId);
+
+            simulatorForm.setLegDecoration3Id(
+                    decorationId
+            );
+
             break;
+
 
         case "talismanDecoration1Id":
-            simulatorForm.setTalismanDecoration1Id(decorationId);
+
+            simulatorForm.setTalismanDecoration1Id(
+                    decorationId
+            );
+
             break;
+
 
         case "talismanDecoration2Id":
-            simulatorForm.setTalismanDecoration2Id(decorationId);
+
+            simulatorForm.setTalismanDecoration2Id(
+                    decorationId
+            );
+
             break;
+
 
         case "talismanDecoration3Id":
-            simulatorForm.setTalismanDecoration3Id(decorationId);
+
+            simulatorForm.setTalismanDecoration3Id(
+                    decorationId
+            );
+
             break;
 
+
         default:
+
             break;
         }
     }
 
+
+    /*
+     * =====================================================
+     * 実際のスロットサイズ取得
+     * =====================================================
+     */
     private int getActualSlotSize(
             String target,
             SimulatorForm simulatorForm) {
 
-        if (target.startsWith("weaponDecoration")) {
+        if (target == null
+                || target.isBlank()) {
 
-            if (simulatorForm.getWeaponId() == null) {
+            return 0;
+        }
+
+
+        /*
+         * =================================================
+         * 武器
+         * =================================================
+         */
+        if (target.startsWith(
+                "weaponDecoration"
+        )) {
+
+            if (simulatorForm.getWeaponId()
+                    == null) {
+
                 return 0;
             }
+
 
             Weapon weapon
                     = weaponService.findById(
                             simulatorForm.getWeaponId()
                     );
 
+
             if (weapon == null) {
+
                 return 0;
             }
+
 
             return switch (target) {
 
@@ -222,26 +447,39 @@ public class DecorationController {
                             weapon.getSlot1Size()
                     );
 
+
             case "weaponDecoration2Id"
                     -> safeSlotSize(
                             weapon.getSlot2Size()
                     );
+
 
             case "weaponDecoration3Id"
                     -> safeSlotSize(
                             weapon.getSlot3Size()
                     );
 
+
             default -> 0;
             };
         }
 
-        if (target.startsWith("headDecoration")) {
+
+        /*
+         * =================================================
+         * 頭
+         * =================================================
+         */
+        if (target.startsWith(
+                "headDecoration"
+        )) {
 
             Armor armor
                     = findArmor(
-                            simulatorForm.getHeadArmorId()
+                            simulatorForm
+                                    .getHeadArmorId()
                     );
+
 
             return getArmorSlotSize(
                     armor,
@@ -250,12 +488,22 @@ public class DecorationController {
             );
         }
 
-        if (target.startsWith("chestDecoration")) {
+
+        /*
+         * =================================================
+         * 胴
+         * =================================================
+         */
+        if (target.startsWith(
+                "chestDecoration"
+        )) {
 
             Armor armor
                     = findArmor(
-                            simulatorForm.getChestArmorId()
+                            simulatorForm
+                                    .getChestArmorId()
                     );
+
 
             return getArmorSlotSize(
                     armor,
@@ -264,12 +512,22 @@ public class DecorationController {
             );
         }
 
-        if (target.startsWith("armDecoration")) {
+
+        /*
+         * =================================================
+         * 腕
+         * =================================================
+         */
+        if (target.startsWith(
+                "armDecoration"
+        )) {
 
             Armor armor
                     = findArmor(
-                            simulatorForm.getArmArmorId()
+                            simulatorForm
+                                    .getArmArmorId()
                     );
+
 
             return getArmorSlotSize(
                     armor,
@@ -278,12 +536,22 @@ public class DecorationController {
             );
         }
 
-        if (target.startsWith("waistDecoration")) {
+
+        /*
+         * =================================================
+         * 腰
+         * =================================================
+         */
+        if (target.startsWith(
+                "waistDecoration"
+        )) {
 
             Armor armor
                     = findArmor(
-                            simulatorForm.getWaistArmorId()
+                            simulatorForm
+                                    .getWaistArmorId()
                     );
+
 
             return getArmorSlotSize(
                     armor,
@@ -292,12 +560,22 @@ public class DecorationController {
             );
         }
 
-        if (target.startsWith("legDecoration")) {
+
+        /*
+         * =================================================
+         * 脚
+         * =================================================
+         */
+        if (target.startsWith(
+                "legDecoration"
+        )) {
 
             Armor armor
                     = findArmor(
-                            simulatorForm.getLegArmorId()
+                            simulatorForm
+                                    .getLegArmorId()
                     );
+
 
             return getArmorSlotSize(
                     armor,
@@ -306,298 +584,576 @@ public class DecorationController {
             );
         }
 
-        if (target.startsWith("talismanDecoration")) {
+
+        /*
+         * =================================================
+         * 護石
+         * =================================================
+         */
+        if (target.startsWith(
+                "talismanDecoration"
+        )) {
 
             return switch (target) {
 
             case "talismanDecoration1Id"
                     -> normalizeSlotSize(
-                            simulatorForm.getTalismanSlot1Size()
+                            simulatorForm
+                                    .getTalismanSlot1Size()
                     );
+
 
             case "talismanDecoration2Id"
                     -> normalizeSlotSize(
-                            simulatorForm.getTalismanSlot2Size()
+                            simulatorForm
+                                    .getTalismanSlot2Size()
                     );
+
 
             case "talismanDecoration3Id"
                     -> normalizeSlotSize(
-                            simulatorForm.getTalismanSlot3Size()
+                            simulatorForm
+                                    .getTalismanSlot3Size()
                     );
+
 
             default -> 0;
             };
         }
 
+
         return 0;
     }
 
-    private Armor findArmor(Integer armorId) {
+
+    /*
+     * =====================================================
+     * 防具取得
+     * =====================================================
+     */
+    private Armor findArmor(
+            Integer armorId) {
 
         if (armorId == null) {
+
             return null;
         }
 
-        return armorService.findById(armorId);
+
+        return armorService.findById(
+                armorId
+        );
     }
 
+
+    /*
+     * =====================================================
+     * 防具スロットサイズ
+     * =====================================================
+     */
     private int getArmorSlotSize(
             Armor armor,
             String target,
             String prefix) {
 
         if (armor == null) {
+
             return 0;
         }
 
-        if (target.equals(prefix + "1Id")) {
+
+        if (target.equals(
+                prefix + "1Id"
+        )) {
+
             return safeSlotSize(
                     armor.getSlot1Size()
             );
         }
 
-        if (target.equals(prefix + "2Id")) {
+
+        if (target.equals(
+                prefix + "2Id"
+        )) {
+
             return safeSlotSize(
                     armor.getSlot2Size()
             );
         }
 
-        if (target.equals(prefix + "3Id")) {
+
+        if (target.equals(
+                prefix + "3Id"
+        )) {
+
             return safeSlotSize(
                     armor.getSlot3Size()
             );
         }
 
+
         return 0;
     }
 
-    private int safeSlotSize(Integer slotSize) {
+
+    /*
+     * =====================================================
+     * null安全スロット
+     * =====================================================
+     */
+    private int safeSlotSize(
+            Integer slotSize) {
 
         if (slotSize == null) {
+
             return 0;
         }
+
 
         return slotSize;
     }
 
-    private int normalizeSlotSize(Integer slotSize) {
+
+    /*
+     * =====================================================
+     * 護石スロット正規化
+     * =====================================================
+     */
+    private int normalizeSlotSize(
+            Integer slotSize) {
 
         if (slotSize == null) {
+
             return 0;
         }
+
 
         if (slotSize < 0) {
+
             return 0;
         }
 
+
         if (slotSize > 4) {
+
             return 4;
         }
 
+
         return slotSize;
     }
 
+
+    /*
+     * =====================================================
+     * 条件付きスキルパラメータ保持
+     * =====================================================
+     */
+    private void preserveSkillStateParameters(
+            Map<String, String> requestParams,
+            RedirectAttributes redirectAttributes) {
+
+        if (requestParams == null
+                || requestParams.isEmpty()) {
+
+            return;
+        }
+
+
+        for (Map.Entry<String, String> entry
+                : requestParams.entrySet()) {
+
+            String name
+                    = entry.getKey();
+
+            String value
+                    = entry.getValue();
+
+
+            if (name == null
+                    || !name.startsWith(
+                            "skillState_"
+                    )) {
+
+                continue;
+            }
+
+
+            if (value == null
+                    || value.isBlank()) {
+
+                continue;
+            }
+
+
+            redirectAttributes.addAttribute(
+                    name,
+                    value
+            );
+        }
+    }
+
+
+    /*
+     * =====================================================
+     * シミュレーター状態引き継ぎ
+     * =====================================================
+     */
     private void addSimulatorAttributes(
             SimulatorForm simulatorForm,
             RedirectAttributes redirectAttributes) {
 
-        /* 武器 */
-        redirectAttributes.addAttribute(
+
+        /*
+         * =================================================
+         * 武器
+         * =================================================
+         */
+        addAttributeIfNotNull(
+                redirectAttributes,
                 "weaponId",
                 simulatorForm.getWeaponId()
         );
 
-        /* 百竜装飾品 */
-        redirectAttributes.addAttribute(
+
+        /*
+         * =================================================
+         * モンスター
+         * =================================================
+         */
+        addAttributeIfNotNull(
+                redirectAttributes,
+                "monsterId",
+                simulatorForm.getMonsterId()
+        );
+
+        addAttributeIfNotNull(
+                redirectAttributes,
+                "hitzoneId",
+                simulatorForm.getHitzoneId()
+        );
+
+
+        /*
+         * =================================================
+         * 百竜装飾品
+         * =================================================
+         */
+        addAttributeIfNotNull(
+                redirectAttributes,
                 "rampageDecorationId",
                 simulatorForm.getRampageDecorationId()
         );
 
-        /* 弓：溜め段階 */
-        redirectAttributes.addAttribute(
+
+        /*
+         * =================================================
+         * 弓
+         * =================================================
+         */
+        addAttributeIfNotNull(
+                redirectAttributes,
                 "bowChargeId",
                 simulatorForm.getBowChargeId()
         );
 
-        /* 弓：ビン */
-        redirectAttributes.addAttribute(
+        addAttributeIfNotNull(
+                redirectAttributes,
                 "bowCoatingId",
                 simulatorForm.getBowCoatingId()
         );
 
-        /* 防具 */
-        redirectAttributes.addAttribute(
+
+        /*
+         * =================================================
+         * ボウガン
+         * =================================================
+         */
+        addAttributeIfNotNull(
+                redirectAttributes,
+                "bowgunAmmoId",
+                simulatorForm.getBowgunAmmoId()
+        );
+
+
+        /*
+         * =================================================
+         * 防具
+         * =================================================
+         */
+        addAttributeIfNotNull(
+                redirectAttributes,
                 "headArmorId",
                 simulatorForm.getHeadArmorId()
         );
 
-        redirectAttributes.addAttribute(
+        addAttributeIfNotNull(
+                redirectAttributes,
                 "chestArmorId",
                 simulatorForm.getChestArmorId()
         );
 
-        redirectAttributes.addAttribute(
+        addAttributeIfNotNull(
+                redirectAttributes,
                 "armArmorId",
                 simulatorForm.getArmArmorId()
         );
 
-        redirectAttributes.addAttribute(
+        addAttributeIfNotNull(
+                redirectAttributes,
                 "waistArmorId",
                 simulatorForm.getWaistArmorId()
         );
 
-        redirectAttributes.addAttribute(
+        addAttributeIfNotNull(
+                redirectAttributes,
                 "legArmorId",
                 simulatorForm.getLegArmorId()
         );
 
-        /* 武器装飾品 */
-        redirectAttributes.addAttribute(
+
+        /*
+         * =================================================
+         * 武器装飾品
+         * =================================================
+         */
+        addAttributeIfNotNull(
+                redirectAttributes,
                 "weaponDecoration1Id",
                 simulatorForm.getWeaponDecoration1Id()
         );
 
-        redirectAttributes.addAttribute(
+        addAttributeIfNotNull(
+                redirectAttributes,
                 "weaponDecoration2Id",
                 simulatorForm.getWeaponDecoration2Id()
         );
 
-        redirectAttributes.addAttribute(
+        addAttributeIfNotNull(
+                redirectAttributes,
                 "weaponDecoration3Id",
                 simulatorForm.getWeaponDecoration3Id()
         );
 
-        /* 頭装飾品 */
-        redirectAttributes.addAttribute(
+
+        /*
+         * =================================================
+         * 頭装飾品
+         * =================================================
+         */
+        addAttributeIfNotNull(
+                redirectAttributes,
                 "headDecoration1Id",
                 simulatorForm.getHeadDecoration1Id()
         );
 
-        redirectAttributes.addAttribute(
+        addAttributeIfNotNull(
+                redirectAttributes,
                 "headDecoration2Id",
                 simulatorForm.getHeadDecoration2Id()
         );
 
-        redirectAttributes.addAttribute(
+        addAttributeIfNotNull(
+                redirectAttributes,
                 "headDecoration3Id",
                 simulatorForm.getHeadDecoration3Id()
         );
 
-        /* 胴装飾品 */
-        redirectAttributes.addAttribute(
+
+        /*
+         * =================================================
+         * 胴装飾品
+         * =================================================
+         */
+        addAttributeIfNotNull(
+                redirectAttributes,
                 "chestDecoration1Id",
                 simulatorForm.getChestDecoration1Id()
         );
 
-        redirectAttributes.addAttribute(
+        addAttributeIfNotNull(
+                redirectAttributes,
                 "chestDecoration2Id",
                 simulatorForm.getChestDecoration2Id()
         );
 
-        redirectAttributes.addAttribute(
+        addAttributeIfNotNull(
+                redirectAttributes,
                 "chestDecoration3Id",
                 simulatorForm.getChestDecoration3Id()
         );
 
-        /* 腕装飾品 */
-        redirectAttributes.addAttribute(
+
+        /*
+         * =================================================
+         * 腕装飾品
+         * =================================================
+         */
+        addAttributeIfNotNull(
+                redirectAttributes,
                 "armDecoration1Id",
                 simulatorForm.getArmDecoration1Id()
         );
 
-        redirectAttributes.addAttribute(
+        addAttributeIfNotNull(
+                redirectAttributes,
                 "armDecoration2Id",
                 simulatorForm.getArmDecoration2Id()
         );
 
-        redirectAttributes.addAttribute(
+        addAttributeIfNotNull(
+                redirectAttributes,
                 "armDecoration3Id",
                 simulatorForm.getArmDecoration3Id()
         );
 
-        /* 腰装飾品 */
-        redirectAttributes.addAttribute(
+
+        /*
+         * =================================================
+         * 腰装飾品
+         * =================================================
+         */
+        addAttributeIfNotNull(
+                redirectAttributes,
                 "waistDecoration1Id",
                 simulatorForm.getWaistDecoration1Id()
         );
 
-        redirectAttributes.addAttribute(
+        addAttributeIfNotNull(
+                redirectAttributes,
                 "waistDecoration2Id",
                 simulatorForm.getWaistDecoration2Id()
         );
 
-        redirectAttributes.addAttribute(
+        addAttributeIfNotNull(
+                redirectAttributes,
                 "waistDecoration3Id",
                 simulatorForm.getWaistDecoration3Id()
         );
 
-        /* 脚装飾品 */
-        redirectAttributes.addAttribute(
+
+        /*
+         * =================================================
+         * 脚装飾品
+         * =================================================
+         */
+        addAttributeIfNotNull(
+                redirectAttributes,
                 "legDecoration1Id",
                 simulatorForm.getLegDecoration1Id()
         );
 
-        redirectAttributes.addAttribute(
+        addAttributeIfNotNull(
+                redirectAttributes,
                 "legDecoration2Id",
                 simulatorForm.getLegDecoration2Id()
         );
 
-        redirectAttributes.addAttribute(
+        addAttributeIfNotNull(
+                redirectAttributes,
                 "legDecoration3Id",
                 simulatorForm.getLegDecoration3Id()
         );
 
-        /* 護石スキル */
-        redirectAttributes.addAttribute(
+
+        /*
+         * =================================================
+         * 護石スキル
+         * =================================================
+         */
+        addAttributeIfNotNull(
+                redirectAttributes,
                 "talismanSkill1Id",
                 simulatorForm.getTalismanSkill1Id()
         );
 
-        redirectAttributes.addAttribute(
+        addAttributeIfNotNull(
+                redirectAttributes,
                 "talismanSkill1Level",
                 simulatorForm.getTalismanSkill1Level()
         );
 
-        redirectAttributes.addAttribute(
+        addAttributeIfNotNull(
+                redirectAttributes,
                 "talismanSkill2Id",
                 simulatorForm.getTalismanSkill2Id()
         );
 
-        redirectAttributes.addAttribute(
+        addAttributeIfNotNull(
+                redirectAttributes,
                 "talismanSkill2Level",
                 simulatorForm.getTalismanSkill2Level()
         );
 
-        /* 護石スロット */
-        redirectAttributes.addAttribute(
+
+        /*
+         * =================================================
+         * 護石スロット
+         * =================================================
+         */
+        addAttributeIfNotNull(
+                redirectAttributes,
                 "talismanSlot1Size",
                 simulatorForm.getTalismanSlot1Size()
         );
 
-        redirectAttributes.addAttribute(
+        addAttributeIfNotNull(
+                redirectAttributes,
                 "talismanSlot2Size",
                 simulatorForm.getTalismanSlot2Size()
         );
 
-        redirectAttributes.addAttribute(
+        addAttributeIfNotNull(
+                redirectAttributes,
                 "talismanSlot3Size",
                 simulatorForm.getTalismanSlot3Size()
         );
 
-        /* 護石装飾品 */
-        redirectAttributes.addAttribute(
+
+        /*
+         * =================================================
+         * 護石装飾品
+         * =================================================
+         */
+        addAttributeIfNotNull(
+                redirectAttributes,
                 "talismanDecoration1Id",
                 simulatorForm.getTalismanDecoration1Id()
         );
 
-        redirectAttributes.addAttribute(
+        addAttributeIfNotNull(
+                redirectAttributes,
                 "talismanDecoration2Id",
                 simulatorForm.getTalismanDecoration2Id()
         );
 
-        redirectAttributes.addAttribute(
+        addAttributeIfNotNull(
+                redirectAttributes,
                 "talismanDecoration3Id",
                 simulatorForm.getTalismanDecoration3Id()
+        );
+    }
+
+
+    /*
+     * =====================================================
+     * null以外だけURLへ追加
+     * =====================================================
+     */
+    private void addAttributeIfNotNull(
+            RedirectAttributes redirectAttributes,
+            String name,
+            Object value) {
+
+        if (value == null) {
+
+            return;
+        }
+
+
+        redirectAttributes.addAttribute(
+                name,
+                value
         );
     }
 }

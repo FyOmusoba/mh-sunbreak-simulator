@@ -10,118 +10,74 @@
 
     <h1>防具一覧</h1>
 
-    <form th:action="@{/armor-list}"
-          th:object="${simulatorForm}"
-          method="get">
 
-        <!-- 武器 -->
-        <input type="hidden" th:field="*{weaponId}">
+    <!-- ================================================== -->
+    <!-- 部位絞り込み -->
+    <!-- ================================================== -->
 
-        <!-- 百竜装飾品 -->
-        <input type="hidden" th:field="*{rampageDecorationId}">
+    <label for="partSelect">
+        部位：
+    </label>
 
-        <!-- 弓設定 -->
-        <input type="hidden" th:field="*{bowChargeId}">
-        <input type="hidden" th:field="*{bowCoatingId}">
+    <select id="partSelect">
 
-        <!-- 防具 -->
-        <input type="hidden" th:field="*{headArmorId}">
-        <input type="hidden" th:field="*{chestArmorId}">
-        <input type="hidden" th:field="*{armArmorId}">
-        <input type="hidden" th:field="*{waistArmorId}">
-        <input type="hidden" th:field="*{legArmorId}">
+        <option value=""
+                th:selected="${selectedPart == null or selectedPart == ''}">
+            すべて
+        </option>
 
-        <!-- 武器装飾品 -->
-        <input type="hidden" th:field="*{weaponDecoration1Id}">
-        <input type="hidden" th:field="*{weaponDecoration2Id}">
-        <input type="hidden" th:field="*{weaponDecoration3Id}">
+        <option value="頭"
+                th:selected="${selectedPart == '頭'}">
+            頭
+        </option>
 
-        <!-- 頭装飾品 -->
-        <input type="hidden" th:field="*{headDecoration1Id}">
-        <input type="hidden" th:field="*{headDecoration2Id}">
-        <input type="hidden" th:field="*{headDecoration3Id}">
+        <option value="胴"
+                th:selected="${selectedPart == '胴'}">
+            胴
+        </option>
 
-        <!-- 胴装飾品 -->
-        <input type="hidden" th:field="*{chestDecoration1Id}">
-        <input type="hidden" th:field="*{chestDecoration2Id}">
-        <input type="hidden" th:field="*{chestDecoration3Id}">
+        <option value="腕"
+                th:selected="${selectedPart == '腕'}">
+            腕
+        </option>
 
-        <!-- 腕装飾品 -->
-        <input type="hidden" th:field="*{armDecoration1Id}">
-        <input type="hidden" th:field="*{armDecoration2Id}">
-        <input type="hidden" th:field="*{armDecoration3Id}">
+        <option value="腰"
+                th:selected="${selectedPart == '腰'}">
+            腰
+        </option>
 
-        <!-- 腰装飾品 -->
-        <input type="hidden" th:field="*{waistDecoration1Id}">
-        <input type="hidden" th:field="*{waistDecoration2Id}">
-        <input type="hidden" th:field="*{waistDecoration3Id}">
+        <option value="脚"
+                th:selected="${selectedPart == '脚'}">
+            脚
+        </option>
 
-        <!-- 脚装飾品 -->
-        <input type="hidden" th:field="*{legDecoration1Id}">
-        <input type="hidden" th:field="*{legDecoration2Id}">
-        <input type="hidden" th:field="*{legDecoration3Id}">
+    </select>
 
-        <!-- 護石スキル -->
-        <input type="hidden" th:field="*{talismanSkill1Id}">
-        <input type="hidden" th:field="*{talismanSkill1Level}">
-        <input type="hidden" th:field="*{talismanSkill2Id}">
-        <input type="hidden" th:field="*{talismanSkill2Level}">
+    <button type="button"
+            onclick="filterArmorList()">
+        絞り込み
+    </button>
 
-        <!-- 護石スロット -->
-        <input type="hidden" th:field="*{talismanSlot1Size}">
-        <input type="hidden" th:field="*{talismanSlot2Size}">
-        <input type="hidden" th:field="*{talismanSlot3Size}">
-
-        <!-- 護石装飾品 -->
-        <input type="hidden" th:field="*{talismanDecoration1Id}">
-        <input type="hidden" th:field="*{talismanDecoration2Id}">
-        <input type="hidden" th:field="*{talismanDecoration3Id}">
-
-        <label>部位：</label>
-
-        <select name="part">
-
-            <option value=""
-                    th:selected="${selectedPart == null or selectedPart == ''}">
-                すべて
-            </option>
-
-            <option value="頭"
-                    th:selected="${selectedPart == '頭'}">
-                頭
-            </option>
-
-            <option value="胴"
-                    th:selected="${selectedPart == '胴'}">
-                胴
-            </option>
-
-            <option value="腕"
-                    th:selected="${selectedPart == '腕'}">
-                腕
-            </option>
-
-            <option value="腰"
-                    th:selected="${selectedPart == '腰'}">
-                腰
-            </option>
-
-            <option value="脚"
-                    th:selected="${selectedPart == '脚'}">
-                脚
-            </option>
-
-        </select>
-
-        <button type="submit">
-            絞り込み
-        </button>
-
-    </form>
 
     <br>
+    <br>
 
-    <table border="1">
+
+    <!-- ================================================== -->
+    <!-- 防具なし -->
+    <!-- ================================================== -->
+
+    <p th:if="${armors == null or #lists.isEmpty(armors)}">
+        防具がありません。
+    </p>
+
+
+    <!-- ================================================== -->
+    <!-- 防具一覧 -->
+    <!-- ================================================== -->
+
+    <table border="1"
+           th:if="${armors != null and !#lists.isEmpty(armors)}">
 
         <thead>
 
@@ -140,105 +96,215 @@
 
         <tbody>
 
-            <tr th:each="armor : ${armors}">
+            <!--
+                armorがnullの場合は
+                中身を一切評価しない。
+            -->
+            <th:block th:each="armor : ${armors}">
 
-                <td th:text="${armor.armorName}"></td>
+                <tr th:if="${armor != null}">
 
-                <td th:text="${armor.part}"></td>
+                    <td th:text="${armor.armorName}">
+                    </td>
 
-                <td th:text="${armor.defense}"></td>
+                    <td th:text="${armor.part}">
+                    </td>
 
-                <td>
+                    <td th:text="${armor.defense}">
+                    </td>
 
-                    <div th:if="${armor.skill1Name != null}">
-                        <span th:text="${armor.skill1Name}"></span>
-                        Lv<span th:text="${armor.skill1Level}"></span>
-                    </div>
 
-                    <div th:if="${armor.skill2Name != null}">
-                        <span th:text="${armor.skill2Name}"></span>
-                        Lv<span th:text="${armor.skill2Level}"></span>
-                    </div>
+                    <!-- ====================================== -->
+                    <!-- スキル -->
+                    <!-- ====================================== -->
 
-                    <div th:if="${armor.skill3Name != null}">
-                        <span th:text="${armor.skill3Name}"></span>
-                        Lv<span th:text="${armor.skill3Level}"></span>
-                    </div>
+                    <td>
 
-                    <div th:if="${armor.skill4Name != null}">
-                        <span th:text="${armor.skill4Name}"></span>
-                        Lv<span th:text="${armor.skill4Level}"></span>
-                    </div>
+                        <div th:if="${armor.skill1Name != null}">
 
-                </td>
+                            <span th:text="${armor.skill1Name}">
+                            </span>
 
-                <td th:text="${armor.slot1Size}"></td>
-                <td th:text="${armor.slot2Size}"></td>
-                <td th:text="${armor.slot3Size}"></td>
+                            Lv<span th:text="${armor.skill1Level}">
+                            </span>
 
-                <td>
+                        </div>
 
-                    <a th:href="@{/armor/{armorId}(
-                        armorId=${armor.armorId},
 
-                        weaponId=${simulatorForm.weaponId},
-                        rampageDecorationId=${simulatorForm.rampageDecorationId},
-                        bowChargeId=${simulatorForm.bowChargeId},
-                        bowCoatingId=${simulatorForm.bowCoatingId},
+                        <div th:if="${armor.skill2Name != null}">
 
-                        headArmorId=${simulatorForm.headArmorId},
-                        chestArmorId=${simulatorForm.chestArmorId},
-                        armArmorId=${simulatorForm.armArmorId},
-                        waistArmorId=${simulatorForm.waistArmorId},
-                        legArmorId=${simulatorForm.legArmorId},
+                            <span th:text="${armor.skill2Name}">
+                            </span>
 
-                        weaponDecoration1Id=${simulatorForm.weaponDecoration1Id},
-                        weaponDecoration2Id=${simulatorForm.weaponDecoration2Id},
-                        weaponDecoration3Id=${simulatorForm.weaponDecoration3Id},
+                            Lv<span th:text="${armor.skill2Level}">
+                            </span>
 
-                        headDecoration1Id=${simulatorForm.headDecoration1Id},
-                        headDecoration2Id=${simulatorForm.headDecoration2Id},
-                        headDecoration3Id=${simulatorForm.headDecoration3Id},
+                        </div>
 
-                        chestDecoration1Id=${simulatorForm.chestDecoration1Id},
-                        chestDecoration2Id=${simulatorForm.chestDecoration2Id},
-                        chestDecoration3Id=${simulatorForm.chestDecoration3Id},
 
-                        armDecoration1Id=${simulatorForm.armDecoration1Id},
-                        armDecoration2Id=${simulatorForm.armDecoration2Id},
-                        armDecoration3Id=${simulatorForm.armDecoration3Id},
+                        <div th:if="${armor.skill3Name != null}">
 
-                        waistDecoration1Id=${simulatorForm.waistDecoration1Id},
-                        waistDecoration2Id=${simulatorForm.waistDecoration2Id},
-                        waistDecoration3Id=${simulatorForm.waistDecoration3Id},
+                            <span th:text="${armor.skill3Name}">
+                            </span>
 
-                        legDecoration1Id=${simulatorForm.legDecoration1Id},
-                        legDecoration2Id=${simulatorForm.legDecoration2Id},
-                        legDecoration3Id=${simulatorForm.legDecoration3Id},
+                            Lv<span th:text="${armor.skill3Level}">
+                            </span>
 
-                        talismanSkill1Id=${simulatorForm.talismanSkill1Id},
-                        talismanSkill1Level=${simulatorForm.talismanSkill1Level},
-                        talismanSkill2Id=${simulatorForm.talismanSkill2Id},
-                        talismanSkill2Level=${simulatorForm.talismanSkill2Level},
+                        </div>
 
-                        talismanSlot1Size=${simulatorForm.talismanSlot1Size},
-                        talismanSlot2Size=${simulatorForm.talismanSlot2Size},
-                        talismanSlot3Size=${simulatorForm.talismanSlot3Size},
 
-                        talismanDecoration1Id=${simulatorForm.talismanDecoration1Id},
-                        talismanDecoration2Id=${simulatorForm.talismanDecoration2Id},
-                        talismanDecoration3Id=${simulatorForm.talismanDecoration3Id}
-                    )}">
-                        選択
-                    </a>
+                        <div th:if="${armor.skill4Name != null}">
 
-                </td>
+                            <span th:text="${armor.skill4Name}">
+                            </span>
 
-            </tr>
+                            Lv<span th:text="${armor.skill4Level}">
+                            </span>
+
+                        </div>
+
+                    </td>
+
+
+                    <!-- ====================================== -->
+                    <!-- スロット -->
+                    <!-- ====================================== -->
+
+                    <td th:text="${armor.slot1Size != null
+                        ? armor.slot1Size
+                        : 0}">
+                    </td>
+
+                    <td th:text="${armor.slot2Size != null
+                        ? armor.slot2Size
+                        : 0}">
+                    </td>
+
+                    <td th:text="${armor.slot3Size != null
+                        ? armor.slot3Size
+                        : 0}">
+                    </td>
+
+
+                    <!-- ====================================== -->
+                    <!-- 選択 -->
+                    <!-- ====================================== -->
+
+                    <td>
+
+                        <button type="button"
+                                th:data-armor-id="${armor.armorId}"
+                                onclick="goArmorDetail(
+                                    this.dataset.armorId
+                                )">
+
+                            選択
+
+                        </button>
+
+                    </td>
+
+                </tr>
+
+            </th:block>
 
         </tbody>
 
     </table>
+
+
+    <script>
+
+        /*
+         * =====================================================
+         * 部位絞り込み
+         * =====================================================
+         *
+         * 現在のURLをそのまま使用するため、
+         *
+         * 武器
+         * モンスター
+         * 部位
+         * 防具
+         * 装飾品
+         * 護石
+         * 条件付きスキル
+         *
+         * などの状態を維持する。
+         */
+        function filterArmorList() {
+
+            const part
+                    = document
+                            .getElementById(
+                                    "partSelect"
+                            )
+                            .value;
+
+
+            const url
+                    = new URL(
+                            window.location.href
+                    );
+
+
+            url.pathname
+                    = "/armor-list";
+
+
+            if (part) {
+
+                url.searchParams.set(
+                        "part",
+                        part
+                );
+
+            } else {
+
+                url.searchParams.delete(
+                        "part"
+                );
+            }
+
+
+            window.location.href
+                    = url.toString();
+        }
+
+
+        /*
+         * =====================================================
+         * 防具詳細へ
+         * =====================================================
+         *
+         * URLに入っている現在のシミュレーター状態を
+         * すべて維持したまま移動する。
+         */
+        function goArmorDetail(
+                armorId) {
+
+            if (!armorId) {
+
+                return;
+            }
+
+
+            const url
+                    = new URL(
+                            window.location.href
+                    );
+
+
+            url.pathname
+                    = "/armor/"
+                    + armorId;
+
+
+            window.location.href
+                    = url.toString();
+        }
+
+    </script>
 
 </body>
 

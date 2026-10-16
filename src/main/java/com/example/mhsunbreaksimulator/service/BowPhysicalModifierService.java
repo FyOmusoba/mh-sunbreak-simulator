@@ -14,6 +14,34 @@ import com.example.mhsunbreaksimulator.dto.ConditionalSkillModifierTotal;
 @Service
 public class BowPhysicalModifierService {
 
+    /*
+     * =====================================================
+     * 弓の基礎物理係数
+     * =====================================================
+     *
+     * ここでは、
+     *
+     * ・矢のモーション値
+     * ・溜め段階
+     * ・ビン
+     *
+     * だけをまとめる。
+     *
+     *
+     * 通常弾・連射矢強化
+     * 貫通弾・貫通矢強化
+     * 散弾・拡散矢強化
+     *
+     * などのshotMulは、
+     *
+     * ShotSkillModifierService
+     *
+     * で現在の矢種を判定した後、
+     *
+     * BowPhysicalDamageService
+     *
+     * 側で1回だけ適用する。
+     */
     public BowPhysicalModifier calculate(
             BowChargeModifier bowChargeModifier,
             BowShotModifier bowShotModifier,
@@ -23,55 +51,97 @@ public class BowPhysicalModifierService {
         BowPhysicalModifier result
                 = new BowPhysicalModifier();
 
+
+        /*
+         * =================================================
+         * 必須値確認
+         * =================================================
+         */
         if (bowShotModifier == null
-                || bowShotModifier.getMotionValuePerHit() == null
-                || bowShotModifier.getMaxHitCount() == null
-                || bowShotModifier.getMaxHitCount() <= 0) {
+                || bowShotModifier
+                        .getMotionValuePerHit() == null
+                || bowShotModifier
+                        .getMaxHitCount() == null
+                || bowShotModifier
+                        .getMaxHitCount() <= 0) {
 
             return result;
         }
 
 
-        /* ========================================== */
-        /* 矢のモーション値を倍率へ変換 */
-        /* ========================================== */
-
+        /*
+         * =================================================
+         * 矢モーション値
+         * =================================================
+         *
+         * 例：
+         *
+         * MV 12
+         *
+         * ↓
+         *
+         * 0.12
+         */
         BigDecimal motionValueRate
-                = bowShotModifier.getMotionValuePerHit()
+                = bowShotModifier
+                        .getMotionValuePerHit()
                         .divide(
-                                new BigDecimal("100"),
+                                new BigDecimal(
+                                        "100"
+                                ),
                                 10,
                                 RoundingMode.HALF_UP
                         );
 
 
-        /* ========================================== */
-        /* 各補正 */
-        /* ========================================== */
-
+        /*
+         * =================================================
+         * 溜め物理倍率
+         * =================================================
+         */
         BigDecimal chargePhysicalMul
                 = bowChargeModifier == null
-                        || bowChargeModifier.getPhysicalMul() == null
-                                ? BigDecimal.ONE
-                                : bowChargeModifier.getPhysicalMul();
+                        || bowChargeModifier
+                                .getPhysicalMul() == null
 
+                                ? BigDecimal.ONE
+                                : bowChargeModifier
+                                        .getPhysicalMul();
+
+
+        /*
+         * =================================================
+         * ビン物理倍率
+         * =================================================
+         */
         BigDecimal coatingPhysicalMul
                 = bowCoatingModifier == null
-                        || bowCoatingModifier.getPhysicalMul() == null
+                        || bowCoatingModifier
+                                .getPhysicalMul() == null
+
                                 ? BigDecimal.ONE
-                                : bowCoatingModifier.getPhysicalMul();
-
-        BigDecimal shotMul
-                = conditionalSkillModifierTotal == null
-                        || conditionalSkillModifierTotal.getShotMul() == null
-                                ? BigDecimal.ONE
-                                : conditionalSkillModifierTotal.getShotMul();
+                                : bowCoatingModifier
+                                        .getPhysicalMul();
 
 
-        /* ========================================== */
-        /* 1hitあたりの最終物理係数 */
-        /* ========================================== */
-
+        /*
+         * =================================================
+         * 1hitあたり基礎物理係数
+         * =================================================
+         *
+         * モーション値
+         *
+         * ×
+         *
+         * 溜め倍率
+         *
+         * ×
+         *
+         * ビン倍率
+         *
+         *
+         * ★ shotMulはここでは掛けない。
+         */
         BigDecimal physicalRatePerHit
                 = motionValueRate
                         .multiply(
@@ -79,35 +149,44 @@ public class BowPhysicalModifierService {
                         )
                         .multiply(
                                 coatingPhysicalMul
-                        )
-                        .multiply(
-                                shotMul
                         );
 
 
-        /* ========================================== */
-        /* 最大ヒット時の合計係数 */
-        /* ========================================== */
-
+        /*
+         * =================================================
+         * 最大ヒット時物理係数
+         * =================================================
+         */
         BigDecimal maxPhysicalRate
-                = physicalRatePerHit.multiply(
-                        BigDecimal.valueOf(
-                                bowShotModifier.getMaxHitCount()
-                        )
-                );
+                = physicalRatePerHit
+                        .multiply(
+                                BigDecimal.valueOf(
+                                        bowShotModifier
+                                                .getMaxHitCount()
+                                )
+                        );
 
 
+        /*
+         * =================================================
+         * 結果
+         * =================================================
+         */
         result.setPhysicalRatePerHit(
                 physicalRatePerHit
         );
+
 
         result.setMaxPhysicalRate(
                 maxPhysicalRate
         );
 
+
         result.setMaxHitCount(
-                bowShotModifier.getMaxHitCount()
+                bowShotModifier
+                        .getMaxHitCount()
         );
+
 
         return result;
     }

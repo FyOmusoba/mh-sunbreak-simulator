@@ -14,8 +14,7 @@ import com.example.mhsunbreaksimulator.service.ConditionalSkillModifierService;
 
 public class ConditionalSkillModifierServiceTest {
 
-    private final ConditionalSkillModifierService
-            conditionalSkillModifierService
+    private final ConditionalSkillModifierService conditionalSkillModifierService
             = new ConditionalSkillModifierService();
 
 
@@ -28,73 +27,24 @@ public class ConditionalSkillModifierServiceTest {
     void testNullSelectedEffects() {
 
         ConditionalSkillModifierTotal result
-                = conditionalSkillModifierService.calculate(
-                        null
-                );
+                = conditionalSkillModifierService.calculate(null);
 
+        assertDecimalEquals("0", result.getAttackAdd());
+        assertDecimalEquals("1", result.getAttackMul());
+        assertDecimalEquals("0", result.getAffinityAdd());
+        assertDecimalEquals("1", result.getElementDamageMul());
 
-        assertDecimalEquals(
-                "0",
-                result.getAttackAdd()
-        );
+        assertDecimalEquals("0", result.getDefenseAdd());
+        assertDecimalEquals("1", result.getDefenseMul());
 
-        assertDecimalEquals(
-                "1",
-                result.getAttackMul()
-        );
+        assertDecimalEquals("0", result.getFireResAdd());
+        assertDecimalEquals("0", result.getWaterResAdd());
+        assertDecimalEquals("0", result.getThunderResAdd());
+        assertDecimalEquals("0", result.getIceResAdd());
+        assertDecimalEquals("0", result.getDragonResAdd());
 
-        assertDecimalEquals(
-                "0",
-                result.getAffinityAdd()
-        );
-
-        assertDecimalEquals(
-                "1",
-                result.getElementDamageMul()
-        );
-
-        assertDecimalEquals(
-                "0",
-                result.getDefenseAdd()
-        );
-
-        assertDecimalEquals(
-                "1",
-                result.getDefenseMul()
-        );
-
-        assertDecimalEquals(
-                "0",
-                result.getFireResAdd()
-        );
-
-        assertDecimalEquals(
-                "0",
-                result.getWaterResAdd()
-        );
-
-        assertDecimalEquals(
-                "0",
-                result.getThunderResAdd()
-        );
-
-        assertDecimalEquals(
-                "0",
-                result.getIceResAdd()
-        );
-
-        assertDecimalEquals(
-                "0",
-                result.getDragonResAdd()
-        );
-
-        assertNull(
-                result.getAllElementResSet()
-        );
-
-        assertNull(
-                result.getPostConversionAllElementResSet()
-        );
+        assertNull(result.getAllElementResSet());
+        assertNull(result.getPostConversionAllElementResSet());
 
         assertDecimalEquals(
                 "0",
@@ -104,7 +54,6 @@ public class ConditionalSkillModifierServiceTest {
         assertFalse(
                 result.getNullifyNonDragonElement()
         );
-
 
         System.out.println(
                 "selectedEffects=null：正常"
@@ -125,7 +74,6 @@ public class ConditionalSkillModifierServiceTest {
                         Map.of()
                 );
 
-
         assertDecimalEquals(
                 "0",
                 result.getAttackAdd()
@@ -162,7 +110,6 @@ public class ConditionalSkillModifierServiceTest {
         assertFalse(
                 result.getNullifyNonDragonElement()
         );
-
 
         System.out.println(
                 "selectedEffects=empty：正常"
@@ -197,7 +144,6 @@ public class ConditionalSkillModifierServiceTest {
                 new BigDecimal("1.10")
         );
 
-
         Map<Integer, SkillEffectState> effects
                 = new LinkedHashMap<>();
 
@@ -206,12 +152,10 @@ public class ConditionalSkillModifierServiceTest {
                 effect
         );
 
-
         ConditionalSkillModifierTotal result
                 = conditionalSkillModifierService.calculate(
                         effects
                 );
-
 
         assertDecimalEquals(
                 "10",
@@ -232,7 +176,6 @@ public class ConditionalSkillModifierServiceTest {
                 "1.10",
                 result.getElementDamageMul()
         );
-
 
         System.out.println(
                 "通常スキル："
@@ -267,7 +210,6 @@ public class ConditionalSkillModifierServiceTest {
                 new BigDecimal("1.10")
         );
 
-
         SkillEffectState effect2
                 = new SkillEffectState();
 
@@ -278,7 +220,6 @@ public class ConditionalSkillModifierServiceTest {
         effect2.setDefenseMul(
                 new BigDecimal("1.05")
         );
-
 
         Map<Integer, SkillEffectState> effects
                 = new LinkedHashMap<>();
@@ -293,12 +234,10 @@ public class ConditionalSkillModifierServiceTest {
                 effect2
         );
 
-
         ConditionalSkillModifierTotal result
                 = conditionalSkillModifierService.calculate(
                         effects
                 );
-
 
         assertDecimalEquals(
                 "30",
@@ -309,7 +248,6 @@ public class ConditionalSkillModifierServiceTest {
                 "1.155",
                 result.getDefenseMul()
         );
-
 
         System.out.println(
                 "防御力集計："
@@ -340,7 +278,6 @@ public class ConditionalSkillModifierServiceTest {
                 null
         );
 
-
         Map<Integer, SkillEffectState> effects
                 = new LinkedHashMap<>();
 
@@ -349,12 +286,10 @@ public class ConditionalSkillModifierServiceTest {
                 effect
         );
 
-
         ConditionalSkillModifierTotal result
                 = conditionalSkillModifierService.calculate(
                         effects
                 );
-
 
         assertDecimalEquals(
                 "0",
@@ -365,7 +300,6 @@ public class ConditionalSkillModifierServiceTest {
                 "1",
                 result.getDefenseMul()
         );
-
 
         System.out.println(
                 "防御力補正null：正常"
@@ -404,7 +338,6 @@ public class ConditionalSkillModifierServiceTest {
                 new BigDecimal("4")
         );
 
-
         SkillEffectState effect2
                 = new SkillEffectState();
 
@@ -428,7 +361,6 @@ public class ConditionalSkillModifierServiceTest {
                 new BigDecimal("-1")
         );
 
-
         Map<Integer, SkillEffectState> effects
                 = new LinkedHashMap<>();
 
@@ -442,12 +374,10 @@ public class ConditionalSkillModifierServiceTest {
                 effect2
         );
 
-
         ConditionalSkillModifierTotal result
                 = conditionalSkillModifierService.calculate(
                         effects
                 );
-
 
         assertDecimalEquals(
                 "8",
@@ -473,7 +403,6 @@ public class ConditionalSkillModifierServiceTest {
                 "3",
                 result.getDragonResAdd()
         );
-
 
         System.out.println(
                 "属性耐性集計："
@@ -502,7 +431,6 @@ public class ConditionalSkillModifierServiceTest {
         SkillEffectState effect
                 = new SkillEffectState();
 
-
         Map<Integer, SkillEffectState> effects
                 = new LinkedHashMap<>();
 
@@ -511,12 +439,10 @@ public class ConditionalSkillModifierServiceTest {
                 effect
         );
 
-
         ConditionalSkillModifierTotal result
                 = conditionalSkillModifierService.calculate(
                         effects
                 );
-
 
         assertDecimalEquals(
                 "0",
@@ -542,7 +468,6 @@ public class ConditionalSkillModifierServiceTest {
                 "0",
                 result.getDragonResAdd()
         );
-
 
         System.out.println(
                 "属性耐性補正null：正常"
@@ -585,7 +510,6 @@ public class ConditionalSkillModifierServiceTest {
                 new BigDecimal("10")
         );
 
-
         Map<Integer, SkillEffectState> effects
                 = new LinkedHashMap<>();
 
@@ -594,12 +518,10 @@ public class ConditionalSkillModifierServiceTest {
                 effect
         );
 
-
         ConditionalSkillModifierTotal result
                 = conditionalSkillModifierService.calculate(
                         effects
                 );
-
 
         assertDecimalEquals(
                 "15",
@@ -631,7 +553,6 @@ public class ConditionalSkillModifierServiceTest {
                 result.getDragonResAdd()
         );
 
-
         System.out.println(
                 "攻撃＋防御＋耐性："
                 + "attack="
@@ -654,12 +575,6 @@ public class ConditionalSkillModifierServiceTest {
      * =====================================================
      * 龍気活性
      * =====================================================
-     *
-     * 例：
-     * Lv2 ACTIVE
-     *
-     * allElementResSet = 50
-     * nullifyNonDragonElement = true
      */
     @Test
     void testDragonheart() {
@@ -679,25 +594,18 @@ public class ConditionalSkillModifierServiceTest {
                 true
         );
 
-
         Map<Integer, SkillEffectState> effects
                 = new LinkedHashMap<>();
 
-        /*
-         * 龍気活性
-         * skill_id = 57
-         */
         effects.put(
                 57,
                 dragonheart
         );
 
-
         ConditionalSkillModifierTotal result
                 = conditionalSkillModifierService.calculate(
                         effects
                 );
-
 
         assertEquals(
                 50,
@@ -717,7 +625,6 @@ public class ConditionalSkillModifierServiceTest {
                 result.getNullifyNonDragonElement()
         );
 
-
         System.out.println(
                 "龍気活性："
                 + "allElementResSet="
@@ -735,15 +642,6 @@ public class ConditionalSkillModifierServiceTest {
      * 龍気変換【朱】
      * 近接 Lv3
      * =====================================================
-     *
-     * 通常耐性加算
-     * +10
-     *
-     * 変換後全耐性
-     * 0
-     *
-     * 変換率
-     * 0.25
      */
     @Test
     void testDragonConversionRedMeleeLevel3() {
@@ -783,25 +681,18 @@ public class ConditionalSkillModifierServiceTest {
                 new BigDecimal("0.25")
         );
 
-
         Map<Integer, SkillEffectState> effects
                 = new LinkedHashMap<>();
 
-        /*
-         * 龍気変換
-         * skill_id = 45
-         */
         effects.put(
                 45,
                 dragonConversion
         );
 
-
         ConditionalSkillModifierTotal result
                 = conditionalSkillModifierService.calculate(
                         effects
                 );
-
 
         assertDecimalEquals(
                 "10",
@@ -828,32 +719,23 @@ public class ConditionalSkillModifierServiceTest {
                 result.getDragonResAdd()
         );
 
-
-        /*
-         * 龍気変換の0は
-         * 変換前固定値へ入れてはいけない。
-         */
         assertNull(
                 result.getAllElementResSet()
         );
-
 
         assertEquals(
                 0,
                 result.getPostConversionAllElementResSet()
         );
 
-
         assertDecimalEquals(
                 "0.25",
                 result.getResistanceToElementRate()
         );
 
-
         assertFalse(
                 result.getNullifyNonDragonElement()
         );
-
 
         System.out.println(
                 "龍気変換【朱】近接Lv3："
@@ -874,13 +756,6 @@ public class ConditionalSkillModifierServiceTest {
      * 龍気変換【朱】
      * 遠距離 Lv3
      * =====================================================
-     *
-     * ライト
-     * ヘビィ
-     * 弓
-     *
-     * Lv3変換率
-     * = 0.08
      */
     @Test
     void testDragonConversionRedRangedLevel3() {
@@ -920,7 +795,6 @@ public class ConditionalSkillModifierServiceTest {
                 new BigDecimal("0.08")
         );
 
-
         Map<Integer, SkillEffectState> effects
                 = new LinkedHashMap<>();
 
@@ -929,12 +803,10 @@ public class ConditionalSkillModifierServiceTest {
                 dragonConversion
         );
 
-
         ConditionalSkillModifierTotal result
                 = conditionalSkillModifierService.calculate(
                         effects
                 );
-
 
         assertEquals(
                 0,
@@ -945,7 +817,6 @@ public class ConditionalSkillModifierServiceTest {
                 "0.08",
                 result.getResistanceToElementRate()
         );
-
 
         System.out.println(
                 "龍気変換【朱】遠距離Lv3："
@@ -959,19 +830,8 @@ public class ConditionalSkillModifierServiceTest {
 
     /*
      * =====================================================
-     * 龍気活性
-     * ＋
-     * 龍気変換【朱】
+     * 龍気活性＋龍気変換【朱】
      * =====================================================
-     *
-     * 龍気活性
-     * → 変換前耐性50
-     *
-     * 龍気変換
-     * → 変換後耐性0
-     * → 変換率0.25
-     *
-     * 両方を同時保持できることを確認。
      */
     @Test
     void testDragonheartAndDragonConversionTogether() {
@@ -990,7 +850,6 @@ public class ConditionalSkillModifierServiceTest {
         dragonheart.setNullifyNonDragonElement(
                 true
         );
-
 
         SkillEffectState dragonConversion
                 = new SkillEffectState();
@@ -1027,7 +886,6 @@ public class ConditionalSkillModifierServiceTest {
                 new BigDecimal("0.25")
         );
 
-
         Map<Integer, SkillEffectState> effects
                 = new LinkedHashMap<>();
 
@@ -1041,12 +899,10 @@ public class ConditionalSkillModifierServiceTest {
                 dragonConversion
         );
 
-
         ConditionalSkillModifierTotal result
                 = conditionalSkillModifierService.calculate(
                         effects
                 );
-
 
         assertEquals(
                 50,
@@ -1066,7 +922,6 @@ public class ConditionalSkillModifierServiceTest {
         assertTrue(
                 result.getNullifyNonDragonElement()
         );
-
 
         assertDecimalEquals(
                 "10",
@@ -1092,7 +947,6 @@ public class ConditionalSkillModifierServiceTest {
                 "10",
                 result.getDragonResAdd()
         );
-
 
         System.out.println(
                 "龍気活性＋龍気変換【朱】："
@@ -1131,7 +985,6 @@ public class ConditionalSkillModifierServiceTest {
                 null
         );
 
-
         Map<Integer, SkillEffectState> effects
                 = new LinkedHashMap<>();
 
@@ -1140,12 +993,10 @@ public class ConditionalSkillModifierServiceTest {
                 effect
         );
 
-
         ConditionalSkillModifierTotal result
                 = conditionalSkillModifierService.calculate(
                         effects
                 );
-
 
         assertNull(
                 result.getAllElementResSet()
@@ -1164,7 +1015,6 @@ public class ConditionalSkillModifierServiceTest {
                 result.getNullifyNonDragonElement()
         );
 
-
         System.out.println(
                 "特殊耐性補正null：正常"
         );
@@ -1175,10 +1025,6 @@ public class ConditionalSkillModifierServiceTest {
      * =====================================================
      * 通常スキルの全耐性固定
      * =====================================================
-     *
-     * skill_id=45以外なら、
-     * allElementResSet=30は
-     * 変換前固定値へ入る。
      */
     @Test
     void testNormalAllElementResistanceSet() {
@@ -1190,7 +1036,6 @@ public class ConditionalSkillModifierServiceTest {
                 30
         );
 
-
         Map<Integer, SkillEffectState> effects
                 = new LinkedHashMap<>();
 
@@ -1199,12 +1044,10 @@ public class ConditionalSkillModifierServiceTest {
                 effect
         );
 
-
         ConditionalSkillModifierTotal result
                 = conditionalSkillModifierService.calculate(
                         effects
                 );
-
 
         assertEquals(
                 30,
@@ -1214,7 +1057,6 @@ public class ConditionalSkillModifierServiceTest {
         assertNull(
                 result.getPostConversionAllElementResSet()
         );
-
 
         System.out.println(
                 "通常全耐性固定："
@@ -1227,7 +1069,6 @@ public class ConditionalSkillModifierServiceTest {
     /*
      * =====================================================
      * 弱点特効
-     * skill_id = 8
      * =====================================================
      */
     @Test
@@ -1244,7 +1085,6 @@ public class ConditionalSkillModifierServiceTest {
                 new BigDecimal("50")
         );
 
-
         Map<Integer, SkillEffectState> effects
                 = new LinkedHashMap<>();
 
@@ -1253,18 +1093,15 @@ public class ConditionalSkillModifierServiceTest {
                 weaknessExploit
         );
 
-
         ConditionalSkillModifierTotal result
                 = conditionalSkillModifierService.calculate(
                         effects
                 );
 
-
         assertDecimalEquals(
                 "0",
                 result.getAffinityAdd()
         );
-
 
         System.out.println(
                 "弱点特効：通常集計から除外 affinity="
@@ -1276,7 +1113,6 @@ public class ConditionalSkillModifierServiceTest {
     /*
      * =====================================================
      * 弱点特効【属性】
-     * skill_id = 34
      * =====================================================
      */
     @Test
@@ -1293,7 +1129,6 @@ public class ConditionalSkillModifierServiceTest {
                 new BigDecimal("1.15000")
         );
 
-
         Map<Integer, SkillEffectState> effects
                 = new LinkedHashMap<>();
 
@@ -1302,18 +1137,15 @@ public class ConditionalSkillModifierServiceTest {
                 elementExploit
         );
 
-
         ConditionalSkillModifierTotal result
                 = conditionalSkillModifierService.calculate(
                         effects
                 );
 
-
         assertDecimalEquals(
                 "1",
                 result.getElementDamageMul()
         );
-
 
         System.out.println(
                 "弱点特効【属性】：通常集計から除外 elementDamageMul="
@@ -1324,9 +1156,7 @@ public class ConditionalSkillModifierServiceTest {
 
     /*
      * =====================================================
-     * 弱点系除外
-     * ＋
-     * 通常スキル
+     * 弱点系除外＋通常スキル
      * =====================================================
      */
     @Test
@@ -1339,14 +1169,12 @@ public class ConditionalSkillModifierServiceTest {
                 new BigDecimal("50")
         );
 
-
         SkillEffectState elementExploit
                 = new SkillEffectState();
 
         elementExploit.setElementDamageMul(
                 new BigDecimal("1.15000")
         );
-
 
         SkillEffectState normalEffect
                 = new SkillEffectState();
@@ -1362,7 +1190,6 @@ public class ConditionalSkillModifierServiceTest {
         normalEffect.setElementDamageMul(
                 new BigDecimal("1.05")
         );
-
 
         Map<Integer, SkillEffectState> effects
                 = new LinkedHashMap<>();
@@ -1382,12 +1209,10 @@ public class ConditionalSkillModifierServiceTest {
                 normalEffect
         );
 
-
         ConditionalSkillModifierTotal result
                 = conditionalSkillModifierService.calculate(
                         effects
                 );
-
 
         assertDecimalEquals(
                 "15",
@@ -1403,7 +1228,6 @@ public class ConditionalSkillModifierServiceTest {
                 "1.05",
                 result.getElementDamageMul()
         );
-
 
         System.out.println(
                 "弱点系除外＋通常スキル："
@@ -1432,7 +1256,6 @@ public class ConditionalSkillModifierServiceTest {
                         "1.15"
                 );
 
-
         Map<Integer, SkillEffectState> effects
                 = new LinkedHashMap<>();
 
@@ -1441,12 +1264,10 @@ public class ConditionalSkillModifierServiceTest {
                 effect
         );
 
-
         ConditionalSkillModifierTotal result
                 = conditionalSkillModifierService.calculate(
                         effects
                 );
-
 
         assertDecimalEquals(
                 "7",
@@ -1457,7 +1278,6 @@ public class ConditionalSkillModifierServiceTest {
                 "1.15",
                 result.getStatusMul()
         );
-
 
         System.out.println(
                 "ALL：add="
@@ -1483,7 +1303,6 @@ public class ConditionalSkillModifierServiceTest {
                         "1.20"
                 );
 
-
         Map<Integer, SkillEffectState> effects
                 = new LinkedHashMap<>();
 
@@ -1492,12 +1311,10 @@ public class ConditionalSkillModifierServiceTest {
                 effect
         );
 
-
         ConditionalSkillModifierTotal result
                 = conditionalSkillModifierService.calculate(
                         effects
                 );
-
 
         assertDecimalEquals(
                 "5",
@@ -1508,7 +1325,6 @@ public class ConditionalSkillModifierServiceTest {
                 "1.20",
                 result.getPoisonStatusMul()
         );
-
 
         System.out.println(
                 "POISON：add="
@@ -1534,7 +1350,6 @@ public class ConditionalSkillModifierServiceTest {
                         "1.10"
                 );
 
-
         Map<Integer, SkillEffectState> effects
                 = new LinkedHashMap<>();
 
@@ -1543,12 +1358,10 @@ public class ConditionalSkillModifierServiceTest {
                 effect
         );
 
-
         ConditionalSkillModifierTotal result
                 = conditionalSkillModifierService.calculate(
                         effects
                 );
-
 
         assertDecimalEquals(
                 "2",
@@ -1559,7 +1372,6 @@ public class ConditionalSkillModifierServiceTest {
                 "1.10",
                 result.getParalysisStatusMul()
         );
-
 
         System.out.println(
                 "PARALYSIS：add="
@@ -1585,7 +1397,6 @@ public class ConditionalSkillModifierServiceTest {
                         "1.05"
                 );
 
-
         Map<Integer, SkillEffectState> effects
                 = new LinkedHashMap<>();
 
@@ -1594,12 +1405,10 @@ public class ConditionalSkillModifierServiceTest {
                 effect
         );
 
-
         ConditionalSkillModifierTotal result
                 = conditionalSkillModifierService.calculate(
                         effects
                 );
-
 
         assertDecimalEquals(
                 "1",
@@ -1610,7 +1419,6 @@ public class ConditionalSkillModifierServiceTest {
                 "1.05",
                 result.getSleepStatusMul()
         );
-
 
         System.out.println(
                 "SLEEP：add="
@@ -1636,7 +1444,6 @@ public class ConditionalSkillModifierServiceTest {
                         "1.20"
                 );
 
-
         Map<Integer, SkillEffectState> effects
                 = new LinkedHashMap<>();
 
@@ -1645,12 +1452,10 @@ public class ConditionalSkillModifierServiceTest {
                 effect
         );
 
-
         ConditionalSkillModifierTotal result
                 = conditionalSkillModifierService.calculate(
                         effects
                 );
-
 
         assertDecimalEquals(
                 "5",
@@ -1661,7 +1466,6 @@ public class ConditionalSkillModifierServiceTest {
                 "1.20",
                 result.getBlastStatusMul()
         );
-
 
         System.out.println(
                 "BLAST：add="
@@ -1694,7 +1498,6 @@ public class ConditionalSkillModifierServiceTest {
                         "1.05"
                 );
 
-
         Map<Integer, SkillEffectState> effects
                 = new LinkedHashMap<>();
 
@@ -1708,12 +1511,10 @@ public class ConditionalSkillModifierServiceTest {
                 effect2
         );
 
-
         ConditionalSkillModifierTotal result
                 = conditionalSkillModifierService.calculate(
                         effects
                 );
-
 
         assertDecimalEquals(
                 "6",
@@ -1724,7 +1525,6 @@ public class ConditionalSkillModifierServiceTest {
                 "1.2600",
                 result.getPoisonStatusMul()
         );
-
 
         System.out.println(
                 "POISON複数集計：add="
@@ -1750,7 +1550,6 @@ public class ConditionalSkillModifierServiceTest {
                         "9.99"
                 );
 
-
         Map<Integer, SkillEffectState> effects
                 = new LinkedHashMap<>();
 
@@ -1759,12 +1558,10 @@ public class ConditionalSkillModifierServiceTest {
                 effect
         );
 
-
         ConditionalSkillModifierTotal result
                 = conditionalSkillModifierService.calculate(
                         effects
                 );
-
 
         assertDecimalEquals(
                 "0",
@@ -1785,7 +1582,6 @@ public class ConditionalSkillModifierServiceTest {
                 "1",
                 result.getPoisonStatusMul()
         );
-
 
         System.out.println(
                 "statusTarget=null：状態異常補正を無視 正常"
@@ -1808,7 +1604,6 @@ public class ConditionalSkillModifierServiceTest {
                         "9.99"
                 );
 
-
         Map<Integer, SkillEffectState> effects
                 = new LinkedHashMap<>();
 
@@ -1817,12 +1612,10 @@ public class ConditionalSkillModifierServiceTest {
                 effect
         );
 
-
         ConditionalSkillModifierTotal result
                 = conditionalSkillModifierService.calculate(
                         effects
                 );
-
 
         assertDecimalEquals(
                 "0",
@@ -1844,9 +1637,71 @@ public class ConditionalSkillModifierServiceTest {
                 result.getBlastStatusMul()
         );
 
-
         System.out.println(
                 "未知statusTarget：無視 正常"
+        );
+    }
+
+
+    /*
+     * =====================================================
+     * 連撃
+     * HIT_5_PLUS
+     * =====================================================
+     *
+     * 連撃 skill_id = 35
+     *
+     * 5ヒット以上
+     * attackAdd = 15
+     * elementAdd = 15
+     */
+    @Test
+    void testBurstHit5PlusAggregation() {
+
+        SkillEffectState hit5Plus
+                = new SkillEffectState();
+
+        hit5Plus.setStateCode(
+                "HIT_5_PLUS"
+        );
+
+        hit5Plus.setAttackAdd(
+                new BigDecimal("15.000")
+        );
+
+        hit5Plus.setElementAdd(
+                new BigDecimal("15.000")
+        );
+
+        Map<Integer, SkillEffectState> effects
+                = new LinkedHashMap<>();
+
+        effects.put(
+                35,
+                hit5Plus
+        );
+
+        ConditionalSkillModifierTotal result
+                = conditionalSkillModifierService.calculate(
+                        effects
+                );
+
+        assertDecimalEquals(
+                "15.000",
+                result.getAttackAdd()
+        );
+
+        assertDecimalEquals(
+                "15.000",
+                result.getElementAdd()
+        );
+
+        System.out.println(
+                "連撃 HIT_5_PLUS："
+                + "attackAdd="
+                + result.getAttackAdd()
+                + " / elementAdd="
+                + result.getElementAdd()
         );
     }
 
@@ -1865,7 +1720,6 @@ public class ConditionalSkillModifierServiceTest {
         SkillEffectState effect
                 = new SkillEffectState();
 
-
         effect.setStatusTarget(
                 statusTarget
         );
@@ -1881,7 +1735,6 @@ public class ConditionalSkillModifierServiceTest {
                         statusMul
                 )
         );
-
 
         return effect;
     }
