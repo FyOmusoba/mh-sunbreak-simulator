@@ -25,7 +25,9 @@ public class BowgunSpecialDamageServiceTest {
 
 
     /*
+     * =====================================================
      * 徹甲榴弾Lv3
+     * =====================================================
      *
      * 攻撃力300
      *
@@ -120,7 +122,9 @@ public class BowgunSpecialDamageServiceTest {
 
 
     /*
+     * =====================================================
      * 拡散弾Lv3
+     * =====================================================
      *
      * 攻撃力300
      *
@@ -212,7 +216,9 @@ public class BowgunSpecialDamageServiceTest {
 
 
     /*
+     * =====================================================
      * 竜撃弾
+     * =====================================================
      *
      * 攻撃力300
      *
@@ -343,7 +349,9 @@ public class BowgunSpecialDamageServiceTest {
 
 
     /*
+     * =====================================================
      * 斬裂弾
+     * =====================================================
      *
      * 固定ダメージではなく、
      *
@@ -429,8 +437,9 @@ public class BowgunSpecialDamageServiceTest {
 
 
     /*
-     * 条件付き攻撃力補正も
-     * 特殊弾計算へ反映されるか確認。
+     * =====================================================
+     * 条件付き攻撃力補正
+     * =====================================================
      *
      * 武器攻撃力300
      * +10
@@ -504,8 +513,317 @@ public class BowgunSpecialDamageServiceTest {
 
 
     /*
-     * weaponAttack=nullなら
-     * 全て0のまま安全に終了する。
+     * =====================================================
+     * 徹甲榴弾Lv3 + 砲術Lv3
+     * =====================================================
+     *
+     * 攻撃力300
+     *
+     * 元固定ダメージ
+     * 300 × 19%
+     * = 57
+     *
+     * 砲術Lv3
+     * ×1.30
+     *
+     * = 74.1
+     *
+     * 火属性5には砲術を掛けない。
+     */
+    @Test
+    void testStickyAmmoLv3WithArtilleryLv3() {
+
+        BowgunAmmo ammo
+                = createAmmo(
+                        "徹甲榴弾",
+                        3
+                );
+
+
+        BowgunAmmoModifier ammoModifier
+                = bowgunAmmoModifierService.calculate(
+                        ammo
+                );
+
+
+        ConditionalSkillModifierTotal conditionalModifier
+                = createArtilleryModifier(
+                        "1.30"
+                );
+
+
+        BowgunSpecialDamageResult result
+                = bowgunSpecialDamageService.calculate(
+                        300,
+                        ammoModifier,
+                        conditionalModifier,
+                        ammo.getAmmoType()
+                );
+
+
+        assertBigDecimalEquals(
+                "300",
+                result.getEffectiveAttack()
+        );
+
+
+        /*
+         * 固定爆発のみ1.30倍
+         */
+        assertBigDecimalEquals(
+                "74.1",
+                result.getSecondaryFixedDamagePerHit()
+        );
+
+        assertBigDecimalEquals(
+                "74.1",
+                result.getSecondaryFixedDamageTotal()
+        );
+
+
+        /*
+         * 火属性部分はそのまま
+         */
+        assertBigDecimalEquals(
+                "5",
+                result.getSecondaryFixedElementValuePerHit()
+        );
+
+        assertBigDecimalEquals(
+                "5",
+                result.getSecondaryFixedElementValueTotal()
+        );
+
+
+        System.out.println(
+                "徹甲榴弾Lv3＋砲術Lv3："
+                + "fixed="
+                + result.getSecondaryFixedDamageTotal()
+                + " / fire="
+                + result.getSecondaryFixedElementValueTotal()
+        );
+    }
+
+
+    /*
+     * =====================================================
+     * 拡散弾Lv3 + 砲術Lv3
+     * =====================================================
+     *
+     * 拡散弾は砲術対象外。
+     *
+     * 300 × 20%
+     * = 60
+     *
+     * 砲術Lv3があっても
+     * 60のまま。
+     */
+    @Test
+    void testClusterAmmoLv3WithArtilleryLv3() {
+
+        BowgunAmmo ammo
+                = createAmmo(
+                        "拡散弾",
+                        3
+                );
+
+
+        BowgunAmmoModifier ammoModifier
+                = bowgunAmmoModifierService.calculate(
+                        ammo
+                );
+
+
+        ConditionalSkillModifierTotal conditionalModifier
+                = createArtilleryModifier(
+                        "1.30"
+                );
+
+
+        BowgunSpecialDamageResult result
+                = bowgunSpecialDamageService.calculate(
+                        300,
+                        ammoModifier,
+                        conditionalModifier,
+                        ammo.getAmmoType()
+                );
+
+
+        /*
+         * 砲術対象外なので変化なし
+         */
+        assertBigDecimalEquals(
+                "60",
+                result.getSecondaryFixedDamagePerHit()
+        );
+
+        assertBigDecimalEquals(
+                "300",
+                result.getSecondaryFixedDamageTotal()
+        );
+
+
+        /*
+         * 火属性も変化なし
+         */
+        assertBigDecimalEquals(
+                "10",
+                result.getSecondaryFixedElementValuePerHit()
+        );
+
+        assertBigDecimalEquals(
+                "50",
+                result.getSecondaryFixedElementValueTotal()
+        );
+
+
+        System.out.println(
+                "拡散弾Lv3＋砲術Lv3："
+                + "fixedPerHit="
+                + result.getSecondaryFixedDamagePerHit()
+                + " / fixedTotal="
+                + result.getSecondaryFixedDamageTotal()
+                + " / fireTotal="
+                + result.getSecondaryFixedElementValueTotal()
+        );
+    }
+
+
+    /*
+     * =====================================================
+     * 竜撃弾 + 砲術Lv3
+     * =====================================================
+     *
+     * 1段目
+     *
+     * 300 × 80%
+     * = 240
+     *
+     * ×1.30
+     * = 312
+     *
+     *
+     * 2段目
+     *
+     * 300 × 19%
+     * = 57
+     *
+     * ×1.30
+     * = 74.1
+     *
+     *
+     * 火属性
+     *
+     * 40
+     * 20
+     *
+     * は変化なし。
+     */
+    @Test
+    void testWyvernAmmoWithArtilleryLv3() {
+
+        BowgunAmmo ammo
+                = createAmmo(
+                        "竜撃弾",
+                        1
+                );
+
+
+        BowgunAmmoModifier ammoModifier
+                = bowgunAmmoModifierService.calculate(
+                        ammo
+                );
+
+
+        ConditionalSkillModifierTotal conditionalModifier
+                = createArtilleryModifier(
+                        "1.30"
+                );
+
+
+        BowgunSpecialDamageResult result
+                = bowgunSpecialDamageService.calculate(
+                        300,
+                        ammoModifier,
+                        conditionalModifier,
+                        ammo.getAmmoType()
+                );
+
+
+        /*
+         * 1段目固定ダメージ
+         */
+        assertBigDecimalEquals(
+                "312",
+                result.getSecondaryFixedDamagePerHit()
+        );
+
+        assertBigDecimalEquals(
+                "312",
+                result.getSecondaryFixedDamageTotal()
+        );
+
+
+        /*
+         * 1段目火属性
+         */
+        assertBigDecimalEquals(
+                "40",
+                result.getSecondaryFixedElementValuePerHit()
+        );
+
+        assertBigDecimalEquals(
+                "40",
+                result.getSecondaryFixedElementValueTotal()
+        );
+
+
+        /*
+         * 2段目固定ダメージ
+         */
+        assertBigDecimalEquals(
+                "74.1",
+                result.getAdditionalFixedDamagePerHit()
+        );
+
+        assertBigDecimalEquals(
+                "74.1",
+                result.getAdditionalFixedDamageTotal()
+        );
+
+
+        /*
+         * 2段目火属性
+         */
+        assertBigDecimalEquals(
+                "20",
+                result.getAdditionalFixedElementValuePerHit()
+        );
+
+        assertBigDecimalEquals(
+                "20",
+                result.getAdditionalFixedElementValueTotal()
+        );
+
+
+        System.out.println(
+                "竜撃弾＋砲術Lv3："
+                + "stage1Fixed="
+                + result.getSecondaryFixedDamageTotal()
+                + " / stage1Fire="
+                + result.getSecondaryFixedElementValueTotal()
+                + " / stage2Fixed="
+                + result.getAdditionalFixedDamageTotal()
+                + " / stage2Fire="
+                + result.getAdditionalFixedElementValueTotal()
+        );
+    }
+
+
+    /*
+     * =====================================================
+     * weaponAttack=null
+     * =====================================================
      */
     @Test
     void testNullWeaponAttack() {
@@ -541,8 +859,9 @@ public class BowgunSpecialDamageServiceTest {
 
 
     /*
-     * Modifier=nullでも
-     * 全て0のまま安全に終了する。
+     * =====================================================
+     * Modifier=null
+     * =====================================================
      */
     @Test
     void testNullAmmoModifier() {
@@ -577,6 +896,34 @@ public class BowgunSpecialDamageServiceTest {
     }
 
 
+    /*
+     * =====================================================
+     * 砲術補正作成
+     * =====================================================
+     */
+    private ConditionalSkillModifierTotal createArtilleryModifier(
+            String multiplier) {
+
+        ConditionalSkillModifierTotal modifier
+                = new ConditionalSkillModifierTotal();
+
+
+        modifier.setArtilleryDamageMul(
+                new BigDecimal(
+                        multiplier
+                )
+        );
+
+
+        return modifier;
+    }
+
+
+    /*
+     * =====================================================
+     * 弾作成
+     * =====================================================
+     */
     private BowgunAmmo createAmmo(
             String ammoType,
             Integer ammoLevel) {
@@ -596,6 +943,11 @@ public class BowgunSpecialDamageServiceTest {
     }
 
 
+    /*
+     * =====================================================
+     * BigDecimal比較
+     * =====================================================
+     */
     private void assertBigDecimalEquals(
             String expected,
             BigDecimal actual) {

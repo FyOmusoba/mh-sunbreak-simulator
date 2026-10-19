@@ -102,8 +102,31 @@ public class BowPhysicalModifierServiceTest {
     }
 
 
+    /*
+     * =====================================================
+     * shotMulはこのServiceでは適用しない
+     * =====================================================
+     *
+     * 現在の設計では、
+     *
+     * 通常弾・連射矢強化
+     * 貫通弾・貫通矢強化
+     * 散弾・拡散矢強化
+     *
+     * などのshotMulは、
+     *
+     * ShotSkillModifierService
+     * ↓
+     * BowPhysicalDamageService
+     *
+     * で矢種を判定した後に1回だけ適用する。
+     *
+     * BowPhysicalModifierServiceでは
+     * 基礎物理係数だけを作るため、
+     * shotMul=1.10を渡しても結果は変化しない。
+     */
     @Test
-    void testShotMulIsApplied() {
+    void testShotMulIsNotAppliedHere() {
 
         BowChargeModifier chargeModifier
                 = new BowChargeModifier();
@@ -136,6 +159,13 @@ public class BowPhysicalModifierServiceTest {
         ConditionalSkillModifierTotal conditionalModifier
                 = new ConditionalSkillModifierTotal();
 
+        /*
+         * あえて1.10を渡す。
+         *
+         * ただし、
+         * BowPhysicalModifierServiceでは
+         * 適用されないのが正しい。
+         */
         conditionalModifier.setShotMul(
                 new BigDecimal("1.10")
         );
@@ -150,25 +180,46 @@ public class BowPhysicalModifierServiceTest {
                 );
 
 
+        /*
+         * 12%
+         * × 1.35
+         * × 1.35
+         *
+         * = 0.2187
+         *
+         * shotMul 1.10はここでは掛けない。
+         */
         assertEquals(
                 0,
-                new BigDecimal("0.24057")
+                new BigDecimal("0.2187")
                         .compareTo(
                                 result.getPhysicalRatePerHit()
                         )
         );
 
+
+        /*
+         * 0.2187 × 7
+         *
+         * = 1.5309
+         */
         assertEquals(
                 0,
-                new BigDecimal("1.68399")
+                new BigDecimal("1.5309")
                         .compareTo(
                                 result.getMaxPhysicalRate()
                         )
         );
 
 
+        assertEquals(
+                7,
+                result.getMaxHitCount()
+        );
+
+
         System.out.println(
-                "shotMul 1.10："
+                "shotMul 1.10はこのServiceでは未適用："
                 + " perHit="
                 + result.getPhysicalRatePerHit()
                 + " / max="
@@ -238,6 +289,7 @@ public class BowPhysicalModifierServiceTest {
 
         BowShotModifier shotModifier
                 = new BowShotModifier();
+
 
         BowPhysicalModifier result
                 = bowPhysicalModifierService.calculate(

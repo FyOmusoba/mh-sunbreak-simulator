@@ -11,10 +11,53 @@ import com.example.mhsunbreaksimulator.dto.ConditionalSkillModifierTotal;
 @Service
 public class BowgunSpecialDamageService {
 
+    /*
+     * =====================================================
+     * 従来互換用
+     * =====================================================
+     *
+     * 既存テストや既存処理を壊さないため、
+     * ammoTypeを受け取らない従来版も残す。
+     *
+     * ammoTypeが分からない場合は
+     * 砲術補正を適用しない。
+     */
     public BowgunSpecialDamageResult calculate(
             Integer weaponAttack,
             BowgunAmmoModifier bowgunAmmoModifier,
             ConditionalSkillModifierTotal conditionalSkillModifierTotal) {
+
+        return calculate(
+                weaponAttack,
+                bowgunAmmoModifier,
+                conditionalSkillModifierTotal,
+                null
+        );
+    }
+
+
+    /*
+     * =====================================================
+     * ボウガン特殊弾
+     * =====================================================
+     *
+     * ammoTypeを受け取る版。
+     *
+     * 徹甲榴弾
+     * 竜撃弾
+     *
+     * の固定ダメージ部分には
+     * 砲術倍率を適用する。
+     *
+     * 拡散弾には砲術を適用しない。
+     *
+     * 火属性部分にも砲術を適用しない。
+     */
+    public BowgunSpecialDamageResult calculate(
+            Integer weaponAttack,
+            BowgunAmmoModifier bowgunAmmoModifier,
+            ConditionalSkillModifierTotal conditionalSkillModifierTotal,
+            String ammoType) {
 
         BowgunSpecialDamageResult result
                 = new BowgunSpecialDamageResult();
@@ -28,7 +71,9 @@ public class BowgunSpecialDamageService {
 
 
         /*
-         * 武器の素の攻撃力
+         * =================================================
+         * 武器攻撃力
+         * =================================================
          */
         BigDecimal baseAttack
                 = BigDecimal.valueOf(
@@ -37,36 +82,36 @@ public class BowgunSpecialDamageService {
 
 
         /*
-         * 条件付きスキルによる
+         * 条件付きスキル
          * 攻撃力加算
          */
         BigDecimal attackAdd
                 = conditionalSkillModifierTotal == null
-                        || conditionalSkillModifierTotal.getAttackAdd() == null
+                        || conditionalSkillModifierTotal
+                                .getAttackAdd() == null
                                 ? BigDecimal.ZERO
-                                : conditionalSkillModifierTotal.getAttackAdd();
+                                : conditionalSkillModifierTotal
+                                        .getAttackAdd();
 
 
         /*
-         * 条件付きスキルによる
+         * 条件付きスキル
          * 攻撃力倍率
          */
         BigDecimal attackMul
                 = conditionalSkillModifierTotal == null
-                        || conditionalSkillModifierTotal.getAttackMul() == null
+                        || conditionalSkillModifierTotal
+                                .getAttackMul() == null
                                 ? BigDecimal.ONE
-                                : conditionalSkillModifierTotal.getAttackMul();
+                                : conditionalSkillModifierTotal
+                                        .getAttackMul();
 
 
         /*
          * 条件付き補正後攻撃力
          *
-         * 現段階では既存の
-         * BowgunPhysicalDamageService
-         * と同じ順序。
-         *
          * （基礎攻撃力 + 加算）
-         * × 倍率
+         * × 攻撃力倍率
          */
         BigDecimal effectiveAttack
                 = baseAttack
@@ -79,16 +124,41 @@ public class BowgunSpecialDamageService {
 
 
         /*
-         * -----------------------------
+         * =================================================
+         * 砲術倍率
+         * =================================================
+         *
+         * 対象：
+         *
+         * 徹甲榴弾
+         * 竜撃弾
+         *
+         * 非対象：
+         *
+         * 斬裂弾
+         * 拡散弾
+         *
+         * など。
+         */
+        BigDecimal artilleryDamageMul
+                = resolveArtilleryDamageMultiplier(
+                        ammoType,
+                        conditionalSkillModifierTotal
+                );
+
+
+        /*
+         * =================================================
          * 着弾部分
-         * -----------------------------
+         * =================================================
          *
          * 斬裂弾
          * 徹甲榴弾
          * 拡散弾
+         *
          * などの着弾MV。
          *
-         * ここではまだ肉質を掛けない。
+         * 砲術はここには掛けない。
          */
         BigDecimal impactPhysicalMotionValue
                 = valueOrZero(
@@ -98,14 +168,13 @@ public class BowgunSpecialDamageService {
 
 
         /*
-         * -----------------------------
-         * 二次攻撃：
-         * 通常の物理MV部分
-         * -----------------------------
+         * =================================================
+         * 二次物理MV
+         * =================================================
          *
-         * 斬裂弾の炸裂MVなど。
+         * 主に斬裂弾。
          *
-         * これもまだ肉質を掛けない。
+         * 砲術は掛けない。
          */
         BigDecimal secondaryPhysicalMotionValuePerHit
                 = valueOrZero(
@@ -122,18 +191,15 @@ public class BowgunSpecialDamageService {
 
 
         /*
-         * -----------------------------
-         * 二次攻撃：
-         * 固定ダメージ部分
-         * -----------------------------
+         * =================================================
+         * 二次固定ダメージ
+         * =================================================
          *
          * 徹甲榴弾
          * 拡散弾
          * 竜撃弾1段目
          *
          * など。
-         *
-         * 攻撃力 × 固定MV ÷ 100
          */
         BigDecimal secondaryFixedDamageMotionValue
                 = valueOrZero(
@@ -142,6 +208,14 @@ public class BowgunSpecialDamageService {
                 );
 
 
+        /*
+         * 固定ダメージ
+         *
+         * 攻撃力
+         * × 固定MV
+         * ÷ 100
+         * × 砲術倍率
+         */
         BigDecimal secondaryFixedDamagePerHit
                 = effectiveAttack
                         .multiply(
@@ -149,6 +223,9 @@ public class BowgunSpecialDamageService {
                         )
                         .movePointLeft(
                                 2
+                        )
+                        .multiply(
+                                artilleryDamageMul
                         );
 
 
@@ -162,21 +239,13 @@ public class BowgunSpecialDamageService {
 
 
         /*
-         * 二次攻撃部分の
-         * 攻撃力非依存属性値。
+         * =================================================
+         * 二次火属性部分
+         * =================================================
          *
-         * 例：
+         * 徹甲榴弾Lv3なら火5など。
          *
-         * 徹甲榴弾Lv1
-         * 火3
-         *
-         * 拡散弾Lv3
-         * 火10
-         *
-         * 竜撃弾1段目
-         * 火40
-         *
-         * ここではまだ属性肉質を掛けない。
+         * 砲術では増加しない。
          */
         BigDecimal secondaryFixedElementValuePerHit
                 = valueOrZero(
@@ -195,12 +264,15 @@ public class BowgunSpecialDamageService {
 
 
         /*
-         * -----------------------------
-         * 値の異なる追加攻撃部分
-         * -----------------------------
+         * =================================================
+         * 追加固定ダメージ
+         * =================================================
          *
          * 現在は主に
-         * 竜撃弾2段目用。
+         * 竜撃弾2段目。
+         *
+         * 竜撃弾なので
+         * ここにも砲術倍率を適用する。
          */
         BigDecimal additionalFixedDamageMotionValue
                 = valueOrZero(
@@ -223,6 +295,9 @@ public class BowgunSpecialDamageService {
                         )
                         .movePointLeft(
                                 2
+                        )
+                        .multiply(
+                                artilleryDamageMul
                         );
 
 
@@ -235,6 +310,15 @@ public class BowgunSpecialDamageService {
                         );
 
 
+        /*
+         * =================================================
+         * 追加火属性
+         * =================================================
+         *
+         * 竜撃弾2段目など。
+         *
+         * 砲術では増加しない。
+         */
         BigDecimal additionalFixedElementValuePerHit
                 = valueOrZero(
                         bowgunAmmoModifier
@@ -252,9 +336,9 @@ public class BowgunSpecialDamageService {
 
 
         /*
-         * -----------------------------
-         * Resultへ格納
-         * -----------------------------
+         * =================================================
+         * Result
+         * =================================================
          */
 
         result.setEffectiveAttack(
@@ -345,7 +429,69 @@ public class BowgunSpecialDamageService {
 
 
     /*
-     * BigDecimalがnullなら0
+     * =====================================================
+     * 砲術倍率
+     * =====================================================
+     */
+    private BigDecimal resolveArtilleryDamageMultiplier(
+            String ammoType,
+            ConditionalSkillModifierTotal conditionalSkillModifierTotal) {
+
+        /*
+         * 徹甲榴弾・竜撃弾以外は
+         * 砲術対象外。
+         */
+        if (!isArtilleryAmmo(
+                ammoType
+        )) {
+
+            return BigDecimal.ONE;
+        }
+
+
+        /*
+         * スキル補正なし
+         */
+        if (conditionalSkillModifierTotal == null
+                || conditionalSkillModifierTotal
+                        .getArtilleryDamageMul() == null) {
+
+            return BigDecimal.ONE;
+        }
+
+
+        return conditionalSkillModifierTotal
+                .getArtilleryDamageMul();
+    }
+
+
+    /*
+     * =====================================================
+     * 砲術対象弾
+     * =====================================================
+     */
+    private boolean isArtilleryAmmo(
+            String ammoType) {
+
+        if (ammoType == null) {
+
+            return false;
+        }
+
+
+        return "徹甲榴弾".equals(
+                ammoType
+        )
+                || "竜撃弾".equals(
+                        ammoType
+                );
+    }
+
+
+    /*
+     * =====================================================
+     * null安全
+     * =====================================================
      */
     private BigDecimal valueOrZero(
             BigDecimal value) {
@@ -367,6 +513,7 @@ public class BowgunSpecialDamageService {
 
             return 0;
         }
+
 
         return value;
     }

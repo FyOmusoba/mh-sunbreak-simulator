@@ -19,6 +19,8 @@ import com.example.mhsunbreaksimulator.dto.BowgunAmmoModifier;
 import com.example.mhsunbreaksimulator.dto.BowgunElementDamageResult;
 import com.example.mhsunbreaksimulator.dto.BowgunPhysicalDamageResult;
 import com.example.mhsunbreaksimulator.dto.BowgunRapidFireModifier;
+import com.example.mhsunbreaksimulator.dto.BowgunSpecialDamageResult;
+import com.example.mhsunbreaksimulator.dto.BowgunSpecialFinalDamageResult;
 import com.example.mhsunbreaksimulator.dto.ConditionalSkillModifierTotal;
 import com.example.mhsunbreaksimulator.dto.CriticalModifierResult;
 import com.example.mhsunbreaksimulator.dto.ElementHitzoneDamageResult;
@@ -36,6 +38,8 @@ import com.example.mhsunbreaksimulator.entity.Weapon;
 import com.example.mhsunbreaksimulator.service.BowPhysicalDamageService;
 import com.example.mhsunbreaksimulator.service.BowgunElementDamageService;
 import com.example.mhsunbreaksimulator.service.BowgunPhysicalDamageService;
+import com.example.mhsunbreaksimulator.service.BowgunSpecialDamageService;
+import com.example.mhsunbreaksimulator.service.BowgunSpecialFinalDamageService;
 import com.example.mhsunbreaksimulator.service.CriticalModifierService;
 import com.example.mhsunbreaksimulator.service.ElementHitzoneDamageService;
 import com.example.mhsunbreaksimulator.service.FinalDamageService;
@@ -59,15 +63,23 @@ public class ShotDamageWebConfig
 
     private final BowgunElementDamageService bowgunElementDamageService;
 
-    private final PhysicalHitzoneDamageService physicalHitzoneDamageService;
+    private final BowgunSpecialDamageService bowgunSpecialDamageService;
 
-    private final ElementHitzoneDamageService elementHitzoneDamageService;
+    private final BowgunSpecialFinalDamageService
+            bowgunSpecialFinalDamageService;
+
+    private final PhysicalHitzoneDamageService
+            physicalHitzoneDamageService;
+
+    private final ElementHitzoneDamageService
+            elementHitzoneDamageService;
 
     private final FinalDamageService finalDamageService;
 
     private final MonsterWeakpointService monsterWeakpointService;
 
-    private final WeakpointSkillModifierService weakpointSkillModifierService;
+    private final WeakpointSkillModifierService
+            weakpointSkillModifierService;
 
     private final CriticalModifierService criticalModifierService;
 
@@ -95,11 +107,6 @@ public class ShotDamageWebConfig
     }
 
 
-    /*
-     * =====================================================
-     * 射撃系スキル補正
-     * =====================================================
-     */
     private void applyShotSkillDamage(
             ModelAndView modelAndView) {
 
@@ -121,11 +128,6 @@ public class ShotDamageWebConfig
                 = modelAndView.getModel();
 
 
-        /*
-         * =================================================
-         * 武器
-         * =================================================
-         */
         Object weaponObject
                 = model.get(
                         "weapon"
@@ -139,9 +141,6 @@ public class ShotDamageWebConfig
         }
 
 
-        /*
-         * 弓・ライト・ヘビィ以外は対象外
-         */
         if (!isShotWeapon(
                 weapon.getWeaponType()
         )) {
@@ -150,11 +149,6 @@ public class ShotDamageWebConfig
         }
 
 
-        /*
-         * =================================================
-         * 解決済みスキル効果
-         * =================================================
-         */
         Map<Integer, SkillEffectState> resolvedSkillEffects
                 = getResolvedSkillEffects(
                         model.get(
@@ -163,12 +157,8 @@ public class ShotDamageWebConfig
                 );
 
 
-        /*
-         * =================================================
-         * 条件付きスキル補正合計
-         * =================================================
-         */
-        ConditionalSkillModifierTotal conditionalSkillModifierTotal
+        ConditionalSkillModifierTotal
+                conditionalSkillModifierTotal
                 = null;
 
 
@@ -186,11 +176,6 @@ public class ShotDamageWebConfig
         }
 
 
-        /*
-         * =================================================
-         * 弓
-         * =================================================
-         */
         if ("弓".equals(
                 weapon.getWeaponType()
         )) {
@@ -204,11 +189,6 @@ public class ShotDamageWebConfig
         }
 
 
-        /*
-         * =================================================
-         * ライト / ヘビィ
-         * =================================================
-         */
         else {
 
             applyBowgun(
@@ -219,12 +199,6 @@ public class ShotDamageWebConfig
             );
 
 
-            /*
-             * ボウガンでは、
-             * 武器本体ではなく
-             * 選択中の属性弾を基準に
-             * 属性肉質・弱点判定を更新する。
-             */
             applyBowgunElementContext(
                     model,
                     weapon,
@@ -235,14 +209,32 @@ public class ShotDamageWebConfig
 
 
         /*
-         * =================================================
-         * 肉質・最終ダメージ再計算
-         * =================================================
+         * まず通常ルートを計算。
          */
         recalculateFinalDamage(
                 model,
                 weapon
         );
+
+
+        /*
+         * ボウガン特殊弾の場合は
+         * 最後に特殊弾結果へ差し替える。
+         */
+        if ("ライトボウガン".equals(
+                weapon.getWeaponType()
+        )
+                || "ヘビィボウガン".equals(
+                        weapon.getWeaponType()
+                )) {
+
+            applyBowgunSpecialFinalDamage(
+                    model,
+                    weapon,
+                    resolvedSkillEffects,
+                    conditionalSkillModifierTotal
+            );
+        }
     }
 
 
@@ -255,7 +247,8 @@ public class ShotDamageWebConfig
             Map<String, Object> model,
             Weapon weapon,
             Map<Integer, SkillEffectState> resolvedSkillEffects,
-            ConditionalSkillModifierTotal conditionalSkillModifierTotal) {
+            ConditionalSkillModifierTotal
+                    conditionalSkillModifierTotal) {
 
         Object bowChargeObject
                 = model.get(
@@ -283,9 +276,6 @@ public class ShotDamageWebConfig
         }
 
 
-        /*
-         * 現在の矢種に対応したスキル倍率
-         */
         ShotSkillModifier shotSkillModifier
                 = shotSkillModifierService.calculateBow(
                         selectedBowCharge,
@@ -299,9 +289,6 @@ public class ShotDamageWebConfig
         );
 
 
-        /*
-         * 弓物理再計算
-         */
         BowPhysicalDamageResult bowPhysicalDamageResult
                 = bowPhysicalDamageService.calculate(
                         weapon.getAttack(),
@@ -320,14 +307,15 @@ public class ShotDamageWebConfig
 
     /*
      * =====================================================
-     * ライト / ヘビィ
+     * ボウガン
      * =====================================================
      */
     private void applyBowgun(
             Map<String, Object> model,
             Weapon weapon,
             Map<Integer, SkillEffectState> resolvedSkillEffects,
-            ConditionalSkillModifierTotal conditionalSkillModifierTotal) {
+            ConditionalSkillModifierTotal
+                    conditionalSkillModifierTotal) {
 
         Object bowgunAmmoObject
                 = model.get(
@@ -373,9 +361,6 @@ public class ShotDamageWebConfig
         }
 
 
-        /*
-         * 現在の弾種・速射状態に対応した倍率
-         */
         ShotSkillModifier shotSkillModifier
                 = shotSkillModifierService.calculateBowgun(
                         selectedBowgunAmmo,
@@ -390,9 +375,7 @@ public class ShotDamageWebConfig
 
 
         /*
-         * =================================================
-         * 物理
-         * =================================================
+         * 通常物理
          */
         BowgunPhysicalDamageResult bowgunPhysicalDamageResult
                 = bowgunPhysicalDamageService.calculate(
@@ -411,9 +394,7 @@ public class ShotDamageWebConfig
 
 
         /*
-         * =================================================
-         * 属性
-         * =================================================
+         * 通常属性
          */
         BowgunElementDamageResult bowgunElementDamageResult
                 = bowgunElementDamageService.calculate(
@@ -429,34 +410,445 @@ public class ShotDamageWebConfig
                 "bowgunElementDamageResult",
                 bowgunElementDamageResult
         );
+
+
+        /*
+         * 特殊弾
+         */
+        BowgunSpecialDamageResult bowgunSpecialDamageResult
+                = bowgunSpecialDamageService.calculate(
+                        weapon.getAttack(),
+                        bowgunAmmoModifier,
+                        conditionalSkillModifierTotal,
+                        selectedBowgunAmmo.getAmmoType()
+                );
+
+
+        model.put(
+                "bowgunSpecialDamageResult",
+                bowgunSpecialDamageResult
+        );
     }
 
 
     /*
      * =====================================================
-     * ボウガン属性弾用
-     * 肉質・弱点判定更新
+     * ボウガン特殊弾
+     * 最終ダメージ
+     * =====================================================
+     */
+    private void applyBowgunSpecialFinalDamage(
+            Map<String, Object> model,
+            Weapon weapon,
+            Map<Integer, SkillEffectState> resolvedSkillEffects,
+            ConditionalSkillModifierTotal
+                    conditionalSkillModifierTotal) {
+
+        Object ammoObject
+                = model.get(
+                        "selectedBowgunAmmo"
+                );
+
+
+        if (!(ammoObject
+                instanceof BowgunAmmo selectedBowgunAmmo)) {
+
+            model.put(
+                    "bowgunSpecialFinalDamageResult",
+                    null
+            );
+
+            return;
+        }
+
+
+        /*
+         * 通常弾・属性弾なら
+         * 特殊弾処理はしない。
+         */
+        if (!isBowgunSpecialDamageAmmo(
+                selectedBowgunAmmo.getAmmoType()
+        )) {
+
+            model.put(
+                    "bowgunSpecialFinalDamageResult",
+                    null
+            );
+
+            return;
+        }
+
+
+        Object specialDamageObject
+                = model.get(
+                        "bowgunSpecialDamageResult"
+                );
+
+
+        if (!(specialDamageObject
+                instanceof BowgunSpecialDamageResult
+                        bowgunSpecialDamageResult)) {
+
+            model.put(
+                    "bowgunSpecialFinalDamageResult",
+                    null
+            );
+
+            return;
+        }
+
+
+        Object hitzoneObject
+                = model.get(
+                        "selectedHitzone"
+                );
+
+
+        if (!(hitzoneObject
+                instanceof MonsterHitzone selectedHitzone)) {
+
+            model.put(
+                    "bowgunSpecialFinalDamageResult",
+                    null
+            );
+
+            return;
+        }
+
+
+        /*
+         * 特殊弾専用計算
+         */
+        BowgunSpecialFinalDamageResult
+                bowgunSpecialFinalDamageResult
+                = bowgunSpecialFinalDamageService.calculate(
+                        selectedBowgunAmmo,
+                        bowgunSpecialDamageResult,
+                        selectedHitzone,
+                        weapon.getAffinity(),
+                        conditionalSkillModifierTotal,
+                        resolvedSkillEffects
+                );
+
+
+        model.put(
+                "bowgunSpecialFinalDamageResult",
+                bowgunSpecialFinalDamageResult
+        );
+
+
+        /*
+         * 既存の最終ダメージ表示用DTOへ変換。
+         */
+        FinalDamageResult specialFinalDamageResult
+                = convertSpecialFinalDamageResult(
+                        bowgunSpecialFinalDamageResult
+                );
+
+
+        model.put(
+                "finalDamageResult",
+                specialFinalDamageResult
+        );
+
+
+        /*
+         * =================================================
+         * 特殊弾選択中は
+         * 通常弾・属性弾用の途中表示を隠す
+         * =================================================
+         */
+        hideNormalBowgunDamageBlocksForSpecialAmmo(
+                model
+        );
+    }
+
+
+    /*
+     * =====================================================
+     * 特殊弾選択中
+     * 通常弾用表示を非表示
      * =====================================================
      *
-     * ボウガン本体は基本的に無属性。
+     * simulator.html側には既に
      *
-     * そのため、
+     * th:if="${... != null}"
      *
-     * 火炎弾
-     * 水冷弾
-     * 電撃弾
-     * 氷結弾
-     * 滅龍弾
-     *
-     * などを撃つ場合は、
-     * 武器本体ではなく弾種から
-     * 使用する属性を決定する必要がある。
+     * が入っているので、
+     * Modelをnullにするだけで
+     * HTML変更なしで非表示にできる。
+     */
+    private void hideNormalBowgunDamageBlocksForSpecialAmmo(
+            Map<String, Object> model) {
+
+        /*
+         * 「ボウガン弾・計算用データ」
+         */
+        model.put(
+                "bowgunAmmoModifier",
+                null
+        );
+
+
+        /*
+         * 「ボウガン物理ダメージ計算途中値」
+         */
+        model.put(
+                "bowgunPhysicalDamageResult",
+                null
+        );
+
+
+        /*
+         * 「ボウガン属性ダメージ計算途中値」
+         */
+        model.put(
+                "bowgunElementDamageResult",
+                null
+        );
+
+
+        /*
+         * 「物理肉質適用後」
+         */
+        model.put(
+                "physicalHitzoneDamageResult",
+                null
+        );
+
+
+        /*
+         * 「属性肉質適用後」
+         */
+        model.put(
+                "elementHitzoneDamageResult",
+                null
+        );
+
+
+        /*
+         * 特殊弾では速射補正表示も不要。
+         */
+        model.put(
+                "bowgunRapidFireModifier",
+                null
+        );
+    }
+
+
+    /*
+     * =====================================================
+     * 特殊弾
+     * ↓
+     * FinalDamageResult
+     * =====================================================
+     */
+    private FinalDamageResult convertSpecialFinalDamageResult(
+            BowgunSpecialFinalDamageResult specialResult) {
+
+        FinalDamageResult result
+                = new FinalDamageResult();
+
+
+        if (specialResult == null) {
+
+            return result;
+        }
+
+
+        BigDecimal normalPhysicalBeforeRound
+                = safeBigDecimal(
+                        specialResult
+                                .getImpactNormalPhysicalDamage()
+                )
+                        .add(
+                                safeBigDecimal(
+                                        specialResult
+                                                .getSecondaryNormalPhysicalDamageTotal()
+                                )
+                        )
+                        .add(
+                                safeBigDecimal(
+                                        specialResult
+                                                .getSecondaryFixedDamageTotal()
+                                )
+                        )
+                        .add(
+                                safeBigDecimal(
+                                        specialResult
+                                                .getAdditionalFixedDamageTotal()
+                                )
+                        );
+
+
+        BigDecimal normalElementBeforeRound
+                = safeBigDecimal(
+                        specialResult
+                                .getSecondaryElementDamageTotal()
+                )
+                        .add(
+                                safeBigDecimal(
+                                        specialResult
+                                                .getAdditionalElementDamageTotal()
+                                )
+                        );
+
+
+        result.setNormalPhysicalDamageBeforeRound(
+                normalPhysicalBeforeRound
+        );
+
+        result.setNormalElementDamageBeforeRound(
+                normalElementBeforeRound
+        );
+
+
+        BigDecimal positivePhysicalBeforeRound
+                = safeBigDecimal(
+                        specialResult
+                                .getImpactPositiveCriticalPhysicalDamage()
+                )
+                        .add(
+                                safeBigDecimal(
+                                        specialResult
+                                                .getSecondaryPositiveCriticalPhysicalDamageTotal()
+                                )
+                        )
+                        .add(
+                                safeBigDecimal(
+                                        specialResult
+                                                .getSecondaryFixedDamageTotal()
+                                )
+                        )
+                        .add(
+                                safeBigDecimal(
+                                        specialResult
+                                                .getAdditionalFixedDamageTotal()
+                                )
+                        );
+
+
+        result.setPositiveCriticalPhysicalDamageBeforeRound(
+                positivePhysicalBeforeRound
+        );
+
+        result.setPositiveCriticalElementDamageBeforeRound(
+                normalElementBeforeRound
+        );
+
+
+        BigDecimal negativePhysicalBeforeRound
+                = safeBigDecimal(
+                        specialResult
+                                .getImpactNegativeCriticalPhysicalDamage()
+                )
+                        .add(
+                                safeBigDecimal(
+                                        specialResult
+                                                .getSecondaryNegativeCriticalPhysicalDamageTotal()
+                                )
+                        )
+                        .add(
+                                safeBigDecimal(
+                                        specialResult
+                                                .getSecondaryFixedDamageTotal()
+                                )
+                        )
+                        .add(
+                                safeBigDecimal(
+                                        specialResult
+                                                .getAdditionalFixedDamageTotal()
+                                )
+                        );
+
+
+        result.setNegativeCriticalPhysicalDamageBeforeRound(
+                negativePhysicalBeforeRound
+        );
+
+
+        result.setNormalPhysicalDamage(
+                safeInteger(
+                        specialResult
+                                .getNormalPhysicalDamage()
+                )
+        );
+
+        result.setNormalElementDamage(
+                safeInteger(
+                        specialResult
+                                .getNormalElementDamage()
+                )
+        );
+
+        result.setNormalTotalDamage(
+                safeInteger(
+                        specialResult
+                                .getNormalTotalDamage()
+                )
+        );
+
+
+        result.setPositiveCriticalPhysicalDamage(
+                safeInteger(
+                        specialResult
+                                .getPositiveCriticalPhysicalDamage()
+                )
+        );
+
+        result.setPositiveCriticalElementDamage(
+                safeInteger(
+                        specialResult
+                                .getPositiveCriticalElementDamage()
+                )
+        );
+
+        result.setPositiveCriticalTotalDamage(
+                safeInteger(
+                        specialResult
+                                .getPositiveCriticalTotalDamage()
+                )
+        );
+
+
+        result.setNegativeCriticalPhysicalDamage(
+                safeInteger(
+                        specialResult
+                                .getNegativeCriticalPhysicalDamage()
+                )
+        );
+
+        result.setNegativeCriticalElementDamage(
+                safeInteger(
+                        specialResult
+                                .getNegativeCriticalElementDamage()
+                )
+        );
+
+        result.setNegativeCriticalTotalDamage(
+                safeInteger(
+                        specialResult
+                                .getNegativeCriticalTotalDamage()
+                )
+        );
+
+
+        return result;
+    }
+
+
+    /*
+     * =====================================================
+     * ボウガン属性弾
+     * 属性コンテキスト
+     * =====================================================
      */
     private void applyBowgunElementContext(
             Map<String, Object> model,
             Weapon weapon,
             Map<Integer, SkillEffectState> resolvedSkillEffects,
-            ConditionalSkillModifierTotal conditionalSkillModifierTotal) {
+            ConditionalSkillModifierTotal
+                    conditionalSkillModifierTotal) {
 
         Object ammoObject
                 = model.get(
@@ -471,11 +863,6 @@ public class ShotDamageWebConfig
         }
 
 
-        /*
-         * 弾から五属性を取得。
-         *
-         * 非属性弾ならnull。
-         */
         String ammoElementType
                 = resolveBowgunAmmoElementType(
                         selectedBowgunAmmo
@@ -483,10 +870,6 @@ public class ShotDamageWebConfig
                 );
 
 
-        /*
-         * 非属性弾の場合は、
-         * Controller側の通常結果をそのまま使用。
-         */
         if (ammoElementType == null) {
 
             return;
@@ -513,17 +896,13 @@ public class ShotDamageWebConfig
 
 
         if (!(hitzoneValueObject
-                instanceof MonsterHitzoneValueResult hitzoneValueResult)) {
+                instanceof MonsterHitzoneValueResult
+                        hitzoneValueResult)) {
 
             return;
         }
 
 
-        /*
-         * =================================================
-         * 弾属性を主属性として設定
-         * =================================================
-         */
         hitzoneValueResult.setElementType(
                 ammoElementType
         );
@@ -548,11 +927,6 @@ public class ShotDamageWebConfig
         );
 
 
-        /*
-         * =================================================
-         * 属性弱点判定再計算
-         * =================================================
-         */
         MonsterWeakpointResult monsterWeakpointResult
                 = monsterWeakpointService.calculate(
                         hitzoneValueResult
@@ -565,13 +939,6 @@ public class ShotDamageWebConfig
         );
 
 
-        /*
-         * =================================================
-         * 弱点特効
-         * 弱点特効【属性】
-         * 再計算
-         * =================================================
-         */
         WeakpointSkillModifier weakpointSkillModifier
                 = weakpointSkillModifierService.calculate(
                         monsterWeakpointResult,
@@ -585,15 +952,6 @@ public class ShotDamageWebConfig
         );
 
 
-        /*
-         * =================================================
-         * 会心率再計算
-         * =================================================
-         *
-         * 弱点特効の物理判定自体は同じだが、
-         * WeakpointSkillModifierを作り直したため
-         * CriticalModifierも同期して更新する。
-         */
         CriticalModifierResult criticalModifierResult
                 = criticalModifierService.calculate(
                         weapon.getAffinity(),
@@ -611,7 +969,7 @@ public class ShotDamageWebConfig
 
     /*
      * =====================================================
-     * ボウガン弾 → 五属性
+     * ボウガン弾 → 属性
      * =====================================================
      */
     private String resolveBowgunAmmoElementType(
@@ -664,7 +1022,36 @@ public class ShotDamageWebConfig
 
     /*
      * =====================================================
-     * 属性 → モンスター肉質
+     * 特殊弾判定
+     * =====================================================
+     */
+    private boolean isBowgunSpecialDamageAmmo(
+            String ammoType) {
+
+        if (ammoType == null) {
+
+            return false;
+        }
+
+
+        return "斬裂弾".equals(
+                ammoType
+        )
+                || "徹甲榴弾".equals(
+                        ammoType
+                )
+                || "拡散弾".equals(
+                        ammoType
+                )
+                || "竜撃弾".equals(
+                        ammoType
+                );
+    }
+
+
+    /*
+     * =====================================================
+     * 属性肉質
      * =====================================================
      */
     private int resolveElementHitzone(
@@ -734,13 +1121,16 @@ public class ShotDamageWebConfig
 
     /*
      * =====================================================
-     * 肉質適用後・最終ダメージ
+     * 通常射撃
+     * 最終ダメージ再計算
      * =====================================================
      */
     private void recalculateFinalDamage(
             Map<String, Object> model,
             Weapon weapon) {
-        MonsterHitzoneValueResult monsterHitzoneValueResult
+
+        MonsterHitzoneValueResult
+                monsterHitzoneValueResult
                 = null;
 
 
@@ -758,9 +1148,6 @@ public class ShotDamageWebConfig
         }
 
 
-        /*
-         * 部位未選択なら肉質後計算なし。
-         */
         if (monsterHitzoneValueResult == null) {
 
             return;
@@ -859,12 +1246,8 @@ public class ShotDamageWebConfig
         }
 
 
-        /*
-         * =================================================
-         * 物理肉質
-         * =================================================
-         */
-        PhysicalHitzoneDamageResult physicalHitzoneDamageResult
+        PhysicalHitzoneDamageResult
+                physicalHitzoneDamageResult
                 = null;
 
 
@@ -895,9 +1278,6 @@ public class ShotDamageWebConfig
                 = null;
 
 
-        /*
-         * 弓
-         */
         if ("弓".equals(
                 weapon.getWeaponType()
         )) {
@@ -917,9 +1297,6 @@ public class ShotDamageWebConfig
         }
 
 
-        /*
-         * ボウガン
-         */
         else {
 
             Object resultObject
@@ -937,12 +1314,8 @@ public class ShotDamageWebConfig
         }
 
 
-        /*
-         * =================================================
-         * 属性肉質
-         * =================================================
-         */
-        ElementHitzoneDamageResult elementHitzoneDamageResult
+        ElementHitzoneDamageResult
+                elementHitzoneDamageResult
                 = null;
 
 
@@ -983,7 +1356,7 @@ public class ShotDamageWebConfig
 
         /*
          * =================================================
-         * 最終ダメージ
+         * 最終
          * =================================================
          */
         FinalDamageResult finalDamageResult
@@ -1010,12 +1383,13 @@ public class ShotDamageWebConfig
 
     /*
      * =====================================================
-     * resolvedSkillEffects取得
+     * resolvedSkillEffects
      * =====================================================
      */
     @SuppressWarnings("unchecked")
-    private Map<Integer, SkillEffectState> getResolvedSkillEffects(
-            Object value) {
+    private Map<Integer, SkillEffectState>
+            getResolvedSkillEffects(
+                    Object value) {
 
         if (!(value instanceof Map<?, ?> map)) {
 
@@ -1042,6 +1416,24 @@ public class ShotDamageWebConfig
 
 
         return (Map<Integer, SkillEffectState>) value;
+    }
+
+
+    private BigDecimal safeBigDecimal(
+            BigDecimal value) {
+
+        return value == null
+                ? BigDecimal.ZERO
+                : value;
+    }
+
+
+    private int safeInteger(
+            Integer value) {
+
+        return value == null
+                ? 0
+                : value;
     }
 
 
