@@ -9,6 +9,49 @@
     <h1>装備シミュレーター</h1>
 
     <!-- ================================================== -->
+    <!-- プリセット保存 -->
+    <!-- ================================================== -->
+
+    <h2>プリセット保存</h2>
+
+    <p th:if="${param.presetSaved != null
+               and param.presetSaved[0] == 'true'}">
+        プリセットを保存しました。
+    </p>
+
+    <p th:if="${param.presetError != null}"
+       th:text="${param.presetError[0]}">
+    </p>
+
+    <form id="presetSaveForm"
+          th:action="@{/preset/save}"
+          method="post"
+          onsubmit="return preparePresetSave()">
+
+        <label for="presetName">
+            プリセット名：
+        </label>
+
+        <input type="text"
+               id="presetName"
+               name="presetName"
+               required
+               autocomplete="off">
+
+        <button type="submit"
+                th:disabled="${weapon == null}">
+            現在の装備を保存
+        </button>
+
+    </form>
+
+    <p th:if="${weapon == null}">
+        プリセットを保存するには武器を選択してください。
+    </p>
+
+    <br>
+
+    <!-- ================================================== -->
     <!-- 武器 -->
     <!-- ================================================== -->
     <h2>選択中の武器</h2>
@@ -2677,6 +2720,105 @@
     </button>
 
     <script>
+
+        function preparePresetSave() {
+
+            const form
+                    = document.getElementById(
+                            "presetSaveForm"
+                    );
+
+            if (!form) {
+                return false;
+            }
+
+            form.querySelectorAll(
+                    ".preset-state-hidden"
+            ).forEach(
+                    input => input.remove()
+            );
+
+            const params
+                    = new URLSearchParams(
+                            window.location.search
+                    );
+
+            const excludedNames
+                    = new Set([
+                        "presetName",
+                        "presetSaved",
+                        "presetError",
+                        "_csrf"
+                    ]);
+
+            for (const [name, value] of params.entries()) {
+
+                if (excludedNames.has(name)) {
+                    continue;
+                }
+
+                const input
+                        = document.createElement(
+                                "input"
+                        );
+
+                input.type
+                        = "hidden";
+
+                input.name
+                        = name;
+
+                input.value
+                        = value;
+
+                input.className
+                        = "preset-state-hidden";
+
+                form.appendChild(
+                        input
+                );
+            }
+
+            return true;
+        }
+
+
+        document.addEventListener(
+                "DOMContentLoaded",
+                function() {
+
+                    const url
+                            = new URL(
+                                    window.location.href
+                            );
+
+                    const hasPresetMessage
+                            = url.searchParams.has(
+                                    "presetSaved"
+                            )
+                            || url.searchParams.has(
+                                    "presetError"
+                            );
+
+                    if (!hasPresetMessage) {
+                        return;
+                    }
+
+                    url.searchParams.delete(
+                            "presetSaved"
+                    );
+
+                    url.searchParams.delete(
+                            "presetError"
+                    );
+
+                    window.history.replaceState(
+                            {},
+                            document.title,
+                            url.toString()
+                    );
+                }
+        );
 
         function currentUrlFor(path) {
 
