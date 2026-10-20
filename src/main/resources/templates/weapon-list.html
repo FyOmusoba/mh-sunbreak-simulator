@@ -10,128 +10,26 @@
 
     <h1>武器一覧</h1>
 
-    <form th:action="@{/weapon-list}"
-          th:object="${simulatorForm}"
-          method="get">
 
-        <!-- ============================== -->
-        <!-- 現在の武器 -->
-        <!-- ============================== -->
+    <!-- ================================================== -->
+    <!-- 武器種絞り込み -->
+    <!-- ================================================== -->
 
-        <input type="hidden" th:field="*{weaponId}">
+    <form id="weaponFilterForm"
+          th:action="@{/weapon-list}"
+          method="get"
+          onsubmit="return filterWeaponList()">
 
+        <label for="weaponTypeSelect">
+            武器種：
+        </label>
 
-        <!-- ============================== -->
-        <!-- 弓設定 -->
-        <!-- ============================== -->
-
-        <input type="hidden" th:field="*{bowChargeId}">
-        <input type="hidden" th:field="*{bowCoatingId}">
-
-
-        <!-- ============================== -->
-        <!-- 防具 -->
-        <!-- ============================== -->
-
-        <input type="hidden" th:field="*{headArmorId}">
-        <input type="hidden" th:field="*{chestArmorId}">
-        <input type="hidden" th:field="*{armArmorId}">
-        <input type="hidden" th:field="*{waistArmorId}">
-        <input type="hidden" th:field="*{legArmorId}">
-
-
-        <!-- ============================== -->
-        <!-- 武器装飾品 -->
-        <!-- ============================== -->
-
-        <input type="hidden" th:field="*{weaponDecoration1Id}">
-        <input type="hidden" th:field="*{weaponDecoration2Id}">
-        <input type="hidden" th:field="*{weaponDecoration3Id}">
-
-
-        <!-- ============================== -->
-        <!-- 頭装飾品 -->
-        <!-- ============================== -->
-
-        <input type="hidden" th:field="*{headDecoration1Id}">
-        <input type="hidden" th:field="*{headDecoration2Id}">
-        <input type="hidden" th:field="*{headDecoration3Id}">
-
-
-        <!-- ============================== -->
-        <!-- 胴装飾品 -->
-        <!-- ============================== -->
-
-        <input type="hidden" th:field="*{chestDecoration1Id}">
-        <input type="hidden" th:field="*{chestDecoration2Id}">
-        <input type="hidden" th:field="*{chestDecoration3Id}">
-
-
-        <!-- ============================== -->
-        <!-- 腕装飾品 -->
-        <!-- ============================== -->
-
-        <input type="hidden" th:field="*{armDecoration1Id}">
-        <input type="hidden" th:field="*{armDecoration2Id}">
-        <input type="hidden" th:field="*{armDecoration3Id}">
-
-
-        <!-- ============================== -->
-        <!-- 腰装飾品 -->
-        <!-- ============================== -->
-
-        <input type="hidden" th:field="*{waistDecoration1Id}">
-        <input type="hidden" th:field="*{waistDecoration2Id}">
-        <input type="hidden" th:field="*{waistDecoration3Id}">
-
-
-        <!-- ============================== -->
-        <!-- 脚装飾品 -->
-        <!-- ============================== -->
-
-        <input type="hidden" th:field="*{legDecoration1Id}">
-        <input type="hidden" th:field="*{legDecoration2Id}">
-        <input type="hidden" th:field="*{legDecoration3Id}">
-
-
-        <!-- ============================== -->
-        <!-- 護石スキル -->
-        <!-- ============================== -->
-
-        <input type="hidden" th:field="*{talismanSkill1Id}">
-        <input type="hidden" th:field="*{talismanSkill1Level}">
-        <input type="hidden" th:field="*{talismanSkill2Id}">
-        <input type="hidden" th:field="*{talismanSkill2Level}">
-
-
-        <!-- ============================== -->
-        <!-- 護石スロット -->
-        <!-- ============================== -->
-
-        <input type="hidden" th:field="*{talismanSlot1Size}">
-        <input type="hidden" th:field="*{talismanSlot2Size}">
-        <input type="hidden" th:field="*{talismanSlot3Size}">
-
-
-        <!-- ============================== -->
-        <!-- 護石装飾品 -->
-        <!-- ============================== -->
-
-        <input type="hidden" th:field="*{talismanDecoration1Id}">
-        <input type="hidden" th:field="*{talismanDecoration2Id}">
-        <input type="hidden" th:field="*{talismanDecoration3Id}">
-
-
-        <!-- ============================== -->
-        <!-- 武器種絞り込み -->
-        <!-- ============================== -->
-
-        <label>武器種：</label>
-
-        <select name="weaponType">
+        <select id="weaponTypeSelect"
+                name="weaponType">
 
             <option value=""
-                    th:selected="${selectedWeaponType == null or selectedWeaponType == ''}">
+                    th:selected="${selectedWeaponType == null
+                        or selectedWeaponType == ''}">
                 すべて
             </option>
 
@@ -213,7 +111,13 @@
 
     </form>
 
+
     <br>
+
+
+    <!-- ================================================== -->
+    <!-- 武器一覧 -->
+    <!-- ================================================== -->
 
     <table border="1">
 
@@ -235,71 +139,35 @@
 
             <tr th:each="weapon : ${weapons}">
 
-                <td th:text="${weapon.weaponName}"></td>
+                <td th:text="${weapon.weaponName}">
+                </td>
 
-                <td th:text="${weapon.weaponType}"></td>
+                <td th:text="${weapon.weaponType}">
+                </td>
 
-                <td th:text="${weapon.attack}"></td>
+                <td th:text="${weapon.attack}">
+                </td>
 
-                <td th:text="${weapon.elementType}"></td>
+                <td th:text="${weapon.elementType}">
+                </td>
 
-                <td th:text="${weapon.elementValue}"></td>
+                <td th:text="${weapon.elementValue}">
+                </td>
 
-                <td th:text="${weapon.affinity} + '%'"></td>
+                <td th:text="${weapon.affinity} + '%'">
+                </td>
 
                 <td>
 
-                    <a th:href="@{/weapon/{weaponId}(
-                        weaponId=${weapon.weaponId},
+                    <button type="button"
+                            th:data-weapon-id="${weapon.weaponId}"
+                            onclick="goWeaponDetail(
+                                this.dataset.weaponId
+                            )">
 
-                        bowChargeId=${simulatorForm.bowChargeId},
-                        bowCoatingId=${simulatorForm.bowCoatingId},
-
-                        headArmorId=${simulatorForm.headArmorId},
-                        chestArmorId=${simulatorForm.chestArmorId},
-                        armArmorId=${simulatorForm.armArmorId},
-                        waistArmorId=${simulatorForm.waistArmorId},
-                        legArmorId=${simulatorForm.legArmorId},
-
-                        weaponDecoration1Id=${simulatorForm.weaponDecoration1Id},
-                        weaponDecoration2Id=${simulatorForm.weaponDecoration2Id},
-                        weaponDecoration3Id=${simulatorForm.weaponDecoration3Id},
-
-                        headDecoration1Id=${simulatorForm.headDecoration1Id},
-                        headDecoration2Id=${simulatorForm.headDecoration2Id},
-                        headDecoration3Id=${simulatorForm.headDecoration3Id},
-
-                        chestDecoration1Id=${simulatorForm.chestDecoration1Id},
-                        chestDecoration2Id=${simulatorForm.chestDecoration2Id},
-                        chestDecoration3Id=${simulatorForm.chestDecoration3Id},
-
-                        armDecoration1Id=${simulatorForm.armDecoration1Id},
-                        armDecoration2Id=${simulatorForm.armDecoration2Id},
-                        armDecoration3Id=${simulatorForm.armDecoration3Id},
-
-                        waistDecoration1Id=${simulatorForm.waistDecoration1Id},
-                        waistDecoration2Id=${simulatorForm.waistDecoration2Id},
-                        waistDecoration3Id=${simulatorForm.waistDecoration3Id},
-
-                        legDecoration1Id=${simulatorForm.legDecoration1Id},
-                        legDecoration2Id=${simulatorForm.legDecoration2Id},
-                        legDecoration3Id=${simulatorForm.legDecoration3Id},
-
-                        talismanSkill1Id=${simulatorForm.talismanSkill1Id},
-                        talismanSkill1Level=${simulatorForm.talismanSkill1Level},
-                        talismanSkill2Id=${simulatorForm.talismanSkill2Id},
-                        talismanSkill2Level=${simulatorForm.talismanSkill2Level},
-
-                        talismanSlot1Size=${simulatorForm.talismanSlot1Size},
-                        talismanSlot2Size=${simulatorForm.talismanSlot2Size},
-                        talismanSlot3Size=${simulatorForm.talismanSlot3Size},
-
-                        talismanDecoration1Id=${simulatorForm.talismanDecoration1Id},
-                        talismanDecoration2Id=${simulatorForm.talismanDecoration2Id},
-                        talismanDecoration3Id=${simulatorForm.talismanDecoration3Id}
-                    )}">
                         選択
-                    </a>
+
+                    </button>
 
                 </td>
 
@@ -308,6 +176,121 @@
         </tbody>
 
     </table>
+
+
+    <script>
+
+        /*
+         * =====================================================
+         * 武器種絞り込み
+         * =====================================================
+         *
+         * 現在URLをそのまま利用することで、
+         *
+         * monsterId
+         * hitzoneId
+         * rampageDecorationId
+         * bowChargeId
+         * bowCoatingId
+         * bowgunAmmoId
+         * 防具
+         * 装飾品
+         * 護石
+         * skillState_xxx
+         *
+         * などをすべて維持する。
+         */
+        function filterWeaponList() {
+
+            const weaponTypeSelect
+                    = document.getElementById(
+                            "weaponTypeSelect"
+                    );
+
+            if (!weaponTypeSelect) {
+                return false;
+            }
+
+
+            const url
+                    = new URL(
+                            window.location.href
+                    );
+
+
+            url.pathname
+                    = "/weapon-list";
+
+
+            const weaponType
+                    = weaponTypeSelect.value;
+
+
+            if (weaponType) {
+
+                url.searchParams.set(
+                        "weaponType",
+                        weaponType
+                );
+
+            } else {
+
+                url.searchParams.delete(
+                        "weaponType"
+                );
+            }
+
+
+            window.location.href
+                    = url.toString();
+
+
+            return false;
+        }
+
+
+        /*
+         * =====================================================
+         * 武器詳細画面へ
+         * =====================================================
+         *
+         * 武器詳細へ進む場合も、
+         * 現在URLのシミュレーター状態を
+         * そのまま持っていく。
+         */
+        function goWeaponDetail(
+                weaponId) {
+
+            if (!weaponId) {
+                return;
+            }
+
+
+            const url
+                    = new URL(
+                            window.location.href
+                    );
+
+
+            url.pathname
+                    = "/weapon/"
+                    + weaponId;
+
+
+            /*
+             * weaponTypeは武器一覧の絞り込み状態として
+             * そのまま残しておく。
+             *
+             * 武器詳細から一覧へ戻った場合にも、
+             * 同じ絞り込み状態を復元しやすくするため。
+             */
+
+
+            window.location.href
+                    = url.toString();
+        }
+
+    </script>
 
 </body>
 

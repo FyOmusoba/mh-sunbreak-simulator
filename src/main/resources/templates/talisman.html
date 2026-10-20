@@ -10,9 +10,11 @@
 
     <h1>護石編集</h1>
 
-    <form th:action="@{/talisman-apply}"
+    <form id="talismanForm"
+          th:action="@{/talisman-apply}"
           th:object="${simulatorForm}"
-          method="get">
+          method="get"
+          onsubmit="return prepareTalismanApply()">
 
         <!-- ============================== -->
         <!-- 武器 -->
@@ -220,6 +222,133 @@
 
 
     <script>
+
+        /*
+         * =====================================================
+         * シミュレーター状態を引き継ぐ
+         * =====================================================
+         *
+         * 護石画面のURLに残っているパラメータのうち、
+         * form内に存在しないものをhiddenとして追加する。
+         *
+         * これにより、
+         *
+         * monsterId
+         * hitzoneId
+         * rampageDecorationId
+         * bowChargeId
+         * bowCoatingId
+         * bowgunAmmoId
+         * skillState_xxx
+         *
+         * などを失わずに
+         * /talisman-applyへ送信できる。
+         */
+        function prepareTalismanApply() {
+
+            const form
+                    = document.getElementById(
+                            "talismanForm"
+                    );
+
+            if (!form) {
+                return false;
+            }
+
+
+            /*
+             * 前回追加したhiddenが存在する場合は
+             * 一度削除する。
+             */
+            form.querySelectorAll(
+                    ".talisman-preserved-parameter"
+            ).forEach(
+                    input => input.remove()
+            );
+
+
+            /*
+             * form自身がすでに送信するパラメータ名。
+             *
+             * これらはURL側から重複追加せず、
+             * 現在の入力値を優先する。
+             */
+            const formParameterNames
+                    = new Set();
+
+            for (const element of form.elements) {
+
+                if (!element.name) {
+                    continue;
+                }
+
+                formParameterNames.add(
+                        element.name
+                );
+            }
+
+
+            /*
+             * 現在URLの状態を取得。
+             */
+            const params
+                    = new URLSearchParams(
+                            window.location.search
+                    );
+
+
+            /*
+             * シミュレーター状態ではない
+             * 一時的なメッセージ用パラメータ。
+             */
+            const excludedNames
+                    = new Set([
+                        "presetSaved",
+                        "presetError",
+                        "_csrf"
+                    ]);
+
+
+            for (const [name, value]
+                    of params.entries()) {
+
+                if (excludedNames.has(name)) {
+                    continue;
+                }
+
+                /*
+                 * form内に同名項目がある場合、
+                 * 現在のform入力値を使う。
+                 */
+                if (formParameterNames.has(name)) {
+                    continue;
+                }
+
+                const input
+                        = document.createElement(
+                                "input"
+                        );
+
+                input.type
+                        = "hidden";
+
+                input.name
+                        = name;
+
+                input.value
+                        = value;
+
+                input.className
+                        = "talisman-preserved-parameter";
+
+                form.appendChild(
+                        input
+                );
+            }
+
+            return true;
+        }
+
 
         document.addEventListener(
             "DOMContentLoaded",

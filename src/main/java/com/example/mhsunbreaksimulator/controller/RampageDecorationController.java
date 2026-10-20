@@ -1,6 +1,7 @@
 package com.example.mhsunbreaksimulator.controller;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -25,10 +26,11 @@ public class RampageDecorationController {
     private final WeaponService weaponService;
 
 
-    /* ========================================== */
-    /* 百竜装飾品選択画面 */
-    /* ========================================== */
-
+    /*
+     * =====================================================
+     * 百竜装飾品選択画面
+     * =====================================================
+     */
     @GetMapping("/rampage-decoration-select")
     public String showRampageDecorationSelect(
             @ModelAttribute SimulatorForm simulatorForm,
@@ -73,13 +75,15 @@ public class RampageDecorationController {
     }
 
 
-    /* ========================================== */
-    /* 百竜装飾品を適用 */
-    /* ========================================== */
-
+    /*
+     * =====================================================
+     * 百竜装飾品を適用
+     * =====================================================
+     */
     @GetMapping("/rampage-decoration-apply")
     public String applyRampageDecoration(
             @RequestParam Integer rampageDecorationId,
+            @RequestParam Map<String, String> requestParams,
             @ModelAttribute SimulatorForm simulatorForm,
             RedirectAttributes redirectAttributes) {
 
@@ -110,6 +114,21 @@ public class RampageDecorationController {
             );
         }
 
+
+        /*
+         * 条件付きスキルはSimulatorFormに存在しないため、
+         * requestParamsから別途引き継ぐ。
+         */
+        preserveSkillStateParameters(
+                requestParams,
+                redirectAttributes
+        );
+
+
+        /*
+         * SimulatorFormで管理している状態を
+         * すべてシミュレーターへ戻す。
+         */
         addSimulatorAttributes(
                 simulatorForm,
                 redirectAttributes
@@ -119,10 +138,11 @@ public class RampageDecorationController {
     }
 
 
-    /* ========================================== */
-    /* 武器の百竜スロットサイズ取得 */
-    /* ========================================== */
-
+    /*
+     * =====================================================
+     * 武器の百竜スロットサイズ取得
+     * =====================================================
+     */
     private int getRampageSlotSize(
             SimulatorForm simulatorForm) {
 
@@ -145,10 +165,11 @@ public class RampageDecorationController {
     }
 
 
-    /* ========================================== */
-    /* 百竜スロットサイズ安全化 */
-    /* ========================================== */
-
+    /*
+     * =====================================================
+     * 百竜スロットサイズ安全化
+     * =====================================================
+     */
     private int safeRampageSlotSize(
             Integer slotSize) {
 
@@ -168,251 +189,379 @@ public class RampageDecorationController {
     }
 
 
-    /* ========================================== */
-    /* シミュレーター状態を維持 */
-    /* ========================================== */
+    /*
+     * =====================================================
+     * 条件付きスキル状態を維持
+     * =====================================================
+     */
+    private void preserveSkillStateParameters(
+            Map<String, String> requestParams,
+            RedirectAttributes redirectAttributes) {
 
+        if (requestParams == null
+                || requestParams.isEmpty()) {
+
+            return;
+        }
+
+        for (Map.Entry<String, String> entry
+                : requestParams.entrySet()) {
+
+            String name
+                    = entry.getKey();
+
+            String value
+                    = entry.getValue();
+
+            if (name == null
+                    || !name.startsWith(
+                            "skillState_"
+                    )) {
+
+                continue;
+            }
+
+            if (value == null
+                    || value.isBlank()) {
+
+                continue;
+            }
+
+            redirectAttributes.addAttribute(
+                    name,
+                    value
+            );
+        }
+    }
+
+
+    /*
+     * =====================================================
+     * シミュレーター状態を維持
+     * =====================================================
+     */
     private void addSimulatorAttributes(
             SimulatorForm simulatorForm,
             RedirectAttributes redirectAttributes) {
 
-        /* 武器 */
-        redirectAttributes.addAttribute(
+        /*
+         * 武器
+         */
+        addAttributeIfNotNull(
+                redirectAttributes,
                 "weaponId",
                 simulatorForm.getWeaponId()
         );
 
-        /* 百竜装飾品 */
-        redirectAttributes.addAttribute(
+
+        /*
+         * モンスター
+         */
+        addAttributeIfNotNull(
+                redirectAttributes,
+                "monsterId",
+                simulatorForm.getMonsterId()
+        );
+
+        addAttributeIfNotNull(
+                redirectAttributes,
+                "hitzoneId",
+                simulatorForm.getHitzoneId()
+        );
+
+
+        /*
+         * 百竜装飾品
+         */
+        addAttributeIfNotNull(
+                redirectAttributes,
                 "rampageDecorationId",
                 simulatorForm.getRampageDecorationId()
         );
 
-        /* 弓：溜め段階 */
-        redirectAttributes.addAttribute(
+
+        /*
+         * 弓
+         */
+        addAttributeIfNotNull(
+                redirectAttributes,
                 "bowChargeId",
                 simulatorForm.getBowChargeId()
         );
 
-        /* 弓：ビン */
-        redirectAttributes.addAttribute(
+        addAttributeIfNotNull(
+                redirectAttributes,
                 "bowCoatingId",
                 simulatorForm.getBowCoatingId()
         );
 
 
-        /* ====================================== */
-        /* 防具 */
-        /* ====================================== */
+        /*
+         * ボウガン
+         */
+        addAttributeIfNotNull(
+                redirectAttributes,
+                "bowgunAmmoId",
+                simulatorForm.getBowgunAmmoId()
+        );
 
-        redirectAttributes.addAttribute(
+
+        /*
+         * 防具
+         */
+        addAttributeIfNotNull(
+                redirectAttributes,
                 "headArmorId",
                 simulatorForm.getHeadArmorId()
         );
 
-        redirectAttributes.addAttribute(
+        addAttributeIfNotNull(
+                redirectAttributes,
                 "chestArmorId",
                 simulatorForm.getChestArmorId()
         );
 
-        redirectAttributes.addAttribute(
+        addAttributeIfNotNull(
+                redirectAttributes,
                 "armArmorId",
                 simulatorForm.getArmArmorId()
         );
 
-        redirectAttributes.addAttribute(
+        addAttributeIfNotNull(
+                redirectAttributes,
                 "waistArmorId",
                 simulatorForm.getWaistArmorId()
         );
 
-        redirectAttributes.addAttribute(
+        addAttributeIfNotNull(
+                redirectAttributes,
                 "legArmorId",
                 simulatorForm.getLegArmorId()
         );
 
 
-        /* ====================================== */
-        /* 武器装飾品 */
-        /* ====================================== */
-
-        redirectAttributes.addAttribute(
+        /*
+         * 武器装飾品
+         */
+        addAttributeIfNotNull(
+                redirectAttributes,
                 "weaponDecoration1Id",
                 simulatorForm.getWeaponDecoration1Id()
         );
 
-        redirectAttributes.addAttribute(
+        addAttributeIfNotNull(
+                redirectAttributes,
                 "weaponDecoration2Id",
                 simulatorForm.getWeaponDecoration2Id()
         );
 
-        redirectAttributes.addAttribute(
+        addAttributeIfNotNull(
+                redirectAttributes,
                 "weaponDecoration3Id",
                 simulatorForm.getWeaponDecoration3Id()
         );
 
 
-        /* ====================================== */
-        /* 頭装飾品 */
-        /* ====================================== */
-
-        redirectAttributes.addAttribute(
+        /*
+         * 頭装飾品
+         */
+        addAttributeIfNotNull(
+                redirectAttributes,
                 "headDecoration1Id",
                 simulatorForm.getHeadDecoration1Id()
         );
 
-        redirectAttributes.addAttribute(
+        addAttributeIfNotNull(
+                redirectAttributes,
                 "headDecoration2Id",
                 simulatorForm.getHeadDecoration2Id()
         );
 
-        redirectAttributes.addAttribute(
+        addAttributeIfNotNull(
+                redirectAttributes,
                 "headDecoration3Id",
                 simulatorForm.getHeadDecoration3Id()
         );
 
 
-        /* ====================================== */
-        /* 胴装飾品 */
-        /* ====================================== */
-
-        redirectAttributes.addAttribute(
+        /*
+         * 胴装飾品
+         */
+        addAttributeIfNotNull(
+                redirectAttributes,
                 "chestDecoration1Id",
                 simulatorForm.getChestDecoration1Id()
         );
 
-        redirectAttributes.addAttribute(
+        addAttributeIfNotNull(
+                redirectAttributes,
                 "chestDecoration2Id",
                 simulatorForm.getChestDecoration2Id()
         );
 
-        redirectAttributes.addAttribute(
+        addAttributeIfNotNull(
+                redirectAttributes,
                 "chestDecoration3Id",
                 simulatorForm.getChestDecoration3Id()
         );
 
 
-        /* ====================================== */
-        /* 腕装飾品 */
-        /* ====================================== */
-
-        redirectAttributes.addAttribute(
+        /*
+         * 腕装飾品
+         */
+        addAttributeIfNotNull(
+                redirectAttributes,
                 "armDecoration1Id",
                 simulatorForm.getArmDecoration1Id()
         );
 
-        redirectAttributes.addAttribute(
+        addAttributeIfNotNull(
+                redirectAttributes,
                 "armDecoration2Id",
                 simulatorForm.getArmDecoration2Id()
         );
 
-        redirectAttributes.addAttribute(
+        addAttributeIfNotNull(
+                redirectAttributes,
                 "armDecoration3Id",
                 simulatorForm.getArmDecoration3Id()
         );
 
 
-        /* ====================================== */
-        /* 腰装飾品 */
-        /* ====================================== */
-
-        redirectAttributes.addAttribute(
+        /*
+         * 腰装飾品
+         */
+        addAttributeIfNotNull(
+                redirectAttributes,
                 "waistDecoration1Id",
                 simulatorForm.getWaistDecoration1Id()
         );
 
-        redirectAttributes.addAttribute(
+        addAttributeIfNotNull(
+                redirectAttributes,
                 "waistDecoration2Id",
                 simulatorForm.getWaistDecoration2Id()
         );
 
-        redirectAttributes.addAttribute(
+        addAttributeIfNotNull(
+                redirectAttributes,
                 "waistDecoration3Id",
                 simulatorForm.getWaistDecoration3Id()
         );
 
 
-        /* ====================================== */
-        /* 脚装飾品 */
-        /* ====================================== */
-
-        redirectAttributes.addAttribute(
+        /*
+         * 脚装飾品
+         */
+        addAttributeIfNotNull(
+                redirectAttributes,
                 "legDecoration1Id",
                 simulatorForm.getLegDecoration1Id()
         );
 
-        redirectAttributes.addAttribute(
+        addAttributeIfNotNull(
+                redirectAttributes,
                 "legDecoration2Id",
                 simulatorForm.getLegDecoration2Id()
         );
 
-        redirectAttributes.addAttribute(
+        addAttributeIfNotNull(
+                redirectAttributes,
                 "legDecoration3Id",
                 simulatorForm.getLegDecoration3Id()
         );
 
 
-        /* ====================================== */
-        /* 護石スキル */
-        /* ====================================== */
-
-        redirectAttributes.addAttribute(
+        /*
+         * 護石スキル
+         */
+        addAttributeIfNotNull(
+                redirectAttributes,
                 "talismanSkill1Id",
                 simulatorForm.getTalismanSkill1Id()
         );
 
-        redirectAttributes.addAttribute(
+        addAttributeIfNotNull(
+                redirectAttributes,
                 "talismanSkill1Level",
                 simulatorForm.getTalismanSkill1Level()
         );
 
-        redirectAttributes.addAttribute(
+        addAttributeIfNotNull(
+                redirectAttributes,
                 "talismanSkill2Id",
                 simulatorForm.getTalismanSkill2Id()
         );
 
-        redirectAttributes.addAttribute(
+        addAttributeIfNotNull(
+                redirectAttributes,
                 "talismanSkill2Level",
                 simulatorForm.getTalismanSkill2Level()
         );
 
 
-        /* ====================================== */
-        /* 護石スロット */
-        /* ====================================== */
-
-        redirectAttributes.addAttribute(
+        /*
+         * 護石スロット
+         */
+        addAttributeIfNotNull(
+                redirectAttributes,
                 "talismanSlot1Size",
                 simulatorForm.getTalismanSlot1Size()
         );
 
-        redirectAttributes.addAttribute(
+        addAttributeIfNotNull(
+                redirectAttributes,
                 "talismanSlot2Size",
                 simulatorForm.getTalismanSlot2Size()
         );
 
-        redirectAttributes.addAttribute(
+        addAttributeIfNotNull(
+                redirectAttributes,
                 "talismanSlot3Size",
                 simulatorForm.getTalismanSlot3Size()
         );
 
 
-        /* ====================================== */
-        /* 護石装飾品 */
-        /* ====================================== */
-
-        redirectAttributes.addAttribute(
+        /*
+         * 護石装飾品
+         */
+        addAttributeIfNotNull(
+                redirectAttributes,
                 "talismanDecoration1Id",
                 simulatorForm.getTalismanDecoration1Id()
         );
 
-        redirectAttributes.addAttribute(
+        addAttributeIfNotNull(
+                redirectAttributes,
                 "talismanDecoration2Id",
                 simulatorForm.getTalismanDecoration2Id()
         );
 
-        redirectAttributes.addAttribute(
+        addAttributeIfNotNull(
+                redirectAttributes,
                 "talismanDecoration3Id",
                 simulatorForm.getTalismanDecoration3Id()
+        );
+    }
+
+
+    /*
+     * =====================================================
+     * nullではない値だけURLへ追加
+     * =====================================================
+     */
+    private void addAttributeIfNotNull(
+            RedirectAttributes redirectAttributes,
+            String name,
+            Object value) {
+
+        if (value == null) {
+            return;
+        }
+
+        redirectAttributes.addAttribute(
+                name,
+                value
         );
     }
 }

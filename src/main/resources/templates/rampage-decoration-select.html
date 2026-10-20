@@ -14,6 +14,7 @@
 
     <h1>百竜装飾品選択</h1>
 
+
     <p>
         使用できる百竜スロットサイズ：
         <span th:text="${slotSize}"></span>
@@ -43,237 +44,27 @@
 
             <tr th:each="rampageDecoration : ${rampageDecorations}">
 
-                <td th:text="${rampageDecoration.decorationName}"></td>
+                <td th:text="${rampageDecoration.decorationName}">
+                </td>
 
-                <td th:text="${rampageDecoration.rampageSkillName}"></td>
+                <td th:text="${rampageDecoration.rampageSkillName}">
+                </td>
 
-                <td th:text="${rampageDecoration.requiredSlotSize}"></td>
+                <td th:text="${rampageDecoration.requiredSlotSize}">
+                </td>
 
 
                 <td>
 
-                    <form th:action="@{/rampage-decoration-apply}"
-                          method="get">
-
-
-                        <!-- ===================== -->
-                        <!-- 今回選ぶ百竜装飾品 -->
-                        <!-- ===================== -->
-
-                        <input type="hidden"
-                               name="rampageDecorationId"
-                               th:value="${rampageDecoration.rampageDecorationId}">
-
-
-                        <!-- ===================== -->
-                        <!-- 現在の武器 -->
-                        <!-- ===================== -->
-
-                        <input type="hidden"
-                               name="weaponId"
-                               th:value="${simulatorForm.weaponId}">
-
-
-                        <!-- ===================== -->
-                        <!-- 弓設定 -->
-                        <!-- ===================== -->
-
-                        <input type="hidden"
-                               name="bowChargeId"
-                               th:value="${simulatorForm.bowChargeId}">
-
-                        <input type="hidden"
-                               name="bowCoatingId"
-                               th:value="${simulatorForm.bowCoatingId}">
-
-
-                        <!-- ===================== -->
-                        <!-- 現在の防具 -->
-                        <!-- ===================== -->
-
-                        <input type="hidden"
-                               name="headArmorId"
-                               th:value="${simulatorForm.headArmorId}">
-
-                        <input type="hidden"
-                               name="chestArmorId"
-                               th:value="${simulatorForm.chestArmorId}">
-
-                        <input type="hidden"
-                               name="armArmorId"
-                               th:value="${simulatorForm.armArmorId}">
-
-                        <input type="hidden"
-                               name="waistArmorId"
-                               th:value="${simulatorForm.waistArmorId}">
-
-                        <input type="hidden"
-                               name="legArmorId"
-                               th:value="${simulatorForm.legArmorId}">
-
-
-                        <!-- ===================== -->
-                        <!-- 武器装飾品 -->
-                        <!-- ===================== -->
-
-                        <input type="hidden"
-                               name="weaponDecoration1Id"
-                               th:value="${simulatorForm.weaponDecoration1Id}">
-
-                        <input type="hidden"
-                               name="weaponDecoration2Id"
-                               th:value="${simulatorForm.weaponDecoration2Id}">
-
-                        <input type="hidden"
-                               name="weaponDecoration3Id"
-                               th:value="${simulatorForm.weaponDecoration3Id}">
-
-
-                        <!-- ===================== -->
-                        <!-- 頭装飾品 -->
-                        <!-- ===================== -->
-
-                        <input type="hidden"
-                               name="headDecoration1Id"
-                               th:value="${simulatorForm.headDecoration1Id}">
-
-                        <input type="hidden"
-                               name="headDecoration2Id"
-                               th:value="${simulatorForm.headDecoration2Id}">
-
-                        <input type="hidden"
-                               name="headDecoration3Id"
-                               th:value="${simulatorForm.headDecoration3Id}">
-
-
-                        <!-- ===================== -->
-                        <!-- 胴装飾品 -->
-                        <!-- ===================== -->
-
-                        <input type="hidden"
-                               name="chestDecoration1Id"
-                               th:value="${simulatorForm.chestDecoration1Id}">
-
-                        <input type="hidden"
-                               name="chestDecoration2Id"
-                               th:value="${simulatorForm.chestDecoration2Id}">
-
-                        <input type="hidden"
-                               name="chestDecoration3Id"
-                               th:value="${simulatorForm.chestDecoration3Id}">
-
-
-                        <!-- ===================== -->
-                        <!-- 腕装飾品 -->
-                        <!-- ===================== -->
-
-                        <input type="hidden"
-                               name="armDecoration1Id"
-                               th:value="${simulatorForm.armDecoration1Id}">
-
-                        <input type="hidden"
-                               name="armDecoration2Id"
-                               th:value="${simulatorForm.armDecoration2Id}">
-
-                        <input type="hidden"
-                               name="armDecoration3Id"
-                               th:value="${simulatorForm.armDecoration3Id}">
-
-
-                        <!-- ===================== -->
-                        <!-- 腰装飾品 -->
-                        <!-- ===================== -->
-
-                        <input type="hidden"
-                               name="waistDecoration1Id"
-                               th:value="${simulatorForm.waistDecoration1Id}">
-
-                        <input type="hidden"
-                               name="waistDecoration2Id"
-                               th:value="${simulatorForm.waistDecoration2Id}">
-
-                        <input type="hidden"
-                               name="waistDecoration3Id"
-                               th:value="${simulatorForm.waistDecoration3Id}">
-
-
-                        <!-- ===================== -->
-                        <!-- 脚装飾品 -->
-                        <!-- ===================== -->
-
-                        <input type="hidden"
-                               name="legDecoration1Id"
-                               th:value="${simulatorForm.legDecoration1Id}">
-
-                        <input type="hidden"
-                               name="legDecoration2Id"
-                               th:value="${simulatorForm.legDecoration2Id}">
-
-                        <input type="hidden"
-                               name="legDecoration3Id"
-                               th:value="${simulatorForm.legDecoration3Id}">
-
-
-                        <!-- ===================== -->
-                        <!-- 護石スキル -->
-                        <!-- ===================== -->
-
-                        <input type="hidden"
-                               name="talismanSkill1Id"
-                               th:value="${simulatorForm.talismanSkill1Id}">
-
-                        <input type="hidden"
-                               name="talismanSkill1Level"
-                               th:value="${simulatorForm.talismanSkill1Level}">
-
-                        <input type="hidden"
-                               name="talismanSkill2Id"
-                               th:value="${simulatorForm.talismanSkill2Id}">
-
-                        <input type="hidden"
-                               name="talismanSkill2Level"
-                               th:value="${simulatorForm.talismanSkill2Level}">
-
-
-                        <!-- ===================== -->
-                        <!-- 護石スロット -->
-                        <!-- ===================== -->
-
-                        <input type="hidden"
-                               name="talismanSlot1Size"
-                               th:value="${simulatorForm.talismanSlot1Size}">
-
-                        <input type="hidden"
-                               name="talismanSlot2Size"
-                               th:value="${simulatorForm.talismanSlot2Size}">
-
-                        <input type="hidden"
-                               name="talismanSlot3Size"
-                               th:value="${simulatorForm.talismanSlot3Size}">
-
-
-                        <!-- ===================== -->
-                        <!-- 護石装飾品 -->
-                        <!-- ===================== -->
-
-                        <input type="hidden"
-                               name="talismanDecoration1Id"
-                               th:value="${simulatorForm.talismanDecoration1Id}">
-
-                        <input type="hidden"
-                               name="talismanDecoration2Id"
-                               th:value="${simulatorForm.talismanDecoration2Id}">
-
-                        <input type="hidden"
-                               name="talismanDecoration3Id"
-                               th:value="${simulatorForm.talismanDecoration3Id}">
-
-
-                        <button type="submit">
-                            選択
-                        </button>
-
-                    </form>
+                    <button type="button"
+                            th:data-rampage-decoration-id="${rampageDecoration.rampageDecorationId}"
+                            onclick="applyRampageDecoration(
+                                this.dataset.rampageDecorationId
+                            )">
+
+                        選択
+
+                    </button>
 
                 </td>
 
@@ -282,6 +73,76 @@
         </tbody>
 
     </table>
+
+
+    <script>
+
+        /*
+         * =====================================================
+         * 百竜装飾品を適用
+         * =====================================================
+         *
+         * 現在URLに存在するシミュレーター状態を
+         * すべて維持したまま
+         * /rampage-decoration-apply へ移動する。
+         *
+         * これにより、
+         *
+         * weaponId
+         * monsterId
+         * hitzoneId
+         * bowChargeId
+         * bowCoatingId
+         * bowgunAmmoId
+         * 各防具ID
+         * 各装飾品ID
+         * 護石
+         * skillState_xxx
+         *
+         * などを個別に列挙する必要がなくなる。
+         */
+        function applyRampageDecoration(
+                rampageDecorationId) {
+
+            if (!rampageDecorationId) {
+                return;
+            }
+
+
+            /*
+             * 現在のURLをそのままコピーする。
+             */
+            const url
+                    = new URL(
+                            window.location.href
+                    );
+
+
+            /*
+             * 遷移先だけ変更する。
+             */
+            url.pathname
+                    = "/rampage-decoration-apply";
+
+
+            /*
+             * 今回選択した百竜装飾品を設定する。
+             */
+            url.searchParams.set(
+                    "rampageDecorationId",
+                    rampageDecorationId
+            );
+
+
+            /*
+             * 現在持っているその他のパラメータは
+             * 一切削除せず、そのまま維持する。
+             */
+            window.location.href
+                    = url.toString();
+        }
+
+    </script>
 
 </body>
 
