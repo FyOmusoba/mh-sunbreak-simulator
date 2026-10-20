@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.mhsunbreaksimulator.mapper.PresetArmorAugmentSkillMapper">
+
+
+    <!--
+        =====================================================
+        防具傀異錬成スキル登録
+        =====================================================
+
+        augment_skill_id は
+        PostgreSQL の IDENTITY ALWAYS により自動採番。
+    -->
+    <insert id="insert"
+            parameterType="com.example.mhsunbreaksimulator.entity.PresetArmorAugmentSkill"
+            useGeneratedKeys="true"
+            keyProperty="augmentSkillId"
+            keyColumn="augment_skill_id">
+
+        INSERT INTO preset_armor_augment_skill (
+            preset_armor_id,
+            skill_id,
+            level_delta
+        )
+        VALUES (
+            #{presetArmorId},
+            #{skillId},
+            #{levelDelta}
+        )
+
+    </insert>
+
+
+    <!--
+        =====================================================
+        防具1部位の傀異錬成スキル一覧取得
+        =====================================================
+    -->
+    <select id="findByPresetArmorId"
+            resultType="com.example.mhsunbreaksimulator.entity.PresetArmorAugmentSkill">
+
+        SELECT
+            augment_skill_id,
+            preset_armor_id,
+            skill_id,
+            level_delta
+        FROM preset_armor_augment_skill
+        WHERE preset_armor_id = #{presetArmorId}
+        ORDER BY augment_skill_id
+
+    </select>
+
+
+    <!--
+        =====================================================
+        防具1部位の傀異錬成スキル全削除
+        =====================================================
+    -->
+    <delete id="deleteByPresetArmorId">
+
+        DELETE FROM preset_armor_augment_skill
+        WHERE preset_armor_id = #{presetArmorId}
+
+    </delete>
+
+
+</mapper>

@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.mhsunbreaksimulator.mapper.PresetBowgunSettingMapper">
+
+
+    <!--
+        =====================================================
+        ボウガン設定保存
+        =====================================================
+    -->
+    <insert id="insert"
+            parameterType="com.example.mhsunbreaksimulator.entity.PresetBowgunSetting">
+
+        INSERT INTO preset_bowgun_setting (
+            preset_id,
+            ammo_type,
+            ammo_level,
+            custom_id
+        )
+        VALUES (
+            #{presetId},
+            #{ammoType},
+            #{ammoLevel},
+            #{customId}
+        )
+
+    </insert>
+
+
+    <!--
+        =====================================================
+        プリセットのボウガン設定取得
+        =====================================================
+    -->
+    <select id="findByPresetId"
+            resultType="com.example.mhsunbreaksimulator.entity.PresetBowgunSetting">
+
+        SELECT
+            preset_id,
+            ammo_type,
+            ammo_level,
+            custom_id
+        FROM preset_bowgun_setting
+        WHERE preset_id = #{presetId}
+
+    </select>
+
+
+    <!--
+        =====================================================
+        プリセットのボウガン設定削除
+        =====================================================
+    -->
+    <delete id="deleteByPresetId">
+
+        DELETE FROM preset_bowgun_setting
+        WHERE preset_id = #{presetId}
+
+    </delete>
+
+
+</mapper>

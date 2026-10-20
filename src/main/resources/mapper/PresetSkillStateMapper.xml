@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.mhsunbreaksimulator.mapper.PresetSkillStateMapper">
+
+
+    <!--
+        =====================================================
+        条件付きスキル状態1件保存
+        =====================================================
+
+        preset_skill_state_id は
+        PostgreSQL の IDENTITY ALWAYS により自動採番。
+    -->
+    <insert id="insert"
+            parameterType="com.example.mhsunbreaksimulator.entity.PresetSkillState"
+            useGeneratedKeys="true"
+            keyProperty="presetSkillStateId"
+            keyColumn="preset_skill_state_id">
+
+        INSERT INTO preset_skill_state (
+            preset_id,
+            skill_id,
+            state_code
+        )
+        VALUES (
+            #{presetId},
+            #{skillId},
+            #{stateCode}
+        )
+
+    </insert>
+
+
+    <!--
+        =====================================================
+        プリセット内の条件付きスキル状態一覧取得
+        =====================================================
+    -->
+    <select id="findByPresetId"
+            resultType="com.example.mhsunbreaksimulator.entity.PresetSkillState">
+
+        SELECT
+            preset_skill_state_id,
+            preset_id,
+            skill_id,
+            state_code
+        FROM preset_skill_state
+        WHERE preset_id = #{presetId}
+        ORDER BY
+            skill_id,
+            preset_skill_state_id
+
+    </select>
+
+
+    <!--
+        =====================================================
+        プリセット内の条件付きスキル状態を全削除
+        =====================================================
+    -->
+    <delete id="deleteByPresetId">
+
+        DELETE FROM preset_skill_state
+        WHERE preset_id = #{presetId}
+
+    </delete>
+
+
+</mapper>

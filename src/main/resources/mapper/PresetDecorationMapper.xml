@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.mhsunbreaksimulator.mapper.PresetDecorationMapper">
+
+
+    <!--
+        =====================================================
+        装飾品1件保存
+        =====================================================
+
+        preset_decoration_id は
+        PostgreSQL の IDENTITY ALWAYS により自動採番。
+    -->
+    <insert id="insert"
+            parameterType="com.example.mhsunbreaksimulator.entity.PresetDecoration"
+            useGeneratedKeys="true"
+            keyProperty="presetDecorationId"
+            keyColumn="preset_decoration_id">
+
+        INSERT INTO preset_decoration (
+            preset_id,
+            equipment_kind,
+            equipment_part,
+            slot_no,
+            decoration_id
+        )
+        VALUES (
+            #{presetId},
+            #{equipmentKind},
+            #{equipmentPart},
+            #{slotNo},
+            #{decorationId}
+        )
+
+    </insert>
+
+
+    <!--
+        =====================================================
+        プリセット内の装飾品一覧取得
+        =====================================================
+    -->
+    <select id="findByPresetId"
+            resultType="com.example.mhsunbreaksimulator.entity.PresetDecoration">
+
+        SELECT
+            preset_decoration_id,
+            preset_id,
+            equipment_kind,
+            equipment_part,
+            slot_no,
+            decoration_id
+        FROM preset_decoration
+        WHERE preset_id = #{presetId}
+        ORDER BY
+            equipment_kind,
+            equipment_part,
+            slot_no,
+            preset_decoration_id
+
+    </select>
+
+
+    <!--
+        =====================================================
+        プリセット内の装飾品を全削除
+        =====================================================
+    -->
+    <delete id="deleteByPresetId">
+
+        DELETE FROM preset_decoration
+        WHERE preset_id = #{presetId}
+
+    </delete>
+
+
+</mapper>

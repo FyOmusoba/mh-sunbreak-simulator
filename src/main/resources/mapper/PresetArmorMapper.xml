@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.mhsunbreaksimulator.mapper.PresetArmorMapper">
+
+
+    <!--
+        =====================================================
+        防具プリセット1件保存
+        =====================================================
+
+        preset_armor_id は
+        PostgreSQL の IDENTITY ALWAYS により自動採番。
+    -->
+    <insert id="insert"
+            parameterType="com.example.mhsunbreaksimulator.entity.PresetArmor"
+            useGeneratedKeys="true"
+            keyProperty="presetArmorId"
+            keyColumn="preset_armor_id">
+
+        INSERT INTO preset_armor (
+            preset_id,
+            part,
+            armor_id,
+            slot1_size_final,
+            slot2_size_final,
+            slot3_size_final,
+            defense_delta,
+            fire_res_delta,
+            water_res_delta,
+            thunder_res_delta,
+            ice_res_delta,
+            dragon_res_delta
+        )
+        VALUES (
+            #{presetId},
+            #{part},
+            #{armorId},
+            #{slot1SizeFinal},
+            #{slot2SizeFinal},
+            #{slot3SizeFinal},
+            #{defenseDelta},
+            #{fireResDelta},
+            #{waterResDelta},
+            #{thunderResDelta},
+            #{iceResDelta},
+            #{dragonResDelta}
+        )
+
+    </insert>
+
+
+    <!--
+        =====================================================
+        プリセット内の防具一覧取得
+        =====================================================
+
+        DBのCHECK制約に合わせて、
+        頭 → 胴 → 腕 → 腰 → 脚
+        の順番で取得する。
+    -->
+    <select id="findByPresetId"
+            resultType="com.example.mhsunbreaksimulator.entity.PresetArmor">
+
+        SELECT
+            preset_armor_id,
+            preset_id,
+            part,
+            armor_id,
+            slot1_size_final,
+            slot2_size_final,
+            slot3_size_final,
+            defense_delta,
+            fire_res_delta,
+            water_res_delta,
+            thunder_res_delta,
+            ice_res_delta,
+            dragon_res_delta
+        FROM preset_armor
+        WHERE preset_id = #{presetId}
+        ORDER BY
+            CASE part
+                WHEN '頭' THEN 1
+                WHEN '胴' THEN 2
+                WHEN '腕' THEN 3
+                WHEN '腰' THEN 4
+                WHEN '脚' THEN 5
+                ELSE 99
+            END,
+            preset_armor_id
+
+    </select>
+
+
+    <!--
+        =====================================================
+        プリセット内の防具を全削除
+        =====================================================
+
+        preset_armor_augment_skill が存在する場合は、
+        先にそちらを削除する必要がある。
+    -->
+    <delete id="deleteByPresetId">
+
+        DELETE FROM preset_armor
+        WHERE preset_id = #{presetId}
+
+    </delete>
+
+
+</mapper>

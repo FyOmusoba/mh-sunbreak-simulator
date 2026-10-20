@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.mhsunbreaksimulator.mapper.PresetBowSettingMapper">
+
+
+    <!--
+        =====================================================
+        弓設定保存
+        =====================================================
+    -->
+    <insert id="insert"
+            parameterType="com.example.mhsunbreaksimulator.entity.PresetBowSetting">
+
+        INSERT INTO preset_bow_setting (
+            preset_id,
+            coating_type,
+            bow_charge_id
+        )
+        VALUES (
+            #{presetId},
+            #{coatingType},
+            #{bowChargeId}
+        )
+
+    </insert>
+
+
+    <!--
+        =====================================================
+        プリセットの弓設定取得
+        =====================================================
+    -->
+    <select id="findByPresetId"
+            resultType="com.example.mhsunbreaksimulator.entity.PresetBowSetting">
+
+        SELECT
+            preset_id,
+            coating_type,
+            bow_charge_id
+        FROM preset_bow_setting
+        WHERE preset_id = #{presetId}
+
+    </select>
+
+
+    <!--
+        =====================================================
+        プリセットの弓設定削除
+        =====================================================
+    -->
+    <delete id="deleteByPresetId">
+
+        DELETE FROM preset_bow_setting
+        WHERE preset_id = #{presetId}
+
+    </delete>
+
+
+</mapper>

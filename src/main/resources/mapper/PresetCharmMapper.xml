@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.mhsunbreaksimulator.mapper.PresetCharmMapper">
+
+
+    <!--
+        =====================================================
+        護石保存
+        =====================================================
+    -->
+    <insert id="insert"
+            parameterType="com.example.mhsunbreaksimulator.entity.PresetCharm">
+
+        INSERT INTO preset_charm (
+            preset_id,
+            skill1_id,
+            skill1_level,
+            skill2_id,
+            skill2_level,
+            slot1_size,
+            slot2_size,
+            slot3_size
+        )
+        VALUES (
+            #{presetId},
+            #{skill1Id},
+            #{skill1Level},
+            #{skill2Id},
+            #{skill2Level},
+            #{slot1Size},
+            #{slot2Size},
+            #{slot3Size}
+        )
+
+    </insert>
+
+
+    <!--
+        =====================================================
+        プリセットの護石取得
+        =====================================================
+    -->
+    <select id="findByPresetId"
+            resultType="com.example.mhsunbreaksimulator.entity.PresetCharm">
+
+        SELECT
+            preset_id,
+            skill1_id,
+            skill1_level,
+            skill2_id,
+            skill2_level,
+            slot1_size,
+            slot2_size,
+            slot3_size
+        FROM preset_charm
+        WHERE preset_id = #{presetId}
+
+    </select>
+
+
+    <!--
+        =====================================================
+        プリセットの護石削除
+        =====================================================
+    -->
+    <delete id="deleteByPresetId">
+
+        DELETE FROM preset_charm
+        WHERE preset_id = #{presetId}
+
+    </delete>
+
+
+</mapper>
