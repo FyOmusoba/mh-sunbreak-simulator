@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <title>プリセット一覧</title>
+</head>
+
+<body>
+
+    <h1>プリセット一覧</h1>
+
+
+    <!-- ================================================== -->
+    <!-- エラーメッセージ -->
+    <!-- ================================================== -->
+
+    <p th:if="${param.presetError != null}"
+       th:text="${param.presetError[0]}">
+    </p>
+
+
+    <!-- ================================================== -->
+    <!-- プリセットが1件もない場合 -->
+    <!-- ================================================== -->
+
+    <p th:if="${presets == null or #lists.isEmpty(presets)}">
+        保存されているプリセットはありません。
+    </p>
+
+
+    <!-- ================================================== -->
+    <!-- プリセット一覧 -->
+    <!-- ================================================== -->
+
+    <table border="1"
+           th:if="${presets != null and !#lists.isEmpty(presets)}">
+
+        <thead>
+
+            <tr>
+                <th>プリセット名</th>
+                <th>武器ID</th>
+                <th>百竜装飾品ID</th>
+                <th>操作</th>
+            </tr>
+
+        </thead>
+
+        <tbody>
+
+            <tr th:each="preset : ${presets}">
+
+                <td th:text="${preset.presetName}">
+                    プリセット名
+                </td>
+
+                <td th:text="${preset.weaponId}">
+                    武器ID
+                </td>
+
+                <td th:text="${preset.rampageDecorationId != null
+                    ? preset.rampageDecorationId
+                    : '-'}">
+                    -
+                </td>
+
+                <td>
+
+                    <a th:href="@{/preset/load(
+                        presetId=${preset.presetId}
+                    )}">
+                        読み込む
+                    </a>
+
+                </td>
+
+            </tr>
+
+        </tbody>
+
+    </table>
+
+
+    <br>
+
+
+    <!-- ================================================== -->
+    <!-- シミュレーターへ戻る -->
+    <!-- ================================================== -->
+
+    <a th:href="@{/simulator}">
+        シミュレーターへ戻る
+    </a>
+
+</body>
+
+</html>
