@@ -76,106 +76,137 @@
 
     <br>
 
-    <a th:href="@{/simulator(
-        weaponId=${weapon.weaponId},
 
-        headArmorId=${simulatorForm.headArmorId},
-        chestArmorId=${simulatorForm.chestArmorId},
-        armArmorId=${simulatorForm.armArmorId},
-        waistArmorId=${simulatorForm.waistArmorId},
-        legArmorId=${simulatorForm.legArmorId},
+    <!-- ================================================== -->
+    <!-- この武器を選択 -->
+    <!-- ================================================== -->
 
-        weaponDecoration1Id=${simulatorForm.weaponDecoration1Id},
-        weaponDecoration2Id=${simulatorForm.weaponDecoration2Id},
-        weaponDecoration3Id=${simulatorForm.weaponDecoration3Id},
+    <button type="button"
+            th:data-weapon-id="${weapon.weaponId}"
+            onclick="selectWeapon(
+                this.dataset.weaponId
+            )">
 
-        headDecoration1Id=${simulatorForm.headDecoration1Id},
-        headDecoration2Id=${simulatorForm.headDecoration2Id},
-        headDecoration3Id=${simulatorForm.headDecoration3Id},
-
-        chestDecoration1Id=${simulatorForm.chestDecoration1Id},
-        chestDecoration2Id=${simulatorForm.chestDecoration2Id},
-        chestDecoration3Id=${simulatorForm.chestDecoration3Id},
-
-        armDecoration1Id=${simulatorForm.armDecoration1Id},
-        armDecoration2Id=${simulatorForm.armDecoration2Id},
-        armDecoration3Id=${simulatorForm.armDecoration3Id},
-
-        waistDecoration1Id=${simulatorForm.waistDecoration1Id},
-        waistDecoration2Id=${simulatorForm.waistDecoration2Id},
-        waistDecoration3Id=${simulatorForm.waistDecoration3Id},
-
-        legDecoration1Id=${simulatorForm.legDecoration1Id},
-        legDecoration2Id=${simulatorForm.legDecoration2Id},
-        legDecoration3Id=${simulatorForm.legDecoration3Id},
-
-        talismanSkill1Id=${simulatorForm.talismanSkill1Id},
-        talismanSkill1Level=${simulatorForm.talismanSkill1Level},
-        talismanSkill2Id=${simulatorForm.talismanSkill2Id},
-        talismanSkill2Level=${simulatorForm.talismanSkill2Level},
-
-        talismanSlot1Size=${simulatorForm.talismanSlot1Size},
-        talismanSlot2Size=${simulatorForm.talismanSlot2Size},
-        talismanSlot3Size=${simulatorForm.talismanSlot3Size},
-
-        talismanDecoration1Id=${simulatorForm.talismanDecoration1Id},
-        talismanDecoration2Id=${simulatorForm.talismanDecoration2Id},
-        talismanDecoration3Id=${simulatorForm.talismanDecoration3Id}
-    )}">
         この武器を選択
-    </a>
+
+    </button>
+
 
     <br>
     <br>
 
-    <a th:href="@{/weapon-list(
-        weaponId=${simulatorForm.weaponId},
 
-        headArmorId=${simulatorForm.headArmorId},
-        chestArmorId=${simulatorForm.chestArmorId},
-        armArmorId=${simulatorForm.armArmorId},
-        waistArmorId=${simulatorForm.waistArmorId},
-        legArmorId=${simulatorForm.legArmorId},
+    <!-- ================================================== -->
+    <!-- 武器一覧へ戻る -->
+    <!-- ================================================== -->
 
-        weaponDecoration1Id=${simulatorForm.weaponDecoration1Id},
-        weaponDecoration2Id=${simulatorForm.weaponDecoration2Id},
-        weaponDecoration3Id=${simulatorForm.weaponDecoration3Id},
+    <button type="button"
+            onclick="backToWeaponList()">
 
-        headDecoration1Id=${simulatorForm.headDecoration1Id},
-        headDecoration2Id=${simulatorForm.headDecoration2Id},
-        headDecoration3Id=${simulatorForm.headDecoration3Id},
-
-        chestDecoration1Id=${simulatorForm.chestDecoration1Id},
-        chestDecoration2Id=${simulatorForm.chestDecoration2Id},
-        chestDecoration3Id=${simulatorForm.chestDecoration3Id},
-
-        armDecoration1Id=${simulatorForm.armDecoration1Id},
-        armDecoration2Id=${simulatorForm.armDecoration2Id},
-        armDecoration3Id=${simulatorForm.armDecoration3Id},
-
-        waistDecoration1Id=${simulatorForm.waistDecoration1Id},
-        waistDecoration2Id=${simulatorForm.waistDecoration2Id},
-        waistDecoration3Id=${simulatorForm.waistDecoration3Id},
-
-        legDecoration1Id=${simulatorForm.legDecoration1Id},
-        legDecoration2Id=${simulatorForm.legDecoration2Id},
-        legDecoration3Id=${simulatorForm.legDecoration3Id},
-
-        talismanSkill1Id=${simulatorForm.talismanSkill1Id},
-        talismanSkill1Level=${simulatorForm.talismanSkill1Level},
-        talismanSkill2Id=${simulatorForm.talismanSkill2Id},
-        talismanSkill2Level=${simulatorForm.talismanSkill2Level},
-
-        talismanSlot1Size=${simulatorForm.talismanSlot1Size},
-        talismanSlot2Size=${simulatorForm.talismanSlot2Size},
-        talismanSlot3Size=${simulatorForm.talismanSlot3Size},
-
-        talismanDecoration1Id=${simulatorForm.talismanDecoration1Id},
-        talismanDecoration2Id=${simulatorForm.talismanDecoration2Id},
-        talismanDecoration3Id=${simulatorForm.talismanDecoration3Id}
-    )}">
         武器一覧へ戻る
-    </a>
+
+    </button>
+
+
+    <script>
+
+        /*
+         * =====================================================
+         * この武器を選択
+         * =====================================================
+         *
+         * 現在URLのシミュレーター状態をそのまま維持し、
+         * weaponIdだけ今回選択した武器へ変更する。
+         *
+         * 武器固有の設定については、
+         * SimulatorController側で新しい武器に使用可能か
+         * 判定され、使用できないものは自動的に解除される。
+         */
+        function selectWeapon(
+                weaponId) {
+
+            if (!weaponId) {
+                return;
+            }
+
+
+            const url
+                    = new URL(
+                            window.location.href
+                    );
+
+
+            /*
+             * シミュレーターへ戻る。
+             */
+            url.pathname
+                    = "/simulator";
+
+
+            /*
+             * 今回選択した武器へ変更。
+             */
+            url.searchParams.set(
+                    "weaponId",
+                    weaponId
+            );
+
+
+            /*
+             * weaponTypeは武器一覧だけで使う
+             * 絞り込み用パラメータなので、
+             * シミュレーターへ戻る際は削除する。
+             */
+            url.searchParams.delete(
+                    "weaponType"
+            );
+
+
+            window.location.href
+                    = url.toString();
+        }
+
+
+        /*
+         * =====================================================
+         * 武器一覧へ戻る
+         * =====================================================
+         *
+         * 詳細画面へ来た時点のURLをそのまま使う。
+         *
+         * そのため、
+         *
+         * monsterId
+         * hitzoneId
+         * rampageDecorationId
+         * bowChargeId
+         * bowCoatingId
+         * bowgunAmmoId
+         * 防具
+         * 装飾品
+         * 護石
+         * skillState_xxx
+         * weaponType
+         *
+         * をすべて維持したまま一覧へ戻れる。
+         */
+        function backToWeaponList() {
+
+            const url
+                    = new URL(
+                            window.location.href
+                    );
+
+
+            url.pathname
+                    = "/weapon-list";
+
+
+            window.location.href
+                    = url.toString();
+        }
+
+    </script>
 
 </body>
 
