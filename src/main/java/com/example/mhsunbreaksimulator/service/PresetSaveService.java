@@ -68,6 +68,9 @@ public class PresetSaveService {
     private final PresetBowgunSettingService
             presetBowgunSettingService;
 
+    private final PresetWeaponAugmentService
+            presetWeaponAugmentService;
+
 
     /*
      * =====================================================
@@ -196,6 +199,52 @@ public class PresetSaveService {
 
             throw new IllegalStateException(
                     "プリセットIDの採番に失敗しました。"
+            );
+        }
+
+
+        /*
+         * =====================================================
+         * 武器傀異錬成
+         * =====================================================
+         */
+
+        Integer weaponAugmentAttackLevel
+                = normalizeAugmentLevel(
+                        simulatorForm.getWeaponAugmentAttackLevel(),
+                        4
+                );
+
+        Integer weaponAugmentElementLevel
+                = normalizeAugmentLevel(
+                        simulatorForm.getWeaponAugmentElementLevel(),
+                        8
+                );
+
+        Integer weaponAugmentAffinityLevel
+                = normalizeAugmentLevel(
+                        simulatorForm.getWeaponAugmentAffinityLevel(),
+                        3
+                );
+
+        Integer weaponAugmentSharpnessLevel
+                = normalizeAugmentLevel(
+                        simulatorForm.getWeaponAugmentSharpnessLevel(),
+                        4
+                );
+
+
+        if (weaponAugmentAttackLevel != null
+                || weaponAugmentElementLevel != null
+                || weaponAugmentAffinityLevel != null
+                || weaponAugmentSharpnessLevel != null) {
+
+            presetWeaponAugmentService.create(
+                    presetId,
+                    weaponAugmentAttackLevel,
+                    weaponAugmentElementLevel,
+                    weaponAugmentAffinityLevel,
+                    weaponAugmentSharpnessLevel
             );
         }
 
@@ -546,6 +595,29 @@ public class PresetSaveService {
 
 
         return preset;
+    }
+
+
+    /*
+     * =====================================================
+     * 武器傀異錬成Lv正規化
+     * =====================================================
+     */
+    private Integer normalizeAugmentLevel(
+            Integer level,
+            int maxLevel) {
+
+        if (level == null
+                || level <= 0) {
+
+            return null;
+        }
+
+
+        return Math.min(
+                level,
+                maxLevel
+        );
     }
 
 

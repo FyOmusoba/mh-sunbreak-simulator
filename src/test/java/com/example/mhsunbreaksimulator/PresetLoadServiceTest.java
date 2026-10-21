@@ -21,6 +21,7 @@ import com.example.mhsunbreaksimulator.entity.PresetBowgunSetting;
 import com.example.mhsunbreaksimulator.entity.PresetCharm;
 import com.example.mhsunbreaksimulator.entity.PresetDecoration;
 import com.example.mhsunbreaksimulator.entity.PresetSkillState;
+import com.example.mhsunbreaksimulator.entity.PresetWeaponAugment;
 import com.example.mhsunbreaksimulator.entity.User;
 import com.example.mhsunbreaksimulator.service.BowCoatingService;
 import com.example.mhsunbreaksimulator.service.BowgunAmmoService;
@@ -32,6 +33,7 @@ import com.example.mhsunbreaksimulator.service.PresetDecorationService;
 import com.example.mhsunbreaksimulator.service.PresetLoadService;
 import com.example.mhsunbreaksimulator.service.PresetService;
 import com.example.mhsunbreaksimulator.service.PresetSkillStateService;
+import com.example.mhsunbreaksimulator.service.PresetWeaponAugmentService;
 import com.example.mhsunbreaksimulator.service.UserService;
 
 @ExtendWith(MockitoExtension.class)
@@ -60,6 +62,9 @@ class PresetLoadServiceTest {
 
     @Mock
     private PresetBowgunSettingService presetBowgunSettingService;
+
+    @Mock
+    private PresetWeaponAugmentService presetWeaponAugmentService;
 
     @Mock
     private BowCoatingService bowCoatingService;
@@ -450,6 +455,134 @@ class PresetLoadServiceTest {
         assertEquals(
                 "1104",
                 result.get("bowgunAmmoId")
+        );
+    }
+
+
+    /*
+     * =====================================================
+     * 武器傀異錬成
+     * =====================================================
+     */
+
+    @Test
+    void load_武器傀異錬成をURLパラメータへ復元できる() {
+
+        User user
+                = new User();
+
+        user.setUserId(
+                1
+        );
+
+        user.setUsername(
+                "testuser"
+        );
+
+
+        Preset preset
+                = new Preset();
+
+        preset.setPresetId(
+                30
+        );
+
+        preset.setUserId(
+                1
+        );
+
+        preset.setPresetName(
+                "傀異錬成テスト"
+        );
+
+        preset.setWeaponId(
+                100
+        );
+
+
+        PresetWeaponAugment weaponAugment
+                = new PresetWeaponAugment();
+
+        weaponAugment.setPresetId(
+                30
+        );
+
+        weaponAugment.setAttackLevel(
+                4
+        );
+
+        weaponAugment.setElementLevel(
+                8
+        );
+
+        weaponAugment.setAffinityLevel(
+                3
+        );
+
+        weaponAugment.setSharpnessLevel(
+                4
+        );
+
+
+        when(
+                userService.findByUsername(
+                        "testuser"
+                )
+        ).thenReturn(user);
+
+
+        when(
+                presetService.findByIdAndUserId(
+                        30,
+                        1
+                )
+        ).thenReturn(preset);
+
+
+        when(
+                presetWeaponAugmentService.findByPresetId(
+                        30
+                )
+        ).thenReturn(weaponAugment);
+
+
+        Map<String, String> result
+                = presetLoadService.load(
+                        "testuser",
+                        30
+                );
+
+
+        assertEquals(
+                "100",
+                result.get("weaponId")
+        );
+
+        assertEquals(
+                "4",
+                result.get("weaponAugmentAttackLevel")
+        );
+
+        assertEquals(
+                "8",
+                result.get("weaponAugmentElementLevel")
+        );
+
+        assertEquals(
+                "3",
+                result.get("weaponAugmentAffinityLevel")
+        );
+
+        assertEquals(
+                "4",
+                result.get("weaponAugmentSharpnessLevel")
+        );
+
+
+        verify(
+                presetWeaponAugmentService
+        ).findByPresetId(
+                30
         );
     }
 

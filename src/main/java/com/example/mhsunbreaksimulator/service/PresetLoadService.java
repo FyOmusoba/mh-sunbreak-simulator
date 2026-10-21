@@ -16,6 +16,7 @@ import com.example.mhsunbreaksimulator.entity.PresetBowgunSetting;
 import com.example.mhsunbreaksimulator.entity.PresetCharm;
 import com.example.mhsunbreaksimulator.entity.PresetDecoration;
 import com.example.mhsunbreaksimulator.entity.PresetSkillState;
+import com.example.mhsunbreaksimulator.entity.PresetWeaponAugment;
 import com.example.mhsunbreaksimulator.entity.User;
 
 import lombok.RequiredArgsConstructor;
@@ -39,6 +40,8 @@ public class PresetLoadService {
     private final PresetBowSettingService presetBowSettingService;
 
     private final PresetBowgunSettingService presetBowgunSettingService;
+
+    private final PresetWeaponAugmentService presetWeaponAugmentService;
 
     private final BowCoatingService bowCoatingService;
 
@@ -167,6 +170,46 @@ public class PresetLoadService {
                 "rampageDecorationId",
                 preset.getRampageDecorationId()
         );
+
+
+        /*
+         * =====================================================
+         * 武器傀異錬成
+         * =====================================================
+         */
+
+        PresetWeaponAugment presetWeaponAugment
+                = presetWeaponAugmentService.findByPresetId(
+                        presetId
+                );
+
+
+        if (presetWeaponAugment != null) {
+
+            putInteger(
+                    parameters,
+                    "weaponAugmentAttackLevel",
+                    presetWeaponAugment.getAttackLevel()
+            );
+
+            putInteger(
+                    parameters,
+                    "weaponAugmentElementLevel",
+                    presetWeaponAugment.getElementLevel()
+            );
+
+            putInteger(
+                    parameters,
+                    "weaponAugmentAffinityLevel",
+                    presetWeaponAugment.getAffinityLevel()
+            );
+
+            putInteger(
+                    parameters,
+                    "weaponAugmentSharpnessLevel",
+                    presetWeaponAugment.getSharpnessLevel()
+            );
+        }
 
 
         /*

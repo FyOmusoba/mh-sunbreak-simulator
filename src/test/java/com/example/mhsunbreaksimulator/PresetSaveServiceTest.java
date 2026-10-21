@@ -32,6 +32,7 @@ import com.example.mhsunbreaksimulator.service.PresetDecorationService;
 import com.example.mhsunbreaksimulator.service.PresetSaveService;
 import com.example.mhsunbreaksimulator.service.PresetService;
 import com.example.mhsunbreaksimulator.service.PresetSkillStateService;
+import com.example.mhsunbreaksimulator.service.PresetWeaponAugmentService;
 import com.example.mhsunbreaksimulator.service.RampageDecorationService;
 import com.example.mhsunbreaksimulator.service.SkillService;
 import com.example.mhsunbreaksimulator.service.UserService;
@@ -87,6 +88,9 @@ class PresetSaveServiceTest {
 
     @Mock
     private PresetBowgunSettingService presetBowgunSettingService;
+
+    @Mock
+    private PresetWeaponAugmentService presetWeaponAugmentService;
 
     @InjectMocks
     private PresetSaveService presetSaveService;
@@ -481,6 +485,106 @@ class PresetSaveServiceTest {
                 "貫通弾",
                 2,
                 null
+        );
+    }
+
+
+    /*
+     * =====================================================
+     * 武器傀異錬成
+     * =====================================================
+     */
+
+    @Test
+    void save_武器傀異錬成を保存できる() {
+
+        User user
+                = createUser();
+
+        Weapon weapon
+                = createWeapon(
+                        100,
+                        "太刀"
+                );
+
+        Preset savedPreset
+                = createPreset(
+                        503,
+                        100
+                );
+
+
+        when(
+                userService.findByUsername(
+                        "testuser"
+                )
+        ).thenReturn(user);
+
+
+        when(
+                weaponService.findById(
+                        100
+                )
+        ).thenReturn(weapon);
+
+
+        when(
+                presetService.create(
+                        10,
+                        "傀異錬成テスト",
+                        100,
+                        null
+                )
+        ).thenReturn(savedPreset);
+
+
+        SimulatorForm simulatorForm
+                = new SimulatorForm();
+
+        simulatorForm.setWeaponId(
+                100
+        );
+
+        simulatorForm.setWeaponAugmentAttackLevel(
+                4
+        );
+
+        simulatorForm.setWeaponAugmentElementLevel(
+                8
+        );
+
+        simulatorForm.setWeaponAugmentAffinityLevel(
+                3
+        );
+
+        simulatorForm.setWeaponAugmentSharpnessLevel(
+                4
+        );
+
+
+        Preset result
+                = presetSaveService.save(
+                        "testuser",
+                        "傀異錬成テスト",
+                        simulatorForm,
+                        Map.of()
+                );
+
+
+        assertSame(
+                savedPreset,
+                result
+        );
+
+
+        verify(
+                presetWeaponAugmentService
+        ).create(
+                503,
+                4,
+                8,
+                3,
+                4
         );
     }
 
