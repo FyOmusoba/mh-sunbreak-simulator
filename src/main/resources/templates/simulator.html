@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
@@ -84,6 +84,276 @@
         <button type="button" onclick="goWeaponSelect()">
             武器を選び直す
         </button>
+    </div>
+
+    <br>
+
+    <!-- ================================================== -->
+    <!-- 武器傀異錬成 -->
+    <!-- ================================================== -->
+
+    <div th:if="${weapon != null}">
+
+        <h2>武器傀異錬成</h2>
+
+        <table border="1">
+
+            <tr>
+                <th>項目</th>
+                <th>Lv</th>
+                <th>補正後</th>
+            </tr>
+
+
+            <!-- 攻撃力強化 -->
+            <tr>
+
+                <th>攻撃力強化</th>
+
+                <td>
+                    <select onchange="selectWeaponAugment(
+                        'weaponAugmentAttackLevel',
+                        this.value
+                    )">
+
+                        <option value=""
+                                th:selected="${simulatorForm.weaponAugmentAttackLevel == null}">
+                            なし
+                        </option>
+
+                        <option value="1"
+                                th:selected="${simulatorForm.weaponAugmentAttackLevel == 1}">
+                            Lv1
+                        </option>
+
+                        <option value="2"
+                                th:selected="${simulatorForm.weaponAugmentAttackLevel == 2}">
+                            Lv2
+                        </option>
+
+                        <option value="3"
+                                th:selected="${simulatorForm.weaponAugmentAttackLevel == 3}">
+                            Lv3
+                        </option>
+
+                        <option value="4"
+                                th:selected="${simulatorForm.weaponAugmentAttackLevel == 4}">
+                            Lv4
+                        </option>
+
+                    </select>
+                </td>
+
+                <td>
+                    <span th:text="${weapon.attack}"></span>
+                    →
+                    <strong th:text="${augmentedWeaponAttack}"></strong>
+                </td>
+
+            </tr>
+
+
+            <!-- 属性・状態異常強化 -->
+            <tr th:if="${weapon.weaponType != 'ライトボウガン'
+                        and weapon.weaponType != 'ヘビィボウガン'
+                        and (
+                            (weapon.elementType != null
+                                and weapon.elementType != ''
+                                and weapon.elementType != '無')
+                            or
+                            (weapon.subElementType != null
+                                and weapon.subElementType != ''
+                                and weapon.subElementType != '無')
+                        )}">
+
+                <th>属性・状態異常強化</th>
+
+                <td>
+                    <select onchange="selectWeaponAugment(
+                        'weaponAugmentElementLevel',
+                        this.value
+                    )">
+
+                        <option value=""
+                                th:selected="${simulatorForm.weaponAugmentElementLevel == null}">
+                            なし
+                        </option>
+
+                        <option value="1"
+                                th:selected="${simulatorForm.weaponAugmentElementLevel == 1}">
+                            Lv1
+                        </option>
+
+                        <option value="2"
+                                th:selected="${simulatorForm.weaponAugmentElementLevel == 2}">
+                            Lv2
+                        </option>
+
+                        <option value="3"
+                                th:selected="${simulatorForm.weaponAugmentElementLevel == 3}">
+                            Lv3
+                        </option>
+
+                        <option value="4"
+                                th:selected="${simulatorForm.weaponAugmentElementLevel == 4}">
+                            Lv4
+                        </option>
+
+                        <option value="5"
+                                th:if="${weapon.elementType == '火'
+                                    or weapon.elementType == '水'
+                                    or weapon.elementType == '雷'
+                                    or weapon.elementType == '氷'
+                                    or weapon.elementType == '龍'}"
+                                th:selected="${simulatorForm.weaponAugmentElementLevel == 5}">
+                            Lv5
+                        </option>
+
+                        <option value="6"
+                                th:if="${weapon.elementType == '火'
+                                    or weapon.elementType == '水'
+                                    or weapon.elementType == '雷'
+                                    or weapon.elementType == '氷'
+                                    or weapon.elementType == '龍'}"
+                                th:selected="${simulatorForm.weaponAugmentElementLevel == 6}">
+                            Lv6
+                        </option>
+
+                        <option value="7"
+                                th:if="${weapon.elementType == '火'
+                                    or weapon.elementType == '水'
+                                    or weapon.elementType == '雷'
+                                    or weapon.elementType == '氷'
+                                    or weapon.elementType == '龍'}"
+                                th:selected="${simulatorForm.weaponAugmentElementLevel == 7}">
+                            Lv7
+                        </option>
+
+                        <option value="8"
+                                th:if="${weapon.elementType == '火'
+                                    or weapon.elementType == '水'
+                                    or weapon.elementType == '雷'
+                                    or weapon.elementType == '氷'
+                                    or weapon.elementType == '龍'}"
+                                th:selected="${simulatorForm.weaponAugmentElementLevel == 8}">
+                            Lv8
+                        </option>
+
+                    </select>
+                </td>
+
+                <td>
+                    <span th:if="${weapon.elementValue != null}">
+                        主：
+                        <span th:text="${weapon.elementValue}"></span>
+                        →
+                        <strong th:text="${augmentedWeaponElementValue}"></strong>
+                    </span>
+
+                    <span th:if="${weapon.subElementValue != null}">
+                        ／ 副：
+                        <span th:text="${weapon.subElementValue}"></span>
+                        →
+                        <strong th:text="${augmentedWeaponSubElementValue}"></strong>
+                    </span>
+                </td>
+
+            </tr>
+
+
+            <!-- 会心率強化 -->
+            <tr>
+
+                <th>会心率強化</th>
+
+                <td>
+                    <select onchange="selectWeaponAugment(
+                        'weaponAugmentAffinityLevel',
+                        this.value
+                    )">
+
+                        <option value=""
+                                th:selected="${simulatorForm.weaponAugmentAffinityLevel == null}">
+                            なし
+                        </option>
+
+                        <option value="1"
+                                th:selected="${simulatorForm.weaponAugmentAffinityLevel == 1}">
+                            Lv1
+                        </option>
+
+                        <option value="2"
+                                th:selected="${simulatorForm.weaponAugmentAffinityLevel == 2}">
+                            Lv2
+                        </option>
+
+                        <option value="3"
+                                th:selected="${simulatorForm.weaponAugmentAffinityLevel == 3}">
+                            Lv3
+                        </option>
+
+                    </select>
+                </td>
+
+                <td>
+                    <span th:text="${weapon.affinity}"></span>%
+                    →
+                    <strong th:text="${augmentedWeaponAffinity}"></strong>%
+                </td>
+
+            </tr>
+
+
+            <!-- 斬れ味強化 -->
+            <tr th:if="${weapon.weaponType != '弓'
+                        and weapon.weaponType != 'ライトボウガン'
+                        and weapon.weaponType != 'ヘビィボウガン'}">
+
+                <th>斬れ味強化</th>
+
+                <td>
+                    <select onchange="selectWeaponAugment(
+                        'weaponAugmentSharpnessLevel',
+                        this.value
+                    )">
+
+                        <option value=""
+                                th:selected="${simulatorForm.weaponAugmentSharpnessLevel == null}">
+                            なし
+                        </option>
+
+                        <option value="1"
+                                th:selected="${simulatorForm.weaponAugmentSharpnessLevel == 1}">
+                            Lv1
+                        </option>
+
+                        <option value="2"
+                                th:selected="${simulatorForm.weaponAugmentSharpnessLevel == 2}">
+                            Lv2
+                        </option>
+
+                        <option value="3"
+                                th:selected="${simulatorForm.weaponAugmentSharpnessLevel == 3}">
+                            Lv3
+                        </option>
+
+                        <option value="4"
+                                th:selected="${simulatorForm.weaponAugmentSharpnessLevel == 4}">
+                            Lv4
+                        </option>
+
+                    </select>
+                </td>
+
+                <td>
+                    +
+                    <strong th:text="${weaponAugmentModifier.sharpnessAdd}"></strong>
+                </td>
+
+            </tr>
+
+        </table>
+
     </div>
 
     <br>
@@ -2928,6 +3198,36 @@
             url.searchParams.delete(
                     parameterName
             );
+
+            window.location.href
+                    = url.toString();
+        }
+
+
+        function selectWeaponAugment(
+                parameterName,
+                level) {
+
+            const url
+                    = new URL(
+                            window.location.href
+                    );
+
+
+            if (level) {
+
+                url.searchParams.set(
+                        parameterName,
+                        level
+                );
+
+            } else {
+
+                url.searchParams.delete(
+                        parameterName
+                );
+            }
+
 
             window.location.href
                     = url.toString();

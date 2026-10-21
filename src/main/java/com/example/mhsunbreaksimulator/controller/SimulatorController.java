@@ -33,6 +33,7 @@ import com.example.mhsunbreaksimulator.dto.PhysicalHitzoneDamageResult;
 import com.example.mhsunbreaksimulator.dto.SkillStateSelection;
 import com.example.mhsunbreaksimulator.dto.SkillTotal;
 import com.example.mhsunbreaksimulator.dto.TalismanSkill;
+import com.example.mhsunbreaksimulator.dto.WeaponAugmentModifier;
 import com.example.mhsunbreaksimulator.dto.WeakpointSkillModifier;
 import com.example.mhsunbreaksimulator.entity.Armor;
 import com.example.mhsunbreaksimulator.entity.BowCharge;
@@ -78,6 +79,7 @@ import com.example.mhsunbreaksimulator.service.SkillAggregationService;
 import com.example.mhsunbreaksimulator.service.SkillService;
 import com.example.mhsunbreaksimulator.service.SkillStateSelectionService;
 import com.example.mhsunbreaksimulator.service.WeakpointSkillModifierService;
+import com.example.mhsunbreaksimulator.service.WeaponAugmentModifierService;
 import com.example.mhsunbreaksimulator.service.WeaponService;
 
 import lombok.RequiredArgsConstructor;
@@ -87,6 +89,7 @@ import lombok.RequiredArgsConstructor;
 public class SimulatorController {
 
     private final WeaponService weaponService;
+    private final WeaponAugmentModifierService weaponAugmentModifierService;
 
     private final BowChargeService bowChargeService;
     private final BowChargeModifierService bowChargeModifierService;
@@ -158,6 +161,91 @@ public class SimulatorController {
         model.addAttribute(
                 "weapon",
                 weapon
+        );
+
+
+        /*
+         * =====================================================
+         * 武器傀異錬成
+         * =====================================================
+         */
+
+        WeaponAugmentModifier weaponAugmentModifier
+                = weaponAugmentModifierService.calculate(
+                        weapon,
+                        simulatorForm.getWeaponAugmentAttackLevel(),
+                        simulatorForm.getWeaponAugmentElementLevel(),
+                        simulatorForm.getWeaponAugmentAffinityLevel(),
+                        simulatorForm.getWeaponAugmentSharpnessLevel()
+                );
+
+
+        model.addAttribute(
+                "weaponAugmentModifier",
+                weaponAugmentModifier
+        );
+
+
+        /*
+         * =====================================================
+         * 傀異錬成反映後の武器基礎値
+         * =====================================================
+         */
+
+        Integer augmentedWeaponAttack
+                = weapon == null
+                        || weapon.getAttack() == null
+
+                                ? null
+                                : weapon.getAttack()
+                                        + weaponAugmentModifier.getAttackAdd();
+
+
+        Integer augmentedWeaponElementValue
+                = weapon == null
+                        || weapon.getElementValue() == null
+
+                                ? null
+                                : weapon.getElementValue()
+                                        + weaponAugmentModifier.getElementAdd();
+
+
+        Integer augmentedWeaponSubElementValue
+                = weapon == null
+                        || weapon.getSubElementValue() == null
+
+                                ? null
+                                : weapon.getSubElementValue()
+                                        + weaponAugmentModifier.getSubElementAdd();
+
+
+        Integer augmentedWeaponAffinity
+                = weapon == null
+                        || weapon.getAffinity() == null
+
+                                ? null
+                                : weapon.getAffinity()
+                                        + weaponAugmentModifier.getAffinityAdd();
+
+
+        model.addAttribute(
+                "augmentedWeaponAttack",
+                augmentedWeaponAttack
+        );
+
+        model.addAttribute(
+                "augmentedWeaponElementValue",
+                augmentedWeaponElementValue
+        );
+
+        model.addAttribute(
+                "augmentedWeaponSubElementValue",
+                augmentedWeaponSubElementValue
+        );
+
+        model.addAttribute(
+                "augmentedWeaponAffinity",
+                augmentedWeaponAffinity
         );
 
 
@@ -1657,9 +1745,7 @@ public class SimulatorController {
 
         CriticalModifierResult criticalModifierResult
                 = criticalModifierService.calculate(
-                        weapon == null
-                                ? null
-                                : weapon.getAffinity(),
+                        augmentedWeaponAffinity,
                         conditionalSkillModifierTotal,
                         weakpointSkillModifier
                 );
@@ -1766,9 +1852,7 @@ public class SimulatorController {
 
         BowPhysicalDamageResult bowPhysicalDamageResult
                 = bowPhysicalDamageService.calculate(
-                        weapon == null
-                                ? null
-                                : weapon.getAttack(),
+                        augmentedWeaponAttack,
                         bowPhysicalModifier,
                         conditionalSkillModifierTotal
                 );
@@ -1789,9 +1873,7 @@ public class SimulatorController {
 
         BowElementDamageResult bowElementDamageResult
                 = bowElementDamageService.calculate(
-                        weapon == null
-                                ? null
-                                : weapon.getElementValue(),
+                        augmentedWeaponElementValue,
                         selectedBowCharge == null
                                 ? null
                                 : bowChargeModifier,
@@ -1817,9 +1899,7 @@ public class SimulatorController {
 
         BowgunPhysicalDamageResult bowgunPhysicalDamageResult
                 = bowgunPhysicalDamageService.calculate(
-                        weapon == null
-                                ? null
-                                : weapon.getAttack(),
+                        augmentedWeaponAttack,
                         selectedBowgunAmmo == null
                                 ? null
                                 : bowgunAmmoModifier,
@@ -1843,9 +1923,7 @@ public class SimulatorController {
 
         BowgunElementDamageResult bowgunElementDamageResult
                 = bowgunElementDamageService.calculate(
-                        weapon == null
-                                ? null
-                                : weapon.getAttack(),
+                        augmentedWeaponAttack,
                         selectedBowgunAmmo == null
                                 ? null
                                 : bowgunAmmoModifier,
