@@ -61,7 +61,24 @@ public class ConditionalSkillModifierTotal {
     private BigDecimal elementCritDamageMul
             = BigDecimal.ONE;
 
+    /*
+     * 通常弾・貫通弾・散弾・矢タイプなどの
+     * 通常射撃系倍率。
+     */
     private BigDecimal shotMul
+            = BigDecimal.ONE;
+
+    /*
+     * 特殊射撃強化専用倍率。
+     *
+     * 対象：
+     * ・ライトボウガン特殊弾
+     * ・ヘビィボウガン特殊弾
+     * ・弓 竜の一矢
+     *
+     * 通常弾・貫通弾・散弾などには使用しない。
+     */
+    private BigDecimal specialShotMul
             = BigDecimal.ONE;
 
     private BigDecimal phialMul

@@ -1,5 +1,8 @@
 package com.example.mhsunbreaksimulator;
 
+import static org.junit.jupiter.api.Assertions.*;
+
+import java.math.BigDecimal;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
@@ -65,6 +68,37 @@ public class SkillEffectStateServiceTest {
                 + state.getAttackAdd()
                 + " / elementAdd="
                 + state.getElementAdd()
+        );
+    }
+
+
+    @Test
+    void testSpecialShotBoostLevel2() {
+
+        SkillEffectState state
+                = skillEffectStateService.findBySkillIdAndLevelAndStateCode(
+                        95,
+                        2,
+                        "DEFAULT",
+                        "ヘビィボウガン"
+                );
+
+        assertNotNull(state);
+        assertNotNull(state.getSpecialShotMul());
+
+        assertEquals(
+                0,
+                new BigDecimal("1.20")
+                        .compareTo(state.getSpecialShotMul())
+        );
+
+        System.out.println(
+                "特殊射撃強化Lv2："
+                + state.getStateCode()
+                + " / "
+                + state.getStateName()
+                + " / specialShotMul="
+                + state.getSpecialShotMul()
         );
     }
 }

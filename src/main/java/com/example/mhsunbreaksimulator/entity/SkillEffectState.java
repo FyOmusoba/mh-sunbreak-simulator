@@ -43,6 +43,21 @@ public class SkillEffectState {
 
     private BigDecimal shotMul;
 
+    /*
+     * 特殊射撃強化倍率。
+     *
+     * 対象：
+     * ・ライトボウガン特殊弾
+     * ・ヘビィボウガン特殊弾
+     * ・弓 竜の一矢
+     *
+     * Lv1 = 1.10
+     * Lv2 = 1.20
+     *
+     * 通常弾・貫通弾・散弾などには使用しない。
+     */
+    private BigDecimal specialShotMul;
+
     private BigDecimal phialMul;
 
     private BigDecimal fixedDamageAdd;

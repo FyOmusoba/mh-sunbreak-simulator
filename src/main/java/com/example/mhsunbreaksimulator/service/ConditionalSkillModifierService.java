@@ -236,6 +236,28 @@ public class ConditionalSkillModifierService {
             );
 
 
+            /*
+             * 特殊射撃強化専用倍率。
+             *
+             * 通常のshotMulとは完全に分離する。
+             *
+             * 対象：
+             * ・ライトボウガン特殊弾
+             * ・ヘビィボウガン特殊弾
+             * ・弓 竜の一矢
+             *
+             * 通常弾・貫通弾・散弾などには
+             * この倍率を使用しない。
+             */
+            total.setSpecialShotMul(
+                    total.getSpecialShotMul().multiply(
+                            safeMultiplier(
+                                    effect.getSpecialShotMul()
+                            )
+                    )
+            );
+
+
             total.setPhialMul(
                     total.getPhialMul().multiply(
                             safeMultiplier(

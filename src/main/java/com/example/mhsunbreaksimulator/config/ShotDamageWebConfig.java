@@ -55,6 +55,10 @@ import lombok.RequiredArgsConstructor;
 public class ShotDamageWebConfig
         implements WebMvcConfigurer {
 
+    private static final int POWDER_MANTLE_SKILL_ID
+            = 74;
+
+
     private final ShotSkillModifierService shotSkillModifierService;
 
     private final BowPhysicalDamageService bowPhysicalDamageService;
@@ -176,6 +180,11 @@ public class ShotDamageWebConfig
         }
 
 
+        /*
+         * =================================================
+         * 弓 / ボウガン
+         * =================================================
+         */
         if ("弓".equals(
                 weapon.getWeaponType()
         )) {
@@ -186,10 +195,8 @@ public class ShotDamageWebConfig
                     resolvedSkillEffects,
                     conditionalSkillModifierTotal
             );
-        }
 
-
-        else {
+        } else {
 
             applyBowgun(
                     model,
@@ -209,7 +216,9 @@ public class ShotDamageWebConfig
 
 
         /*
-         * まず通常ルートを計算。
+         * =================================================
+         * 通常ルート
+         * =================================================
          */
         recalculateFinalDamage(
                 model,
@@ -218,8 +227,25 @@ public class ShotDamageWebConfig
 
 
         /*
-         * ボウガン特殊弾の場合は
-         * 最後に特殊弾結果へ差し替える。
+         * =================================================
+         * 粉塵纏用の補正後攻撃力
+         * =================================================
+         *
+         * 特殊弾では後段で
+         * bowgunPhysicalDamageResultをnullにするため、
+         * その前に確保する。
+         */
+        BigDecimal effectiveAttackForAdditionalDamage
+                = resolveEffectiveAttackForAdditionalDamage(
+                        model,
+                        weapon
+                );
+
+
+        /*
+         * =================================================
+         * ボウガン特殊弾
+         * =================================================
          */
         if ("ライトボウガン".equals(
                 weapon.getWeaponType()
@@ -238,12 +264,27 @@ public class ShotDamageWebConfig
 
 
         /*
-         * 通常射撃・特殊弾のどちらでも、
-         * 最後に固定追加ダメージを1回だけ加算する。
+         * =================================================
+         * 鬼火纏
+         * 固定追加ダメージ
+         * =================================================
          */
         applyFixedAdditionalDamage(
                 model,
                 conditionalSkillModifierTotal
+        );
+
+
+        /*
+         * =================================================
+         * 粉塵纏
+         * 攻撃力参照固定追加ダメージ
+         * =================================================
+         */
+        applyAttackScaledAdditionalDamage(
+                model,
+                resolvedSkillEffects,
+                effectiveAttackForAdditionalDamage
         );
     }
 
@@ -252,13 +293,6 @@ public class ShotDamageWebConfig
      * =====================================================
      * 固定追加ダメージ
      * =====================================================
-     *
-     * 鬼火纏の鬼火爆発など、
-     * 肉質・会心の影響を受けない固定ダメージを
-     * 現在の最終ダメージへ追加する。
-     *
-     * この処理は通常射撃計算・特殊弾差し替えの
-     * 両方が終わった後に1回だけ呼ぶ。
      */
     private void applyFixedAdditionalDamage(
             Map<String, Object> model,
@@ -299,6 +333,176 @@ public class ShotDamageWebConfig
                 "finalDamageResult",
                 finalDamageResult
         );
+    }
+
+
+    /*
+     * =====================================================
+     * 粉塵纏
+     * 攻撃力参照固定追加ダメージ
+     * =====================================================
+     */
+    private void applyAttackScaledAdditionalDamage(
+            Map<String, Object> model,
+            Map<Integer, SkillEffectState> resolvedSkillEffects,
+            BigDecimal effectiveAttack) {
+
+        if (model == null
+                || resolvedSkillEffects == null
+                || resolvedSkillEffects.isEmpty()) {
+
+            return;
+        }
+
+
+        SkillEffectState powderMantleEffect
+                = resolvedSkillEffects.get(
+                        POWDER_MANTLE_SKILL_ID
+                );
+
+
+        if (powderMantleEffect == null) {
+
+            return;
+        }
+
+
+        /*
+         * RED
+         * → 0.30
+         *
+         * BLUE
+         * → 1.25
+         *
+         * INACTIVE
+         * → null
+         */
+        BigDecimal attackMultiplier
+                = powderMantleEffect
+                        .getAdditionalDamageAttackMul();
+
+
+        if (attackMultiplier == null) {
+
+            return;
+        }
+
+
+        Object finalDamageObject
+                = model.get(
+                        "finalDamageResult"
+                );
+
+
+        if (!(finalDamageObject
+                instanceof FinalDamageResult finalDamageResult)) {
+
+            return;
+        }
+
+
+        finalDamageResult
+                = finalDamageService
+                        .addAttackScaledFixedDamage(
+                                finalDamageResult,
+                                effectiveAttack,
+                                attackMultiplier
+                        );
+
+
+        model.put(
+                "finalDamageResult",
+                finalDamageResult
+        );
+    }
+
+
+    /*
+     * =====================================================
+     * 粉塵纏用
+     * 補正後攻撃力取得
+     * =====================================================
+     */
+    private BigDecimal resolveEffectiveAttackForAdditionalDamage(
+            Map<String, Object> model,
+            Weapon weapon) {
+
+        if (model == null
+                || weapon == null) {
+
+            return null;
+        }
+
+
+        if ("弓".equals(
+                weapon.getWeaponType()
+        )) {
+
+            Object resultObject
+                    = model.get(
+                            "bowPhysicalDamageResult"
+                    );
+
+
+            if (resultObject
+                    instanceof BowPhysicalDamageResult result) {
+
+                return result.getEffectiveAttack();
+            }
+        }
+
+
+        if ("ライトボウガン".equals(
+                weapon.getWeaponType()
+        )
+                || "ヘビィボウガン".equals(
+                        weapon.getWeaponType()
+                )) {
+
+            Object physicalResultObject
+                    = model.get(
+                            "bowgunPhysicalDamageResult"
+                    );
+
+
+            if (physicalResultObject
+                    instanceof BowgunPhysicalDamageResult physicalResult
+                    && physicalResult.getEffectiveAttack() != null
+                    && physicalResult.getEffectiveAttack().compareTo(
+                            BigDecimal.ZERO
+                    ) > 0) {
+
+                return physicalResult.getEffectiveAttack();
+            }
+
+
+            /*
+             * 特殊弾では
+             * BowgunPhysicalDamageServiceが通常物理計算を行えず、
+             * effectiveAttackが0のままになる場合がある。
+             *
+             * その場合は特殊弾計算側で保持している
+             * effectiveAttackを使用する。
+             */
+            Object specialResultObject
+                    = model.get(
+                            "bowgunSpecialDamageResult"
+                    );
+
+
+            if (specialResultObject
+                    instanceof BowgunSpecialDamageResult specialResult
+                    && specialResult.getEffectiveAttack() != null
+                    && specialResult.getEffectiveAttack().compareTo(
+                            BigDecimal.ZERO
+                    ) > 0) {
+
+                return specialResult.getEffectiveAttack();
+            }
+        }
+
+
+        return null;
     }
 
 
@@ -526,10 +730,6 @@ public class ShotDamageWebConfig
         }
 
 
-        /*
-         * 通常弾・属性弾なら
-         * 特殊弾処理はしない。
-         */
         if (!isBowgunSpecialDamageAmmo(
                 selectedBowgunAmmo.getAmmoType()
         )) {
@@ -580,9 +780,6 @@ public class ShotDamageWebConfig
         }
 
 
-        /*
-         * 特殊弾専用計算
-         */
         BowgunSpecialFinalDamageResult
                 bowgunSpecialFinalDamageResult
                 = bowgunSpecialFinalDamageService.calculate(
@@ -601,9 +798,6 @@ public class ShotDamageWebConfig
         );
 
 
-        /*
-         * 既存の最終ダメージ表示用DTOへ変換。
-         */
         FinalDamageResult specialFinalDamageResult
                 = convertSpecialFinalDamageResult(
                         bowgunSpecialFinalDamageResult
@@ -616,12 +810,6 @@ public class ShotDamageWebConfig
         );
 
 
-        /*
-         * =================================================
-         * 特殊弾選択中は
-         * 通常弾・属性弾用の途中表示を隠す
-         * =================================================
-         */
         hideNormalBowgunDamageBlocksForSpecialAmmo(
                 model
         );
@@ -633,66 +821,35 @@ public class ShotDamageWebConfig
      * 特殊弾選択中
      * 通常弾用表示を非表示
      * =====================================================
-     *
-     * simulator.html側には既に
-     *
-     * th:if="${... != null}"
-     *
-     * が入っているので、
-     * Modelをnullにするだけで
-     * HTML変更なしで非表示にできる。
      */
     private void hideNormalBowgunDamageBlocksForSpecialAmmo(
             Map<String, Object> model) {
 
-        /*
-         * 「ボウガン弾・計算用データ」
-         */
         model.put(
                 "bowgunAmmoModifier",
                 null
         );
 
-
-        /*
-         * 「ボウガン物理ダメージ計算途中値」
-         */
         model.put(
                 "bowgunPhysicalDamageResult",
                 null
         );
 
-
-        /*
-         * 「ボウガン属性ダメージ計算途中値」
-         */
         model.put(
                 "bowgunElementDamageResult",
                 null
         );
 
-
-        /*
-         * 「物理肉質適用後」
-         */
         model.put(
                 "physicalHitzoneDamageResult",
                 null
         );
 
-
-        /*
-         * 「属性肉質適用後」
-         */
         model.put(
                 "elementHitzoneDamageResult",
                 null
         );
 
-
-        /*
-         * 特殊弾では速射補正表示も不要。
-         */
         model.put(
                 "bowgunRapidFireModifier",
                 null
@@ -703,8 +860,7 @@ public class ShotDamageWebConfig
     /*
      * =====================================================
      * 特殊弾
-     * ↓
-     * FinalDamageResult
+     * FinalDamageResultへ変換
      * =====================================================
      */
     private FinalDamageResult convertSpecialFinalDamageResult(
@@ -971,11 +1127,9 @@ public class ShotDamageWebConfig
                 ammoElementType
         );
 
-
         hitzoneValueResult.setElemental(
                 true
         );
-
 
         hitzoneValueResult.setElementHitzone(
                 resolveElementHitzone(
@@ -1285,10 +1439,8 @@ public class ShotDamageWebConfig
                 physicalDamageBeforeHitzone
                         = result.getPhysicalDamagePerHit();
             }
-        }
 
-
-        else if ("ライトボウガン".equals(
+        } else if ("ライトボウガン".equals(
                 weapon.getWeaponType()
         )
                 || "ヘビィボウガン".equals(
@@ -1358,10 +1510,8 @@ public class ShotDamageWebConfig
                 elementDamageBeforeHitzone
                         = result.getElementDamagePerHit();
             }
-        }
 
-
-        else {
+        } else {
 
             Object resultObject
                     = model.get(
