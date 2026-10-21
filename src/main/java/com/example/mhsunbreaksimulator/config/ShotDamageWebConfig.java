@@ -12,6 +12,9 @@ import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
+import com.example.mhsunbreaksimulator.dto.BowChargeModifier;
+import com.example.mhsunbreaksimulator.dto.BowCoatingModifier;
+import com.example.mhsunbreaksimulator.dto.BowDragonPiercerModifier;
 import com.example.mhsunbreaksimulator.dto.BowElementDamageResult;
 import com.example.mhsunbreaksimulator.dto.BowPhysicalDamageResult;
 import com.example.mhsunbreaksimulator.dto.BowPhysicalModifier;
@@ -35,6 +38,9 @@ import com.example.mhsunbreaksimulator.entity.BowgunAmmo;
 import com.example.mhsunbreaksimulator.entity.MonsterHitzone;
 import com.example.mhsunbreaksimulator.entity.SkillEffectState;
 import com.example.mhsunbreaksimulator.entity.Weapon;
+import com.example.mhsunbreaksimulator.form.SimulatorForm;
+import com.example.mhsunbreaksimulator.service.BowDragonPiercerDamageService;
+import com.example.mhsunbreaksimulator.service.BowDragonPiercerModifierService;
 import com.example.mhsunbreaksimulator.service.BowPhysicalDamageService;
 import com.example.mhsunbreaksimulator.service.BowgunElementDamageService;
 import com.example.mhsunbreaksimulator.service.BowgunPhysicalDamageService;
@@ -62,6 +68,12 @@ public class ShotDamageWebConfig
     private final ShotSkillModifierService shotSkillModifierService;
 
     private final BowPhysicalDamageService bowPhysicalDamageService;
+
+    private final BowDragonPiercerModifierService
+            bowDragonPiercerModifierService;
+
+    private final BowDragonPiercerDamageService
+            bowDragonPiercerDamageService;
 
     private final BowgunPhysicalDamageService bowgunPhysicalDamageService;
 
@@ -531,6 +543,35 @@ public class ShotDamageWebConfig
         }
 
 
+        /*
+         * =================================================
+         * 竜の一矢
+         * =================================================
+         *
+         * bowAttackType=DRAGON_PIERCER の場合は、
+         * 通常矢ルートへ入れず、
+         * 竜の一矢専用計算へ切り替える。
+         */
+        if (isDragonPiercerSelected(
+                model
+        )) {
+
+            applyBowDragonPiercer(
+                    model,
+                    weapon,
+                    selectedBowCharge,
+                    conditionalSkillModifierTotal
+            );
+
+            return;
+        }
+
+
+        /*
+         * =================================================
+         * 通常矢
+         * =================================================
+         */
         Object bowPhysicalModifierObject
                 = model.get(
                         "bowPhysicalModifier"
@@ -570,6 +611,249 @@ public class ShotDamageWebConfig
                 "bowPhysicalDamageResult",
                 bowPhysicalDamageResult
         );
+
+
+        /*
+         * 通常矢選択時は
+         * 竜の一矢専用途中値を残さない。
+         */
+        model.put(
+                "bowDragonPiercerModifier",
+                null
+        );
+
+        model.put(
+                "bowDragonPiercerDamageResult",
+                null
+        );
+    }
+
+
+    /*
+     * =====================================================
+     * 弓
+     * 竜の一矢
+     * =====================================================
+     */
+    private void applyBowDragonPiercer(
+            Map<String, Object> model,
+            Weapon weapon,
+            BowCharge selectedBowCharge,
+            ConditionalSkillModifierTotal
+                    conditionalSkillModifierTotal) {
+
+        Object chargeModifierObject
+                = model.get(
+                        "bowChargeModifier"
+                );
+
+
+        if (!(chargeModifierObject
+                instanceof BowChargeModifier bowChargeModifier)) {
+
+            return;
+        }
+
+
+        Object coatingModifierObject
+                = model.get(
+                        "bowCoatingModifier"
+                );
+
+
+        if (!(coatingModifierObject
+                instanceof BowCoatingModifier bowCoatingModifier)) {
+
+            return;
+        }
+
+
+        /*
+         * =================================================
+         * 竜の一矢専用MV
+         * =================================================
+         *
+         * 溜め1 = 28
+         * 溜め2 = 30
+         * 溜め3 = 32
+         * 溜め4 = 34
+         *
+         * 最大7hit
+         */
+        BowDragonPiercerModifier dragonPiercerModifier
+                = bowDragonPiercerModifierService.calculate(
+                        selectedBowCharge.getChargeLevel()
+                );
+
+
+        model.put(
+                "bowDragonPiercerModifier",
+                dragonPiercerModifier
+        );
+
+
+        /*
+         * =================================================
+         * 竜の一矢物理ダメージ
+         * =================================================
+         *
+         * 通常矢用shotMulは使用しない。
+         *
+         * 特殊射撃強化は
+         * ConditionalSkillModifierTotal.specialShotMul
+         * として専用Service内で1回だけ適用する。
+         */
+        BowPhysicalDamageResult dragonPiercerDamageResult
+                = bowDragonPiercerDamageService.calculate(
+                        resolveWeaponAttackForDamage(
+                                model,
+                                weapon
+                        ),
+                        dragonPiercerModifier,
+                        bowChargeModifier,
+                        bowCoatingModifier,
+                        conditionalSkillModifierTotal
+                );
+
+
+        model.put(
+                "bowDragonPiercerDamageResult",
+                dragonPiercerDamageResult
+        );
+
+
+        /*
+         * 既存の肉質・会心・最終ダメージ計算は
+         * bowPhysicalDamageResultを参照するため、
+         * 竜の一矢結果へ差し替える。
+         */
+        model.put(
+                "bowPhysicalDamageResult",
+                dragonPiercerDamageResult
+        );
+
+
+        /*
+         * 竜の一矢には
+         * 通常弾・連射矢強化 / 貫通弾・貫通矢強化 /
+         * 散弾・拡散矢強化を適用しない。
+         */
+        model.put(
+                "shotSkillModifier",
+                null
+        );
+
+
+        /*
+         * =================================================
+         * 竜の一矢属性ダメージ
+         * 最大hit数補正
+         * =================================================
+         *
+         * 1hitあたり属性値はControllerで計算済みの
+         * BowElementDamageResultをそのまま使用できる。
+         *
+         * ただし最大hit数だけは通常矢の本数ではなく、
+         * 竜の一矢の最大7hitへ合わせる。
+         *
+         * 特殊射撃強化は属性には掛けない。
+         */
+        Object elementDamageObject
+                = model.get(
+                        "bowElementDamageResult"
+                );
+
+
+        if (elementDamageObject
+                instanceof BowElementDamageResult elementDamageResult
+                && elementDamageResult.getElementDamagePerHit() != null
+                && dragonPiercerModifier.getMaxHitCount() != null
+                && dragonPiercerModifier.getMaxHitCount() > 0) {
+
+            elementDamageResult.setMaxElementDamage(
+                    elementDamageResult
+                            .getElementDamagePerHit()
+                            .multiply(
+                                    BigDecimal.valueOf(
+                                            dragonPiercerModifier
+                                                    .getMaxHitCount()
+                                    )
+                            )
+            );
+        }
+    }
+
+
+    /*
+     * =====================================================
+     * 竜の一矢選択判定
+     * =====================================================
+     */
+    private boolean isDragonPiercerSelected(
+            Map<String, Object> model) {
+
+        if (model == null) {
+
+            return false;
+        }
+
+
+        Object formObject
+                = model.get(
+                        "simulatorForm"
+                );
+
+
+        if (!(formObject
+                instanceof SimulatorForm simulatorForm)) {
+
+            return false;
+        }
+
+
+        return "DRAGON_PIERCER".equals(
+                simulatorForm.getBowAttackType()
+        );
+    }
+
+
+    /*
+     * =====================================================
+     * 射撃ダメージ計算用攻撃力
+     * =====================================================
+     *
+     * 武器傀異錬成の攻撃力強化がModelへ存在する場合は
+     * その値を優先する。
+     *
+     * 存在しない場合は武器本来の攻撃力へフォールバック。
+     */
+    private Integer resolveWeaponAttackForDamage(
+            Map<String, Object> model,
+            Weapon weapon) {
+
+        if (weapon == null) {
+
+            return null;
+        }
+
+
+        if (model != null) {
+
+            Object augmentedAttackObject
+                    = model.get(
+                            "augmentedWeaponAttack"
+                    );
+
+
+            if (augmentedAttackObject
+                    instanceof Integer augmentedAttack) {
+
+                return augmentedAttack;
+            }
+        }
+
+
+        return weapon.getAttack();
     }
 
 
@@ -1676,3 +1960,4 @@ public class ShotDamageWebConfig
                 );
     }
 }
+
