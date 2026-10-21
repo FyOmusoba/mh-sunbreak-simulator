@@ -12,8 +12,13 @@
 
 
     <!-- ================================================== -->
-    <!-- エラーメッセージ -->
+    <!-- メッセージ -->
     <!-- ================================================== -->
+
+    <p th:if="${param.presetDeleted != null
+            and param.presetDeleted[0] == 'true'}">
+        プリセットを削除しました。
+    </p>
 
     <p th:if="${param.presetError != null}"
        th:text="${param.presetError[0]}">
@@ -67,11 +72,37 @@
 
                 <td>
 
+                    <!-- ============================== -->
+                    <!-- 読み込み -->
+                    <!-- ============================== -->
+
                     <a th:href="@{/preset/load(
                         presetId=${preset.presetId}
                     )}">
                         読み込む
                     </a>
+
+
+                    <!-- ============================== -->
+                    <!-- 削除 -->
+                    <!-- ============================== -->
+
+                    <form th:action="@{/preset/delete}"
+                          method="post"
+                          style="display: inline;"
+                          onsubmit="return confirm(
+                              'このプリセットを削除しますか？'
+                          );">
+
+                        <input type="hidden"
+                               name="presetId"
+                               th:value="${preset.presetId}">
+
+                        <button type="submit">
+                            削除
+                        </button>
+
+                    </form>
 
                 </td>
 

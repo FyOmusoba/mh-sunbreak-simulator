@@ -16,6 +16,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import com.example.mhsunbreaksimulator.entity.Preset;
 import com.example.mhsunbreaksimulator.entity.User;
 import com.example.mhsunbreaksimulator.form.SimulatorForm;
+import com.example.mhsunbreaksimulator.service.PresetDeleteService;
 import com.example.mhsunbreaksimulator.service.PresetLoadService;
 import com.example.mhsunbreaksimulator.service.PresetSaveService;
 import com.example.mhsunbreaksimulator.service.PresetService;
@@ -31,6 +32,8 @@ public class PresetController {
 
     private final PresetLoadService presetLoadService;
 
+    private final PresetDeleteService presetDeleteService;
+
     private final PresetService presetService;
 
     private final UserService userService;
@@ -40,21 +43,11 @@ public class PresetController {
      * =====================================================
      * プリセット一覧
      * =====================================================
-     *
-     * ログイン中ユーザーが所有している
-     * プリセットだけを取得して表示する。
      */
     @GetMapping("/preset/list")
     public String showPresetList(
             Principal principal,
             Model model) {
-
-
-        /*
-         * =====================================================
-         * ログイン確認
-         * =====================================================
-         */
 
         if (principal == null
                 || principal.getName() == null
@@ -63,12 +56,6 @@ public class PresetController {
             return "redirect:/login";
         }
 
-
-        /*
-         * =====================================================
-         * ログインユーザー取得
-         * =====================================================
-         */
 
         User user
                 = userService.findByUsername(
@@ -82,12 +69,6 @@ public class PresetController {
             return "redirect:/login";
         }
 
-
-        /*
-         * =====================================================
-         * ユーザーのプリセット一覧取得
-         * =====================================================
-         */
 
         List<Preset> presets
                 = presetService.findByUserId(
@@ -109,22 +90,11 @@ public class PresetController {
      * =====================================================
      * プリセット読み込み
      * =====================================================
-     *
-     * 保存済みプリセットを
-     * シミュレーター用URLパラメータへ復元し、
-     * /simulator へ移動する。
      */
     @GetMapping("/preset/load")
     public String loadPreset(
             Principal principal,
             @RequestParam Integer presetId) {
-
-
-        /*
-         * =====================================================
-         * ログイン確認
-         * =====================================================
-         */
 
         if (principal == null
                 || principal.getName() == null
@@ -133,12 +103,6 @@ public class PresetController {
             return "redirect:/login";
         }
 
-
-        /*
-         * =====================================================
-         * プリセット復元
-         * =====================================================
-         */
 
         try {
 
@@ -166,6 +130,50 @@ public class PresetController {
 
     /*
      * =====================================================
+     * プリセット削除
+     * =====================================================
+     *
+     * POSTにすることで、
+     * URLを開いただけで削除されないようにする。
+     */
+    @PostMapping("/preset/delete")
+    public String deletePreset(
+            Principal principal,
+            @RequestParam Integer presetId) {
+
+        if (principal == null
+                || principal.getName() == null
+                || principal.getName().isBlank()) {
+
+            return "redirect:/login";
+        }
+
+
+        boolean deleted
+                = presetDeleteService.delete(
+                        presetId,
+                        principal.getName()
+                );
+
+
+        if (!deleted) {
+
+            return buildPresetListRedirect(
+                    "presetError",
+                    "プリセットを削除できませんでした。"
+            );
+        }
+
+
+        return buildPresetListRedirect(
+                "presetDeleted",
+                "true"
+        );
+    }
+
+
+    /*
+     * =====================================================
      * 現在のシミュレーター構成をプリセット保存
      * =====================================================
      */
@@ -176,13 +184,6 @@ public class PresetController {
             @ModelAttribute SimulatorForm simulatorForm,
             @RequestParam Map<String, String> requestParams) {
 
-
-        /*
-         * =====================================================
-         * ログインユーザー確認
-         * =====================================================
-         */
-
         if (principal == null
                 || principal.getName() == null
                 || principal.getName().isBlank()) {
@@ -190,12 +191,6 @@ public class PresetController {
             return "redirect:/login";
         }
 
-
-        /*
-         * =====================================================
-         * プリセット保存
-         * =====================================================
-         */
 
         try {
 
@@ -225,13 +220,6 @@ public class PresetController {
 
         } catch (DataIntegrityViolationException e) {
 
-            /*
-             * preset には
-             * UNIQUE (user_id, preset_name)
-             * があるため、同一ユーザーが同じ名前を
-             * 保存した場合などにここへ来る。
-             */
-
             return buildSimulatorRedirect(
                     requestParams,
                     "presetError",
@@ -243,8 +231,7 @@ public class PresetController {
 
     /*
      * =====================================================
-     * プリセット読み込み後の
-     * シミュレーターURL作成
+     * 読み込み後のシミュレーターURL作成
      * =====================================================
      */
     private String buildSimulatorRedirect(
@@ -300,12 +287,6 @@ public class PresetController {
      * =====================================================
      * 保存後のシミュレーターURL作成
      * =====================================================
-     *
-     * 保存前の武器・防具・装飾品・護石・
-     * 条件付きスキルなどのURLパラメータを維持する。
-     *
-     * presetName と _csrf は
-     * シミュレーター状態ではないため除外する。
      */
     private String buildSimulatorRedirect(
             Map<String, String> requestParams,
@@ -373,7 +354,7 @@ public class PresetController {
 
     /*
      * =====================================================
-     * プリセット一覧へ戻るURL作成
+     * プリセット一覧URL作成
      * =====================================================
      */
     private String buildPresetListRedirect(

@@ -16,6 +16,24 @@ public class SimulatorForm {
     // 百竜装飾品
     private Integer rampageDecorationId;
 
+    /*
+     * =====================================================
+     * 武器傀異錬成
+     * =====================================================
+     */
+
+    // 攻撃力強化Lv
+    private Integer weaponAugmentAttackLevel;
+
+    // 属性強化Lv
+    private Integer weaponAugmentElementLevel;
+
+    // 会心率強化Lv
+    private Integer weaponAugmentAffinityLevel;
+
+    // 斬れ味強化Lv
+    private Integer weaponAugmentSharpnessLevel;
+
     // 弓の選択中溜め段階
     private Integer bowChargeId;
 

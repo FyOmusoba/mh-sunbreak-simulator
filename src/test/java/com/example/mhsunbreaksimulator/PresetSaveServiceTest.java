@@ -11,7 +11,11 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import com.example.mhsunbreaksimulator.entity.BowCharge;
+import com.example.mhsunbreaksimulator.entity.BowCoating;
+import com.example.mhsunbreaksimulator.entity.BowgunAmmo;
 import com.example.mhsunbreaksimulator.entity.Preset;
+import com.example.mhsunbreaksimulator.entity.Skill;
 import com.example.mhsunbreaksimulator.entity.User;
 import com.example.mhsunbreaksimulator.entity.Weapon;
 import com.example.mhsunbreaksimulator.form.SimulatorForm;
@@ -88,56 +92,44 @@ class PresetSaveServiceTest {
     private PresetSaveService presetSaveService;
 
 
+    /*
+     * =====================================================
+     * 最低限の構成
+     * =====================================================
+     */
+
     @Test
     void save_最低限の構成を保存できる() {
 
-        User user = new User();
+        User user
+                = createUser();
 
-        user.setUserId(10);
-        user.setUsername("testuser");
+        Weapon weapon
+                = createWeapon(
+                        100,
+                        "太刀"
+                );
+
+        Preset savedPreset
+                = createPreset(
+                        500,
+                        100
+                );
+
 
         when(
                 userService.findByUsername(
                         "testuser"
                 )
-        ).thenReturn(
-                user
-        );
+        ).thenReturn(user);
 
-
-        Weapon weapon = new Weapon();
-
-        weapon.setWeaponId(100);
-        weapon.setWeaponType("太刀");
-        weapon.setSlot1Size(0);
-        weapon.setSlot2Size(0);
-        weapon.setSlot3Size(0);
-        weapon.setRampageSlotSize(0);
 
         when(
                 weaponService.findById(
                         100
                 )
-        ).thenReturn(
-                weapon
-        );
+        ).thenReturn(weapon);
 
-
-        SimulatorForm simulatorForm
-                = new SimulatorForm();
-
-        simulatorForm.setWeaponId(
-                100
-        );
-
-
-        Preset savedPreset
-                = new Preset();
-
-        savedPreset.setPresetId(500);
-        savedPreset.setUserId(10);
-        savedPreset.setPresetName("テスト装備");
-        savedPreset.setWeaponId(100);
 
         when(
                 presetService.create(
@@ -146,8 +138,14 @@ class PresetSaveServiceTest {
                         100,
                         null
                 )
-        ).thenReturn(
-                savedPreset
+        ).thenReturn(savedPreset);
+
+
+        SimulatorForm simulatorForm
+                = new SimulatorForm();
+
+        simulatorForm.setWeaponId(
+                100
         );
 
 
@@ -188,5 +186,469 @@ class PresetSaveServiceTest {
                 0,
                 0
         );
+    }
+
+
+    /*
+     * =====================================================
+     * 弓
+     * =====================================================
+     */
+
+    @Test
+    void save_弓のビンと溜め段階を保存できる() {
+
+        User user
+                = createUser();
+
+        Weapon weapon
+                = createWeapon(
+                        801,
+                        "弓"
+                );
+
+        Preset savedPreset
+                = createPreset(
+                        501,
+                        801
+                );
+
+
+        BowCoating bowCoating
+                = new BowCoating();
+
+        bowCoating.setBowCoatingId(
+                81
+        );
+
+        bowCoating.setWeaponId(
+                801
+        );
+
+        bowCoating.setCoatingType(
+                "接撃ビン"
+        );
+
+
+        BowCharge bowCharge
+                = new BowCharge();
+
+        bowCharge.setBowChargeId(
+                94
+        );
+
+        bowCharge.setWeaponId(
+                801
+        );
+
+
+        Skill skill
+                = new Skill();
+
+        skill.setSkillId(
+                40
+        );
+
+
+        when(
+                userService.findByUsername(
+                        "testuser"
+                )
+        ).thenReturn(user);
+
+
+        when(
+                weaponService.findById(
+                        801
+                )
+        ).thenReturn(weapon);
+
+
+        when(
+                presetService.create(
+                        10,
+                        "弓装備",
+                        801,
+                        null
+                )
+        ).thenReturn(savedPreset);
+
+
+        /*
+         * 護石スキル未選択時は
+         * findById(null) が呼ばれるため、
+         * null を返すことを明示しておく。
+         */
+        when(
+                skillService.findById(
+                        (Integer) null
+                )
+        ).thenReturn(null);
+
+
+        when(
+                bowCoatingService.findById(
+                        81
+                )
+        ).thenReturn(bowCoating);
+
+
+        when(
+                bowChargeService.findById(
+                        94
+                )
+        ).thenReturn(bowCharge);
+
+
+        when(
+                skillService.findById(
+                        40
+                )
+        ).thenReturn(skill);
+
+
+        SimulatorForm simulatorForm
+                = new SimulatorForm();
+
+        simulatorForm.setWeaponId(
+                801
+        );
+
+        simulatorForm.setBowCoatingId(
+                81
+        );
+
+        simulatorForm.setBowChargeId(
+                94
+        );
+
+
+        Preset result
+                = presetSaveService.save(
+                        "testuser",
+                        "弓装備",
+                        simulatorForm,
+                        Map.of(
+                                "skillState_40",
+                                "OVERCOME"
+                        )
+                );
+
+
+        assertSame(
+                savedPreset,
+                result
+        );
+
+
+        verify(
+                presetBowSettingService
+        ).create(
+                501,
+                "接撃ビン",
+                94
+        );
+
+
+        verify(
+                presetSkillStateService
+        ).create(
+                501,
+                40,
+                "OVERCOME"
+        );
+
+
+        verify(
+                presetBowgunSettingService,
+                never()
+        ).create(
+                501,
+                "貫通弾",
+                2,
+                null
+        );
+    }
+
+
+    /*
+     * =====================================================
+     * ボウガン
+     * =====================================================
+     */
+
+    @Test
+    void save_ボウガンの弾を保存できる() {
+
+        User user
+                = createUser();
+
+        Weapon weapon
+                = createWeapon(
+                        916,
+                        "ライトボウガン"
+                );
+
+        Preset savedPreset
+                = createPreset(
+                        502,
+                        916
+                );
+
+
+        BowgunAmmo ammo
+                = new BowgunAmmo();
+
+        ammo.setBowgunAmmoId(
+                1104
+        );
+
+        ammo.setWeaponId(
+                916
+        );
+
+        ammo.setAmmoType(
+                "貫通弾"
+        );
+
+        ammo.setAmmoLevel(
+                2
+        );
+
+
+        when(
+                userService.findByUsername(
+                        "testuser"
+                )
+        ).thenReturn(user);
+
+
+        when(
+                weaponService.findById(
+                        916
+                )
+        ).thenReturn(weapon);
+
+
+        when(
+                presetService.create(
+                        10,
+                        "ボウガン装備",
+                        916,
+                        null
+                )
+        ).thenReturn(savedPreset);
+
+
+        when(
+                bowgunAmmoService.findById(
+                        1104
+                )
+        ).thenReturn(ammo);
+
+
+        SimulatorForm simulatorForm
+                = new SimulatorForm();
+
+        simulatorForm.setWeaponId(
+                916
+        );
+
+        simulatorForm.setBowgunAmmoId(
+                1104
+        );
+
+
+        Preset result
+                = presetSaveService.save(
+                        "testuser",
+                        "ボウガン装備",
+                        simulatorForm,
+                        Map.of()
+                );
+
+
+        assertSame(
+                savedPreset,
+                result
+        );
+
+
+        verify(
+                presetBowgunSettingService
+        ).create(
+                502,
+                "貫通弾",
+                2,
+                null
+        );
+    }
+
+
+    /*
+     * =====================================================
+     * プリセット名未入力
+     * =====================================================
+     */
+
+    @Test
+    void save_プリセット名が空なら保存できない() {
+
+        SimulatorForm simulatorForm
+                = new SimulatorForm();
+
+        simulatorForm.setWeaponId(
+                100
+        );
+
+
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> presetSaveService.save(
+                        "testuser",
+                        "",
+                        simulatorForm,
+                        Map.of()
+                )
+        );
+
+
+        verify(
+                presetService,
+                never()
+        ).create(
+                10,
+                "",
+                100,
+                null
+        );
+    }
+
+
+    /*
+     * =====================================================
+     * 武器なし
+     * =====================================================
+     */
+
+    @Test
+    void save_存在しない武器なら保存できない() {
+
+        User user
+                = createUser();
+
+
+        when(
+                userService.findByUsername(
+                        "testuser"
+                )
+        ).thenReturn(user);
+
+
+        SimulatorForm simulatorForm
+                = new SimulatorForm();
+
+        simulatorForm.setWeaponId(
+                999999
+        );
+
+
+        when(
+                weaponService.findById(
+                        999999
+                )
+        ).thenReturn(null);
+
+
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> presetSaveService.save(
+                        "testuser",
+                        "不正武器",
+                        simulatorForm,
+                        Map.of()
+                )
+        );
+    }
+
+
+    /*
+     * =====================================================
+     * テスト用共通データ
+     * =====================================================
+     */
+
+    private User createUser() {
+
+        User user
+                = new User();
+
+        user.setUserId(
+                10
+        );
+
+        user.setUsername(
+                "testuser"
+        );
+
+        return user;
+    }
+
+
+    private Weapon createWeapon(
+            Integer weaponId,
+            String weaponType) {
+
+        Weapon weapon
+                = new Weapon();
+
+        weapon.setWeaponId(
+                weaponId
+        );
+
+        weapon.setWeaponType(
+                weaponType
+        );
+
+        weapon.setSlot1Size(
+                0
+        );
+
+        weapon.setSlot2Size(
+                0
+        );
+
+        weapon.setSlot3Size(
+                0
+        );
+
+        weapon.setRampageSlotSize(
+                0
+        );
+
+        return weapon;
+    }
+
+
+    private Preset createPreset(
+            Integer presetId,
+            Integer weaponId) {
+
+        Preset preset
+                = new Preset();
+
+        preset.setPresetId(
+                presetId
+        );
+
+        preset.setUserId(
+                10
+        );
+
+        preset.setWeaponId(
+                weaponId
+        );
+
+        return preset;
     }
 }
