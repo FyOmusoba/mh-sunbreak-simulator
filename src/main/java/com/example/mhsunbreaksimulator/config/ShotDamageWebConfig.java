@@ -24,6 +24,8 @@ import com.example.mhsunbreaksimulator.dto.BowgunPhysicalDamageResult;
 import com.example.mhsunbreaksimulator.dto.BowgunRapidFireModifier;
 import com.example.mhsunbreaksimulator.dto.BowgunSpecialDamageResult;
 import com.example.mhsunbreaksimulator.dto.BowgunSpecialFinalDamageResult;
+import com.example.mhsunbreaksimulator.dto.BowgunWyvernblastDamageResult;
+import com.example.mhsunbreaksimulator.dto.BowgunWyvernblastModifier;
 import com.example.mhsunbreaksimulator.dto.ConditionalSkillModifierTotal;
 import com.example.mhsunbreaksimulator.dto.CriticalModifierResult;
 import com.example.mhsunbreaksimulator.dto.ElementHitzoneDamageResult;
@@ -46,6 +48,9 @@ import com.example.mhsunbreaksimulator.service.BowgunElementDamageService;
 import com.example.mhsunbreaksimulator.service.BowgunPhysicalDamageService;
 import com.example.mhsunbreaksimulator.service.BowgunSpecialDamageService;
 import com.example.mhsunbreaksimulator.service.BowgunSpecialFinalDamageService;
+import com.example.mhsunbreaksimulator.service.BowgunWyvernblastDamageService;
+import com.example.mhsunbreaksimulator.service.BowgunWyvernblastFinalDamageService;
+import com.example.mhsunbreaksimulator.service.BowgunWyvernblastModifierService;
 import com.example.mhsunbreaksimulator.service.CriticalModifierService;
 import com.example.mhsunbreaksimulator.service.ElementHitzoneDamageService;
 import com.example.mhsunbreaksimulator.service.FinalDamageService;
@@ -83,6 +88,15 @@ public class ShotDamageWebConfig
 
     private final BowgunSpecialFinalDamageService
             bowgunSpecialFinalDamageService;
+
+    private final BowgunWyvernblastModifierService
+            bowgunWyvernblastModifierService;
+
+    private final BowgunWyvernblastDamageService
+            bowgunWyvernblastDamageService;
+
+    private final BowgunWyvernblastFinalDamageService
+            bowgunWyvernblastFinalDamageService;
 
     private final PhysicalHitzoneDamageService
             physicalHitzoneDamageService;
@@ -194,6 +208,20 @@ public class ShotDamageWebConfig
 
         /*
          * =================================================
+         * 起爆竜弾選択判定
+         * =================================================
+         *
+         * 起爆竜弾は通常弾・既存特殊弾とは別経路で計算する。
+         */
+        boolean wyvernblastSelected
+                = isBowgunWyvernblastSelected(
+                        model,
+                        weapon
+                );
+
+
+        /*
+         * =================================================
          * 弓 / ボウガン
          * =================================================
          */
@@ -202,6 +230,15 @@ public class ShotDamageWebConfig
         )) {
 
             applyBow(
+                    model,
+                    weapon,
+                    resolvedSkillEffects,
+                    conditionalSkillModifierTotal
+            );
+
+        } else if (wyvernblastSelected) {
+
+            applyBowgunWyvernblast(
                     model,
                     weapon,
                     resolvedSkillEffects,
@@ -231,11 +268,17 @@ public class ShotDamageWebConfig
          * =================================================
          * 通常ルート
          * =================================================
+         *
+         * 起爆竜弾は専用FinalDamageServiceで計算済みなので、
+         * 通常の肉質・会心再計算へは流さない。
          */
-        recalculateFinalDamage(
-                model,
-                weapon
-        );
+        if (!wyvernblastSelected) {
+
+            recalculateFinalDamage(
+                    model,
+                    weapon
+            );
+        }
 
 
         /*
@@ -258,12 +301,17 @@ public class ShotDamageWebConfig
          * =================================================
          * ボウガン特殊弾
          * =================================================
+         *
+         * 起爆竜弾はここへ入れない。
          */
-        if ("ライトボウガン".equals(
-                weapon.getWeaponType()
-        )
-                || "ヘビィボウガン".equals(
-                        weapon.getWeaponType()
+        if (!wyvernblastSelected
+                && (
+                        "ライトボウガン".equals(
+                                weapon.getWeaponType()
+                        )
+                        || "ヘビィボウガン".equals(
+                                weapon.getWeaponType()
+                        )
                 )) {
 
             applyBowgunSpecialFinalDamage(
@@ -470,6 +518,27 @@ public class ShotDamageWebConfig
                 || "ヘビィボウガン".equals(
                         weapon.getWeaponType()
                 )) {
+
+            /*
+             * 起爆竜弾選択時は、専用計算結果に保持した
+             * effectiveAttackを最優先で使用する。
+             */
+            Object wyvernblastResultObject
+                    = model.get(
+                            "bowgunWyvernblastDamageResult"
+                    );
+
+
+            if (wyvernblastResultObject
+                    instanceof BowgunWyvernblastDamageResult wyvernblastResult
+                    && wyvernblastResult.getEffectiveAttack() != null
+                    && wyvernblastResult.getEffectiveAttack().compareTo(
+                            BigDecimal.ZERO
+                    ) > 0) {
+
+                return wyvernblastResult.getEffectiveAttack();
+            }
+
 
             Object physicalResultObject
                     = model.get(
@@ -854,6 +923,203 @@ public class ShotDamageWebConfig
 
 
         return weapon.getAttack();
+    }
+
+
+    /*
+     * =====================================================
+     * ライトボウガン
+     * 起爆竜弾選択判定
+     * =====================================================
+     */
+    private boolean isBowgunWyvernblastSelected(
+            Map<String, Object> model,
+            Weapon weapon) {
+
+        if (model == null
+                || weapon == null
+                || !"ライトボウガン".equals(
+                        weapon.getWeaponType()
+                )) {
+
+            return false;
+        }
+
+
+        Object formObject
+                = model.get(
+                        "simulatorForm"
+                );
+
+
+        if (!(formObject
+                instanceof SimulatorForm simulatorForm)) {
+
+            return false;
+        }
+
+
+        return "WYVERNBLAST".equals(
+                simulatorForm.getBowgunAttackType()
+        );
+    }
+
+
+    /*
+     * =====================================================
+     * ライトボウガン
+     * 起爆竜弾
+     * =====================================================
+     */
+    private void applyBowgunWyvernblast(
+            Map<String, Object> model,
+            Weapon weapon,
+            Map<Integer, SkillEffectState> resolvedSkillEffects,
+            ConditionalSkillModifierTotal
+                    conditionalSkillModifierTotal) {
+
+        Object formObject
+                = model.get(
+                        "simulatorForm"
+                );
+
+
+        if (!(formObject
+                instanceof SimulatorForm simulatorForm)) {
+
+            return;
+        }
+
+
+        /*
+         * =================================================
+         * 爆発段階補正
+         * =================================================
+         */
+        BowgunWyvernblastModifier wyvernblastModifier
+                = bowgunWyvernblastModifierService.calculate(
+                        simulatorForm.getWyvernblastExplosionSize()
+                );
+
+
+        model.put(
+                "bowgunWyvernblastModifier",
+                wyvernblastModifier
+        );
+
+
+        /*
+         * =================================================
+         * 肉質適用前
+         * =================================================
+         *
+         * 傀異錬成反映後の攻撃力を使用する。
+         *
+         * specialShotMulは専用DamageService内で固定部分だけへ
+         * 適用し、shotMulは使用しない。
+         */
+        BowgunWyvernblastDamageResult wyvernblastDamageResult
+                = bowgunWyvernblastDamageService.calculate(
+                        resolveWeaponAttackForDamage(
+                                model,
+                                weapon
+                        ),
+                        wyvernblastModifier,
+                        conditionalSkillModifierTotal
+                );
+
+
+        model.put(
+                "bowgunWyvernblastDamageResult",
+                wyvernblastDamageResult
+        );
+
+
+        /*
+         * =================================================
+         * 最終ダメージ
+         * =================================================
+         *
+         * 固定部分は物理肉質無視。
+         * 火属性部分だけ火属性肉質を適用する。
+         */
+        Object hitzoneObject
+                = model.get(
+                        "selectedHitzone"
+                );
+
+
+        FinalDamageResult wyvernblastFinalDamageResult
+                = null;
+
+
+        if (hitzoneObject
+                instanceof MonsterHitzone selectedHitzone) {
+
+            wyvernblastFinalDamageResult
+                    = bowgunWyvernblastFinalDamageService.calculate(
+                            wyvernblastDamageResult,
+                            selectedHitzone,
+                            resolvedSkillEffects
+                    );
+        }
+
+
+        model.put(
+                "finalDamageResult",
+                wyvernblastFinalDamageResult
+        );
+
+
+        /*
+         * =================================================
+         * 通常弾・既存特殊弾の途中値を使用しない
+         * =================================================
+         */
+        model.put(
+                "shotSkillModifier",
+                null
+        );
+
+        model.put(
+                "bowgunAmmoModifier",
+                null
+        );
+
+        model.put(
+                "bowgunRapidFireModifier",
+                null
+        );
+
+        model.put(
+                "bowgunPhysicalDamageResult",
+                null
+        );
+
+        model.put(
+                "bowgunElementDamageResult",
+                null
+        );
+
+        model.put(
+                "bowgunSpecialDamageResult",
+                null
+        );
+
+        model.put(
+                "bowgunSpecialFinalDamageResult",
+                null
+        );
+
+        model.put(
+                "physicalHitzoneDamageResult",
+                null
+        );
+
+        model.put(
+                "elementHitzoneDamageResult",
+                null
+        );
     }
 
 

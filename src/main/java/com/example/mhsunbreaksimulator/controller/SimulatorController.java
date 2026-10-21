@@ -33,8 +33,8 @@ import com.example.mhsunbreaksimulator.dto.PhysicalHitzoneDamageResult;
 import com.example.mhsunbreaksimulator.dto.SkillStateSelection;
 import com.example.mhsunbreaksimulator.dto.SkillTotal;
 import com.example.mhsunbreaksimulator.dto.TalismanSkill;
-import com.example.mhsunbreaksimulator.dto.WeaponAugmentModifier;
 import com.example.mhsunbreaksimulator.dto.WeakpointSkillModifier;
+import com.example.mhsunbreaksimulator.dto.WeaponAugmentModifier;
 import com.example.mhsunbreaksimulator.entity.Armor;
 import com.example.mhsunbreaksimulator.entity.BowCharge;
 import com.example.mhsunbreaksimulator.entity.BowCoating;
@@ -2489,6 +2489,12 @@ public class SimulatorController {
 
         addQueryParam(
                 builder,
+                "bowAttackType",
+                form.getBowAttackType()
+        );
+
+        addQueryParam(
+                builder,
                 "bowChargeId",
                 form.getBowChargeId()
         );
@@ -2497,6 +2503,18 @@ public class SimulatorController {
                 builder,
                 "bowCoatingId",
                 form.getBowCoatingId()
+        );
+
+        addQueryParam(
+                builder,
+                "bowgunAttackType",
+                form.getBowgunAttackType()
+        );
+
+        addQueryParam(
+                builder,
+                "wyvernblastExplosionSize",
+                form.getWyvernblastExplosionSize()
         );
 
         addQueryParam(

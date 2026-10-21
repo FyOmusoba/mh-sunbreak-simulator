@@ -525,186 +525,342 @@
 
         <h2>ボウガン</h2>
 
-        <p th:if="${bowgunAmmos == null
-                   or #lists.isEmpty(bowgunAmmos)}">
-            使用可能な弾データがありません。
-        </p>
+        <!-- ================================================== -->
+        <!-- ライトボウガン・攻撃種別 -->
+        <!-- ================================================== -->
 
-        <table border="1"
-               th:if="${bowgunAmmos != null
-                       and !#lists.isEmpty(bowgunAmmos)}">
+        <div th:if="${weapon.weaponType == 'ライトボウガン'}">
 
-            <tr>
-                <th>選択</th>
-                <th>弾</th>
-                <th>Lv</th>
-                <th>装填数</th>
-                <th>速射</th>
-                <th>移動射撃</th>
-                <th>移動リロード</th>
-                <th>単発自動装填</th>
-            </tr>
-
-            <tr th:each="ammo : ${bowgunAmmos}">
-
-                <td>
-
-                    <input type="radio"
-                           name="bowgunAmmoChoice"
-                           th:value="${ammo.bowgunAmmoId}"
-                           th:checked="${selectedBowgunAmmo != null
-                               and selectedBowgunAmmo.bowgunAmmoId == ammo.bowgunAmmoId}"
-                           onchange="selectBowgunAmmo(this.value)">
-
-                </td>
-
-                <td th:text="${ammo.ammoType}"></td>
-                <td th:text="${ammo.ammoLevel}"></td>
-                <td th:text="${ammo.capacity}"></td>
-                <td th:text="${ammo.rapidFire ? '○' : '-'}"></td>
-                <td th:text="${ammo.movingShot ? '○' : '-'}"></td>
-                <td th:text="${ammo.movingReload ? '○' : '-'}"></td>
-                <td th:text="${ammo.singleAuto ? '○' : '-'}"></td>
-
-            </tr>
-
-        </table>
-
-        <div th:if="${selectedBowgunAmmo != null}">
+            <h3>攻撃種別</h3>
 
             <p>
-                選択中：
+                <select onchange="selectBowgunAttackType(this.value)">
 
-                <strong th:text="${selectedBowgunAmmo.ammoType}">
-                </strong>
+                    <option value="NORMAL_AMMO"
+                            th:selected="${simulatorForm.bowgunAttackType == null
+                                or simulatorForm.bowgunAttackType == 'NORMAL_AMMO'}">
+                        通常弾
+                    </option>
 
-                Lv<span th:text="${selectedBowgunAmmo.ammoLevel}">
-                </span>
+                    <option value="WYVERNBLAST"
+                            th:selected="${simulatorForm.bowgunAttackType == 'WYVERNBLAST'}">
+                        起爆竜弾
+                    </option>
+
+                </select>
             </p>
 
         </div>
 
-        <div th:if="${selectedBowgunAmmo != null
-                     and bowgunAmmoModifier != null}">
 
-            <h3>ボウガン弾・計算用データ</h3>
+        <!-- ================================================== -->
+        <!-- 起爆竜弾 -->
+        <!-- ================================================== -->
 
-            <p>
-                1hit物理モーション値：
-                <strong th:text="${bowgunAmmoModifier.physicalMotionValuePerHit}">
-                </strong>
-            </p>
+        <div th:if="${weapon.weaponType == 'ライトボウガン'
+                     and simulatorForm.bowgunAttackType == 'WYVERNBLAST'}">
 
             <p>
-                1hit属性モーション値：
-                <strong th:text="${bowgunAmmoModifier.elementMotionValuePerHit}">
-                </strong>
+                現在の計算：
+                <strong>起爆竜弾</strong>
             </p>
 
-            <p>
-                1hit固定ダメージ値：
-                <strong th:text="${bowgunAmmoModifier.fixedDamageValuePerHit}">
-                </strong>
-            </p>
+            <h3>爆発段階</h3>
 
             <p>
-                最大ヒット数：
-                <strong th:text="${bowgunAmmoModifier.maxHitCount}">
-                </strong>
+                <select onchange="selectWyvernblastExplosionSize(this.value)">
+
+                    <option value="SMALL"
+                            th:selected="${simulatorForm.wyvernblastExplosionSize == 'SMALL'}">
+                        小爆発
+                    </option>
+
+                    <option value="MEDIUM"
+                            th:selected="${simulatorForm.wyvernblastExplosionSize == 'MEDIUM'}">
+                        中爆発
+                    </option>
+
+                    <option value="LARGE"
+                            th:selected="${simulatorForm.wyvernblastExplosionSize == null
+                                or simulatorForm.wyvernblastExplosionSize == 'LARGE'}">
+                        大爆発
+                    </option>
+
+                </select>
             </p>
+
+
+            <div th:if="${bowgunWyvernblastModifier != null}">
+
+                <h3>起爆竜弾・計算用データ</h3>
+
+                <p>
+                    固定ダメージMV：
+                    <strong th:text="${bowgunWyvernblastModifier.fixedDamageMotionValue}">
+                    </strong>
+                </p>
+
+                <p>
+                    火属性値：
+                    <strong th:text="${bowgunWyvernblastModifier.fixedFireValue}">
+                    </strong>
+                </p>
+
+                <p>
+                    耐久消費：
+                    <strong th:text="${bowgunWyvernblastModifier.durabilityCost}">
+                    </strong>
+                    / 初期耐久5
+                </p>
+
+            </div>
+
+
+            <div th:if="${bowgunWyvernblastDamageResult != null}">
+
+                <h3>起爆竜弾・ダメージ計算途中値</h3>
+
+                <p>
+                    条件付き補正後攻撃力：
+                    <strong th:text="${bowgunWyvernblastDamageResult.effectiveAttack}">
+                    </strong>
+                </p>
+
+                <p th:if="${conditionalSkillModifierTotal != null}">
+                    特殊射撃強化倍率：
+                    <strong th:text="${conditionalSkillModifierTotal.specialShotMul}">
+                    </strong>
+                </p>
+
+                <p>
+                    肉質無視・固定ダメージ（丸め前）：
+                    <strong th:text="${bowgunWyvernblastDamageResult.fixedDamage}">
+                    </strong>
+                </p>
+
+                <p>
+                    火属性肉質適用前・火属性値：
+                    <strong th:text="${bowgunWyvernblastDamageResult.fixedFireValue}">
+                    </strong>
+                </p>
+
+                <p>
+                    耐久消費：
+                    <strong th:text="${bowgunWyvernblastDamageResult.durabilityCost}">
+                    </strong>
+                </p>
+
+                <p th:if="${selectedHitzone != null}">
+                    対象部位の火属性肉質：
+                    <strong th:text="${selectedHitzone.fire}">
+                    </strong>
+                </p>
+
+                <p th:if="${finalDamageResult != null}">
+                    火属性肉質適用後・火属性ダメージ（丸め前）：
+                    <strong th:text="${finalDamageResult.normalElementDamageBeforeRound}">
+                    </strong>
+                </p>
+
+                <p>
+                    ※固定ダメージ部分には弾肉質を使用しません。
+                    特殊射撃強化は固定ダメージ部分だけに適用します。
+                </p>
+
+            </div>
 
         </div>
 
-        <div th:if="${selectedBowgunAmmo != null
-                     and bowgunRapidFireModifier != null
-                     and bowgunRapidFireModifier.rapidFire}">
 
-            <h3>速射補正</h3>
+        <!-- ================================================== -->
+        <!-- 通常のボウガン弾 -->
+        <!-- ================================================== -->
 
-            <p>
-                発射数：
-                <strong th:text="${bowgunRapidFireModifier.shotCount}">
-                </strong>
+        <div th:if="${weapon.weaponType == 'ヘビィボウガン'
+                     or simulatorForm.bowgunAttackType == null
+                     or simulatorForm.bowgunAttackType != 'WYVERNBLAST'}">
+
+            <p th:if="${bowgunAmmos == null
+                       or #lists.isEmpty(bowgunAmmos)}">
+                使用可能な弾データがありません。
             </p>
 
-            <p>
-                1発物理倍率：
-                <strong th:text="${bowgunRapidFireModifier.physicalMulPerShot}">
-                </strong>
-            </p>
+            <table border="1"
+                   th:if="${bowgunAmmos != null
+                           and !#lists.isEmpty(bowgunAmmos)}">
 
-            <p>
-                1発属性倍率：
-                <strong th:text="${bowgunRapidFireModifier.elementMulPerShot}">
-                </strong>
-            </p>
+                <tr>
+                    <th>選択</th>
+                    <th>弾</th>
+                    <th>Lv</th>
+                    <th>装填数</th>
+                    <th>速射</th>
+                    <th>移動射撃</th>
+                    <th>移動リロード</th>
+                    <th>単発自動装填</th>
+                </tr>
 
-        </div>
+                <tr th:each="ammo : ${bowgunAmmos}">
 
-        <div th:if="${bowgunPhysicalDamageResult != null
-                     and selectedBowgunAmmo != null}">
+                    <td>
 
-            <h3>ボウガン物理ダメージ計算途中値</h3>
+                        <input type="radio"
+                               name="bowgunAmmoChoice"
+                               th:value="${ammo.bowgunAmmoId}"
+                               th:checked="${selectedBowgunAmmo != null
+                                   and selectedBowgunAmmo.bowgunAmmoId == ammo.bowgunAmmoId}"
+                               onchange="selectBowgunAmmo(this.value)">
 
-            <p>
-                補正後攻撃力：
-                <strong th:text="${bowgunPhysicalDamageResult.effectiveAttack}">
-                </strong>
-            </p>
+                    </td>
 
-            <p>
-                肉質補正前・1hit物理値：
-                <strong th:text="${bowgunPhysicalDamageResult.physicalDamagePerHit}">
-                </strong>
-            </p>
+                    <td th:text="${ammo.ammoType}"></td>
+                    <td th:text="${ammo.ammoLevel}"></td>
+                    <td th:text="${ammo.capacity}"></td>
+                    <td th:text="${ammo.rapidFire ? '○' : '-'}"></td>
+                    <td th:text="${ammo.movingShot ? '○' : '-'}"></td>
+                    <td th:text="${ammo.movingReload ? '○' : '-'}"></td>
+                    <td th:text="${ammo.singleAuto ? '○' : '-'}"></td>
 
-            <p>
-                1発最大物理値：
-                <strong th:text="${bowgunPhysicalDamageResult.maxPhysicalDamage}">
-                </strong>
-            </p>
+                </tr>
 
-            <p>
-                弾1個消費あたり最大物理値：
-                <strong th:text="${bowgunPhysicalDamageResult.maxPhysicalDamagePerAmmo}">
-                </strong>
-            </p>
+            </table>
 
-        </div>
+            <div th:if="${selectedBowgunAmmo != null}">
 
-        <div th:if="${bowgunElementDamageResult != null
-                     and selectedBowgunAmmo != null}">
+                <p>
+                    選択中：
 
-            <h3>ボウガン属性ダメージ計算途中値</h3>
+                    <strong th:text="${selectedBowgunAmmo.ammoType}">
+                    </strong>
 
-            <p>
-                補正後攻撃力：
-                <strong th:text="${bowgunElementDamageResult.effectiveAttack}">
-                </strong>
-            </p>
+                    Lv<span th:text="${selectedBowgunAmmo.ammoLevel}">
+                    </span>
+                </p>
 
-            <p>
-                肉質補正前・1hit属性値：
-                <strong th:text="${bowgunElementDamageResult.elementDamagePerHit}">
-                </strong>
-            </p>
+            </div>
 
-            <p>
-                1発最大属性値：
-                <strong th:text="${bowgunElementDamageResult.maxElementDamage}">
-                </strong>
-            </p>
+            <div th:if="${selectedBowgunAmmo != null
+                         and bowgunAmmoModifier != null}">
 
-            <p>
-                弾1個消費あたり最大属性値：
-                <strong th:text="${bowgunElementDamageResult.maxElementDamagePerAmmo}">
-                </strong>
-            </p>
+                <h3>ボウガン弾・計算用データ</h3>
+
+                <p>
+                    1hit物理モーション値：
+                    <strong th:text="${bowgunAmmoModifier.physicalMotionValuePerHit}">
+                    </strong>
+                </p>
+
+                <p>
+                    1hit属性モーション値：
+                    <strong th:text="${bowgunAmmoModifier.elementMotionValuePerHit}">
+                    </strong>
+                </p>
+
+                <p>
+                    1hit固定ダメージ値：
+                    <strong th:text="${bowgunAmmoModifier.fixedDamageValuePerHit}">
+                    </strong>
+                </p>
+
+                <p>
+                    最大ヒット数：
+                    <strong th:text="${bowgunAmmoModifier.maxHitCount}">
+                    </strong>
+                </p>
+
+            </div>
+
+            <div th:if="${selectedBowgunAmmo != null
+                         and bowgunRapidFireModifier != null
+                         and bowgunRapidFireModifier.rapidFire}">
+
+                <h3>速射補正</h3>
+
+                <p>
+                    発射数：
+                    <strong th:text="${bowgunRapidFireModifier.shotCount}">
+                    </strong>
+                </p>
+
+                <p>
+                    1発物理倍率：
+                    <strong th:text="${bowgunRapidFireModifier.physicalMulPerShot}">
+                    </strong>
+                </p>
+
+                <p>
+                    1発属性倍率：
+                    <strong th:text="${bowgunRapidFireModifier.elementMulPerShot}">
+                    </strong>
+                </p>
+
+            </div>
+
+            <div th:if="${bowgunPhysicalDamageResult != null
+                         and selectedBowgunAmmo != null}">
+
+                <h3>ボウガン物理ダメージ計算途中値</h3>
+
+                <p>
+                    補正後攻撃力：
+                    <strong th:text="${bowgunPhysicalDamageResult.effectiveAttack}">
+                    </strong>
+                </p>
+
+                <p>
+                    肉質補正前・1hit物理値：
+                    <strong th:text="${bowgunPhysicalDamageResult.physicalDamagePerHit}">
+                    </strong>
+                </p>
+
+                <p>
+                    1発最大物理値：
+                    <strong th:text="${bowgunPhysicalDamageResult.maxPhysicalDamage}">
+                    </strong>
+                </p>
+
+                <p>
+                    弾1個消費あたり最大物理値：
+                    <strong th:text="${bowgunPhysicalDamageResult.maxPhysicalDamagePerAmmo}">
+                    </strong>
+                </p>
+
+            </div>
+
+            <div th:if="${bowgunElementDamageResult != null
+                         and selectedBowgunAmmo != null}">
+
+                <h3>ボウガン属性ダメージ計算途中値</h3>
+
+                <p>
+                    補正後攻撃力：
+                    <strong th:text="${bowgunElementDamageResult.effectiveAttack}">
+                    </strong>
+                </p>
+
+                <p>
+                    肉質補正前・1hit属性値：
+                    <strong th:text="${bowgunElementDamageResult.elementDamagePerHit}">
+                    </strong>
+                </p>
+
+                <p>
+                    1発最大属性値：
+                    <strong th:text="${bowgunElementDamageResult.maxElementDamage}">
+                    </strong>
+                </p>
+
+                <p>
+                    弾1個消費あたり最大属性値：
+                    <strong th:text="${bowgunElementDamageResult.maxElementDamagePerAmmo}">
+                    </strong>
+                </p>
+
+            </div>
 
         </div>
 
     </div>
-
     <!-- ================================================== -->
     <!-- 弓 -->
     <!-- ================================================== -->
@@ -3399,9 +3555,109 @@
                             window.location.href
                     );
 
+            /*
+             * 通常弾を選択した時点で、
+             * 起爆竜弾用パラメータを除去する。
+             */
+            url.searchParams.delete(
+                    "bowgunAttackType"
+            );
+
+            url.searchParams.delete(
+                    "wyvernblastExplosionSize"
+            );
+
             url.searchParams.set(
                     "bowgunAmmoId",
                     bowgunAmmoId
+            );
+
+            window.location.href
+                    = url.toString();
+        }
+
+
+        function selectBowgunAttackType(
+                bowgunAttackType) {
+
+            const url
+                    = new URL(
+                            window.location.href
+                    );
+
+
+            if (bowgunAttackType === "WYVERNBLAST") {
+
+                url.searchParams.set(
+                        "bowgunAttackType",
+                        "WYVERNBLAST"
+                );
+
+                /*
+                 * 爆発段階未指定なら
+                 * LARGEを初期値としてURLにも保持する。
+                 */
+                if (!url.searchParams.has(
+                        "wyvernblastExplosionSize"
+                )) {
+
+                    url.searchParams.set(
+                            "wyvernblastExplosionSize",
+                            "LARGE"
+                    );
+                }
+
+                /*
+                 * 起爆竜弾はbowgunAmmoIdを使用しない。
+                 */
+                url.searchParams.delete(
+                        "bowgunAmmoId"
+                );
+
+            } else {
+
+                /*
+                 * NORMAL_AMMOは既存URLとの互換性のため
+                 * bowgunAttackType自体をURLへ残さない。
+                 */
+                url.searchParams.delete(
+                        "bowgunAttackType"
+                );
+
+                url.searchParams.delete(
+                        "wyvernblastExplosionSize"
+                );
+            }
+
+
+            window.location.href
+                    = url.toString();
+        }
+
+
+        function selectWyvernblastExplosionSize(
+                explosionSize) {
+
+            const url
+                    = new URL(
+                            window.location.href
+                    );
+
+            url.searchParams.set(
+                    "bowgunAttackType",
+                    "WYVERNBLAST"
+            );
+
+            url.searchParams.set(
+                    "wyvernblastExplosionSize",
+                    explosionSize
+            );
+
+            /*
+             * 起爆竜弾と通常弾IDを同時保持しない。
+             */
+            url.searchParams.delete(
+                    "bowgunAmmoId"
             );
 
             window.location.href
