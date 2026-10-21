@@ -470,6 +470,18 @@ public class TalismanController {
          */
         addAttributeIfNotNull(
                 redirectAttributes,
+                "bowgunAttackType",
+                simulatorForm.getBowgunAttackType()
+        );
+
+        addAttributeIfNotNull(
+                redirectAttributes,
+                "wyvernblastExplosionSize",
+                simulatorForm.getWyvernblastExplosionSize()
+        );
+
+        addAttributeIfNotNull(
+                redirectAttributes,
                 "bowgunAmmoId",
                 simulatorForm.getBowgunAmmoId()
         );
