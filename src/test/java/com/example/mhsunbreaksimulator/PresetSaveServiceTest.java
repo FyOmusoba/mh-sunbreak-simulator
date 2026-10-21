@@ -350,7 +350,8 @@ class PresetSaveServiceTest {
         ).create(
                 501,
                 "接撃ビン",
-                94
+                94,
+                "NORMAL"
         );
 
 
@@ -371,6 +372,116 @@ class PresetSaveServiceTest {
                 "貫通弾",
                 2,
                 null
+        );
+    }
+
+
+    /*
+     * =====================================================
+     * 弓・竜の一矢
+     * =====================================================
+     */
+
+    @Test
+    void save_竜の一矢攻撃種別を保存できる() {
+
+        User user
+                = createUser();
+
+        Weapon weapon
+                = createWeapon(
+                        800,
+                        "弓"
+                );
+
+        Preset savedPreset
+                = createPreset(
+                        505,
+                        800
+                );
+
+
+        BowCharge bowCharge
+                = new BowCharge();
+
+        bowCharge.setBowChargeId(
+                90
+        );
+
+        bowCharge.setWeaponId(
+                800
+        );
+
+
+        when(
+                userService.findByUsername(
+                        "testuser"
+                )
+        ).thenReturn(user);
+
+
+        when(
+                weaponService.findById(
+                        800
+                )
+        ).thenReturn(weapon);
+
+
+        when(
+                presetService.create(
+                        10,
+                        "竜の一矢装備",
+                        800,
+                        null
+                )
+        ).thenReturn(savedPreset);
+
+
+        when(
+                bowChargeService.findById(
+                        90
+                )
+        ).thenReturn(bowCharge);
+
+
+        SimulatorForm simulatorForm
+                = new SimulatorForm();
+
+        simulatorForm.setWeaponId(
+                800
+        );
+
+        simulatorForm.setBowChargeId(
+                90
+        );
+
+        simulatorForm.setBowAttackType(
+                "DRAGON_PIERCER"
+        );
+
+
+        Preset result
+                = presetSaveService.save(
+                        "testuser",
+                        "竜の一矢装備",
+                        simulatorForm,
+                        Map.of()
+                );
+
+
+        assertSame(
+                savedPreset,
+                result
+        );
+
+
+        verify(
+                presetBowSettingService
+        ).create(
+                505,
+                null,
+                90,
+                "DRAGON_PIERCER"
         );
     }
 
