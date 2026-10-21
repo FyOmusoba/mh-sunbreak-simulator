@@ -18,12 +18,14 @@
         INSERT INTO preset_bow_setting (
             preset_id,
             coating_type,
-            bow_charge_id
+            bow_charge_id,
+            bow_attack_type
         )
         VALUES (
             #{presetId},
             #{coatingType},
-            #{bowChargeId}
+            #{bowChargeId},
+            #{bowAttackType}
         )
 
     </insert>
@@ -40,7 +42,8 @@
         SELECT
             preset_id,
             coating_type,
-            bow_charge_id
+            bow_charge_id,
+            bow_attack_type
         FROM preset_bow_setting
         WHERE preset_id = #{presetId}
 

@@ -714,6 +714,30 @@
 
         <h2>弓</h2>
 
+        <h3>攻撃種別</h3>
+
+        <p>
+            <select onchange="selectBowAttackType(this.value)">
+
+                <option value="NORMAL"
+                        th:selected="${simulatorForm.bowAttackType == null
+                            or simulatorForm.bowAttackType == 'NORMAL'}">
+                    通常射撃
+                </option>
+
+                <option value="DRAGON_PIERCER"
+                        th:selected="${simulatorForm.bowAttackType == 'DRAGON_PIERCER'}">
+                    竜の一矢
+                </option>
+
+            </select>
+        </p>
+
+        <p th:if="${simulatorForm.bowAttackType == 'DRAGON_PIERCER'}">
+            現在の計算：
+            <strong>竜の一矢</strong>
+        </p>
+
         <h3>溜め段階</h3>
 
         <p th:if="${bowCharges == null
@@ -802,7 +826,8 @@
         </div>
 
         <div th:if="${selectedBowCharge != null
-                     and bowShotModifier != null}">
+                     and bowShotModifier != null
+                     and simulatorForm.bowAttackType != 'DRAGON_PIERCER'}">
 
             <p>
                 矢モーション値（1hit）：
@@ -813,6 +838,24 @@
             <p>
                 最大ヒット数：
                 <strong th:text="${bowShotModifier.maxHitCount}">
+                </strong>
+            </p>
+
+        </div>
+
+        <div th:if="${selectedBowCharge != null
+                     and bowDragonPiercerModifier != null
+                     and simulatorForm.bowAttackType == 'DRAGON_PIERCER'}">
+
+            <p>
+                竜の一矢モーション値（1hit）：
+                <strong th:text="${bowDragonPiercerModifier.motionValuePerHit}">
+                </strong>
+            </p>
+
+            <p>
+                最大ヒット数：
+                <strong th:text="${bowDragonPiercerModifier.maxHitCount}">
                 </strong>
             </p>
 
@@ -895,7 +938,8 @@
         </div>
 
         <div th:if="${bowPhysicalModifier != null
-                     and selectedBowCharge != null}">
+                     and selectedBowCharge != null
+                     and simulatorForm.bowAttackType != 'DRAGON_PIERCER'}">
 
             <h3>弓の最終物理係数</h3>
 
@@ -922,7 +966,13 @@
         <div th:if="${bowPhysicalDamageResult != null
                      and selectedBowCharge != null}">
 
-            <h3>弓の物理ダメージ計算途中値</h3>
+            <h3 th:if="${simulatorForm.bowAttackType != 'DRAGON_PIERCER'}">
+                弓の物理ダメージ計算途中値
+            </h3>
+
+            <h3 th:if="${simulatorForm.bowAttackType == 'DRAGON_PIERCER'}">
+                竜の一矢・物理ダメージ計算途中値
+            </h3>
 
             <p>
                 条件付き補正後攻撃力：
@@ -3353,6 +3403,36 @@
                     "bowgunAmmoId",
                     bowgunAmmoId
             );
+
+            window.location.href
+                    = url.toString();
+        }
+
+
+        function selectBowAttackType(
+                bowAttackType) {
+
+            const url
+                    = new URL(
+                            window.location.href
+                    );
+
+
+            if (bowAttackType
+                    && bowAttackType !== "NORMAL") {
+
+                url.searchParams.set(
+                        "bowAttackType",
+                        bowAttackType
+                );
+
+            } else {
+
+                url.searchParams.delete(
+                        "bowAttackType"
+                );
+            }
+
 
             window.location.href
                     = url.toString();

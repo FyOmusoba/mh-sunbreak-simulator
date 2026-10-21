@@ -10,4 +10,6 @@ public class PresetBowSetting {
     private String coatingType;
 
     private Integer bowChargeId;
+
+    private String bowAttackType;
 }

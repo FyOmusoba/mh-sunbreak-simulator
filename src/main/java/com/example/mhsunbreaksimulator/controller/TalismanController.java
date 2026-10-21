@@ -447,6 +447,12 @@ public class TalismanController {
          */
         addAttributeIfNotNull(
                 redirectAttributes,
+                "bowAttackType",
+                simulatorForm.getBowAttackType()
+        );
+
+        addAttributeIfNotNull(
+                redirectAttributes,
                 "bowChargeId",
                 simulatorForm.getBowChargeId()
         );

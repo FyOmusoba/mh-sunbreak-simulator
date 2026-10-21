@@ -1,0 +1,3435 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>装備シミュレーター</title>
+</head>
+<body>
+
+    <h1>装備シミュレーター</h1>
+
+    <!-- ================================================== -->
+    <!-- プリセット保存                                     -->
+    <!-- ================================================== -->
+
+    <h2>プリセット保存</h2>
+
+    <p th:if="${param.presetSaved != null
+               and param.presetSaved[0] == 'true'}">
+        プリセットを保存しました。
+    </p>
+
+    <p th:if="${param.presetError != null}"
+       th:text="${param.presetError[0]}">
+    </p>
+
+    <form id="presetSaveForm"
+          th:action="@{/preset/save}"
+          method="post"
+          onsubmit="return preparePresetSave()">
+
+        <label for="presetName">
+            プリセット名：
+        </label>
+
+        <input type="text"
+               id="presetName"
+               name="presetName"
+               required
+               autocomplete="off">
+
+        <button type="submit"
+                th:disabled="${weapon == null}">
+            現在の装備を保存
+        </button>
+
+    </form>
+
+    <br>
+
+    <a th:href="@{/preset/list}">
+        プリセット一覧
+    </a>
+
+    <p th:if="${weapon == null}">
+        プリセットを保存するには武器を選択してください。
+    </p>
+
+    <br>
+
+    <!-- ================================================== -->
+    <!-- 武器 -->
+    <!-- ================================================== -->
+    <h2>選択中の武器</h2>
+
+    <p th:if="${weapon == null}">
+        武器が選択されていません。
+        <button type="button" onclick="goWeaponSelect()">武器を選ぶ</button>
+    </p>
+
+    <div th:if="${weapon != null}">
+        <table border="1">
+            <tr><th>武器名</th><td th:text="${weapon.weaponName}"></td></tr>
+            <tr><th>武器種</th><td th:text="${weapon.weaponType}"></td></tr>
+            <tr><th>攻撃力</th><td th:text="${weapon.attack}"></td></tr>
+            <tr><th>属性</th><td th:text="${weapon.elementType}"></td></tr>
+            <tr><th>属性値</th><td th:text="${weapon.elementValue}"></td></tr>
+            <tr><th>副属性</th><td th:text="${weapon.subElementType}"></td></tr>
+            <tr><th>会心率</th><td><span th:text="${weapon.affinity}"></span>%</td></tr>
+            <tr><th>攻撃属性</th><td th:text="${weapon.attackProperty}"></td></tr>
+        </table>
+
+        <br>
+
+        <button type="button" onclick="goWeaponSelect()">
+            武器を選び直す
+        </button>
+    </div>
+
+    <br>
+
+    <!-- ================================================== -->
+    <!-- 武器傀異錬成 -->
+    <!-- ================================================== -->
+
+    <div th:if="${weapon != null}">
+
+        <h2>武器傀異錬成</h2>
+
+        <table border="1">
+
+            <tr>
+                <th>項目</th>
+                <th>Lv</th>
+                <th>補正後</th>
+            </tr>
+
+
+            <!-- 攻撃力強化 -->
+            <tr>
+
+                <th>攻撃力強化</th>
+
+                <td>
+                    <select onchange="selectWeaponAugment(
+                        'weaponAugmentAttackLevel',
+                        this.value
+                    )">
+
+                        <option value=""
+                                th:selected="${simulatorForm.weaponAugmentAttackLevel == null}">
+                            なし
+                        </option>
+
+                        <option value="1"
+                                th:selected="${simulatorForm.weaponAugmentAttackLevel == 1}">
+                            Lv1
+                        </option>
+
+                        <option value="2"
+                                th:selected="${simulatorForm.weaponAugmentAttackLevel == 2}">
+                            Lv2
+                        </option>
+
+                        <option value="3"
+                                th:selected="${simulatorForm.weaponAugmentAttackLevel == 3}">
+                            Lv3
+                        </option>
+
+                        <option value="4"
+                                th:selected="${simulatorForm.weaponAugmentAttackLevel == 4}">
+                            Lv4
+                        </option>
+
+                    </select>
+                </td>
+
+                <td>
+                    <span th:text="${weapon.attack}"></span>
+                    →
+                    <strong th:text="${augmentedWeaponAttack}"></strong>
+                </td>
+
+            </tr>
+
+
+            <!-- 属性・状態異常強化 -->
+            <tr th:if="${weapon.weaponType != 'ライトボウガン'
+                        and weapon.weaponType != 'ヘビィボウガン'
+                        and (
+                            (weapon.elementType != null
+                                and weapon.elementType != ''
+                                and weapon.elementType != '無')
+                            or
+                            (weapon.subElementType != null
+                                and weapon.subElementType != ''
+                                and weapon.subElementType != '無')
+                        )}">
+
+                <th>属性・状態異常強化</th>
+
+                <td>
+                    <select onchange="selectWeaponAugment(
+                        'weaponAugmentElementLevel',
+                        this.value
+                    )">
+
+                        <option value=""
+                                th:selected="${simulatorForm.weaponAugmentElementLevel == null}">
+                            なし
+                        </option>
+
+                        <option value="1"
+                                th:selected="${simulatorForm.weaponAugmentElementLevel == 1}">
+                            Lv1
+                        </option>
+
+                        <option value="2"
+                                th:selected="${simulatorForm.weaponAugmentElementLevel == 2}">
+                            Lv2
+                        </option>
+
+                        <option value="3"
+                                th:selected="${simulatorForm.weaponAugmentElementLevel == 3}">
+                            Lv3
+                        </option>
+
+                        <option value="4"
+                                th:selected="${simulatorForm.weaponAugmentElementLevel == 4}">
+                            Lv4
+                        </option>
+
+                        <option value="5"
+                                th:if="${(
+                                        weapon.elementType == '火'
+                                        or weapon.elementType == '水'
+                                        or weapon.elementType == '雷'
+                                        or weapon.elementType == '氷'
+                                        or weapon.elementType == '龍'
+                                    )
+                                    and not (
+                                        weapon.weaponType == '双剣'
+                                        and (
+                                            weapon.subElementType == '毒'
+                                            or weapon.subElementType == '麻痺'
+                                            or weapon.subElementType == '睡眠'
+                                            or weapon.subElementType == '爆破'
+                                        )
+                                    )}"
+                                th:selected="${simulatorForm.weaponAugmentElementLevel == 5}">
+                            Lv5
+                        </option>
+
+                        <option value="6"
+                                th:if="${(
+                                        weapon.elementType == '火'
+                                        or weapon.elementType == '水'
+                                        or weapon.elementType == '雷'
+                                        or weapon.elementType == '氷'
+                                        or weapon.elementType == '龍'
+                                    )
+                                    and not (
+                                        weapon.weaponType == '双剣'
+                                        and (
+                                            weapon.subElementType == '毒'
+                                            or weapon.subElementType == '麻痺'
+                                            or weapon.subElementType == '睡眠'
+                                            or weapon.subElementType == '爆破'
+                                        )
+                                    )}"
+                                th:selected="${simulatorForm.weaponAugmentElementLevel == 6}">
+                            Lv6
+                        </option>
+
+                        <option value="7"
+                                th:if="${(
+                                        weapon.elementType == '火'
+                                        or weapon.elementType == '水'
+                                        or weapon.elementType == '雷'
+                                        or weapon.elementType == '氷'
+                                        or weapon.elementType == '龍'
+                                    )
+                                    and not (
+                                        weapon.weaponType == '双剣'
+                                        and (
+                                            weapon.subElementType == '毒'
+                                            or weapon.subElementType == '麻痺'
+                                            or weapon.subElementType == '睡眠'
+                                            or weapon.subElementType == '爆破'
+                                        )
+                                    )}"
+                                th:selected="${simulatorForm.weaponAugmentElementLevel == 7}">
+                            Lv7
+                        </option>
+
+                        <option value="8"
+                                th:if="${(
+                                        weapon.elementType == '火'
+                                        or weapon.elementType == '水'
+                                        or weapon.elementType == '雷'
+                                        or weapon.elementType == '氷'
+                                        or weapon.elementType == '龍'
+                                    )
+                                    and not (
+                                        weapon.weaponType == '双剣'
+                                        and (
+                                            weapon.subElementType == '毒'
+                                            or weapon.subElementType == '麻痺'
+                                            or weapon.subElementType == '睡眠'
+                                            or weapon.subElementType == '爆破'
+                                        )
+                                    )}"
+                                th:selected="${simulatorForm.weaponAugmentElementLevel == 8}">
+                            Lv8
+                        </option>
+
+                    </select>
+                </td>
+
+                <td>
+                    <span th:if="${weapon.elementValue != null}">
+                        主：
+                        <span th:text="${weapon.elementValue}"></span>
+                        →
+                        <strong th:text="${augmentedWeaponElementValue}"></strong>
+                    </span>
+
+                    <span th:if="${weapon.subElementValue != null}">
+                        ／ 副：
+                        <span th:text="${weapon.subElementValue}"></span>
+                        →
+                        <strong th:text="${augmentedWeaponSubElementValue}"></strong>
+                    </span>
+                </td>
+
+            </tr>
+
+
+            <!-- 会心率強化 -->
+            <tr>
+
+                <th>会心率強化</th>
+
+                <td>
+                    <select onchange="selectWeaponAugment(
+                        'weaponAugmentAffinityLevel',
+                        this.value
+                    )">
+
+                        <option value=""
+                                th:selected="${simulatorForm.weaponAugmentAffinityLevel == null}">
+                            なし
+                        </option>
+
+                        <option value="1"
+                                th:selected="${simulatorForm.weaponAugmentAffinityLevel == 1}">
+                            Lv1
+                        </option>
+
+                        <option value="2"
+                                th:selected="${simulatorForm.weaponAugmentAffinityLevel == 2}">
+                            Lv2
+                        </option>
+
+                        <option value="3"
+                                th:selected="${simulatorForm.weaponAugmentAffinityLevel == 3}">
+                            Lv3
+                        </option>
+
+                    </select>
+                </td>
+
+                <td>
+                    <span th:text="${weapon.affinity}"></span>%
+                    →
+                    <strong th:text="${augmentedWeaponAffinity}"></strong>%
+                </td>
+
+            </tr>
+
+
+            <!-- 斬れ味強化 -->
+            <tr th:if="${weapon.weaponType != '弓'
+                        and weapon.weaponType != 'ライトボウガン'
+                        and weapon.weaponType != 'ヘビィボウガン'}">
+
+                <th>斬れ味強化</th>
+
+                <td>
+                    <select onchange="selectWeaponAugment(
+                        'weaponAugmentSharpnessLevel',
+                        this.value
+                    )">
+
+                        <option value=""
+                                th:selected="${simulatorForm.weaponAugmentSharpnessLevel == null}">
+                            なし
+                        </option>
+
+                        <option value="1"
+                                th:selected="${simulatorForm.weaponAugmentSharpnessLevel == 1}">
+                            Lv1
+                        </option>
+
+                        <option value="2"
+                                th:selected="${simulatorForm.weaponAugmentSharpnessLevel == 2}">
+                            Lv2
+                        </option>
+
+                        <option value="3"
+                                th:selected="${simulatorForm.weaponAugmentSharpnessLevel == 3}">
+                            Lv3
+                        </option>
+
+                        <option value="4"
+                                th:selected="${simulatorForm.weaponAugmentSharpnessLevel == 4}">
+                            Lv4
+                        </option>
+
+                    </select>
+                </td>
+
+                <td>
+                    +
+                    <strong th:text="${weaponAugmentModifier.sharpnessAdd}"></strong>
+                </td>
+
+            </tr>
+
+        </table>
+
+    </div>
+
+    <br>
+
+    <!-- ================================================== -->
+    <!-- モンスター・部位肉質 -->
+    <!-- ================================================== -->
+    <h2>モンスター・部位肉質</h2>
+
+    <p>
+        <label for="monsterSelect">モンスター：</label>
+
+        <select id="monsterSelect"
+                onchange="selectMonster(this.value)">
+
+            <option value="">未選択</option>
+
+            <option th:each="monster : ${monsters}"
+                    th:value="${monster.monsterId}"
+                    th:text="${monster.monsterName}"
+                    th:selected="${selectedMonster != null
+                        and selectedMonster.monsterId == monster.monsterId}">
+            </option>
+
+        </select>
+    </p>
+
+    <p th:if="${selectedMonster != null}">
+        選択中モンスター：
+        <strong th:text="${selectedMonster.monsterName}"></strong>
+    </p>
+
+    <p th:if="${selectedMonster != null}">
+
+        <label for="hitzoneSelect">部位：</label>
+
+        <select id="hitzoneSelect"
+                onchange="selectHitzone(this.value)">
+
+            <option value="">未選択</option>
+
+            <option th:each="hitzone : ${monsterHitzones}"
+                    th:value="${hitzone.hitzoneId}"
+                    th:text="${hitzone.partName}"
+                    th:selected="${selectedHitzone != null
+                        and selectedHitzone.hitzoneId == hitzone.hitzoneId}">
+            </option>
+
+        </select>
+    </p>
+
+    <div th:if="${selectedHitzone != null}">
+
+        <h3>選択部位の肉質</h3>
+
+        <table border="1">
+
+            <tr>
+                <th>部位</th>
+                <th>斬</th>
+                <th>打</th>
+                <th>弾</th>
+                <th>火</th>
+                <th>水</th>
+                <th>雷</th>
+                <th>氷</th>
+                <th>龍</th>
+            </tr>
+
+            <tr>
+                <td th:text="${selectedHitzone.partName}"></td>
+                <td th:text="${selectedHitzone.sever}"></td>
+                <td th:text="${selectedHitzone.blunt}"></td>
+                <td th:text="${selectedHitzone.shot}"></td>
+                <td th:text="${selectedHitzone.fire}"></td>
+                <td th:text="${selectedHitzone.water}"></td>
+                <td th:text="${selectedHitzone.thunder}"></td>
+                <td th:text="${selectedHitzone.ice}"></td>
+                <td th:text="${selectedHitzone.dragon}"></td>
+            </tr>
+
+        </table>
+
+    </div>
+
+    <div th:if="${monsterHitzoneValueResult != null
+                 and selectedHitzone != null}">
+
+        <h3>今回使用する肉質</h3>
+
+        <p>
+            物理：
+            <strong th:text="${monsterHitzoneValueResult.physicalHitzone}">
+            </strong>
+
+            （
+            <span th:text="${monsterHitzoneValueResult.physicalHitzoneType}">
+            </span>
+            ）
+        </p>
+
+        <p th:if="${monsterHitzoneValueResult.elemental}">
+            主属性肉質：
+            <strong th:text="${monsterHitzoneValueResult.elementHitzone}">
+            </strong>
+        </p>
+
+        <p th:if="${monsterHitzoneValueResult.subElemental}">
+            副属性肉質：
+            <strong th:text="${monsterHitzoneValueResult.subElementHitzone}">
+            </strong>
+        </p>
+
+    </div>
+
+    <br>
+
+    <!-- ================================================== -->
+    <!-- ボウガン -->
+    <!-- ================================================== -->
+
+    <div th:if="${weapon != null
+                 and (weapon.weaponType == 'ライトボウガン'
+                      or weapon.weaponType == 'ヘビィボウガン')}">
+
+        <h2>ボウガン</h2>
+
+        <p th:if="${bowgunAmmos == null
+                   or #lists.isEmpty(bowgunAmmos)}">
+            使用可能な弾データがありません。
+        </p>
+
+        <table border="1"
+               th:if="${bowgunAmmos != null
+                       and !#lists.isEmpty(bowgunAmmos)}">
+
+            <tr>
+                <th>選択</th>
+                <th>弾</th>
+                <th>Lv</th>
+                <th>装填数</th>
+                <th>速射</th>
+                <th>移動射撃</th>
+                <th>移動リロード</th>
+                <th>単発自動装填</th>
+            </tr>
+
+            <tr th:each="ammo : ${bowgunAmmos}">
+
+                <td>
+
+                    <input type="radio"
+                           name="bowgunAmmoChoice"
+                           th:value="${ammo.bowgunAmmoId}"
+                           th:checked="${selectedBowgunAmmo != null
+                               and selectedBowgunAmmo.bowgunAmmoId == ammo.bowgunAmmoId}"
+                           onchange="selectBowgunAmmo(this.value)">
+
+                </td>
+
+                <td th:text="${ammo.ammoType}"></td>
+                <td th:text="${ammo.ammoLevel}"></td>
+                <td th:text="${ammo.capacity}"></td>
+                <td th:text="${ammo.rapidFire ? '○' : '-'}"></td>
+                <td th:text="${ammo.movingShot ? '○' : '-'}"></td>
+                <td th:text="${ammo.movingReload ? '○' : '-'}"></td>
+                <td th:text="${ammo.singleAuto ? '○' : '-'}"></td>
+
+            </tr>
+
+        </table>
+
+        <div th:if="${selectedBowgunAmmo != null}">
+
+            <p>
+                選択中：
+
+                <strong th:text="${selectedBowgunAmmo.ammoType}">
+                </strong>
+
+                Lv<span th:text="${selectedBowgunAmmo.ammoLevel}">
+                </span>
+            </p>
+
+        </div>
+
+        <div th:if="${selectedBowgunAmmo != null
+                     and bowgunAmmoModifier != null}">
+
+            <h3>ボウガン弾・計算用データ</h3>
+
+            <p>
+                1hit物理モーション値：
+                <strong th:text="${bowgunAmmoModifier.physicalMotionValuePerHit}">
+                </strong>
+            </p>
+
+            <p>
+                1hit属性モーション値：
+                <strong th:text="${bowgunAmmoModifier.elementMotionValuePerHit}">
+                </strong>
+            </p>
+
+            <p>
+                1hit固定ダメージ値：
+                <strong th:text="${bowgunAmmoModifier.fixedDamageValuePerHit}">
+                </strong>
+            </p>
+
+            <p>
+                最大ヒット数：
+                <strong th:text="${bowgunAmmoModifier.maxHitCount}">
+                </strong>
+            </p>
+
+        </div>
+
+        <div th:if="${selectedBowgunAmmo != null
+                     and bowgunRapidFireModifier != null
+                     and bowgunRapidFireModifier.rapidFire}">
+
+            <h3>速射補正</h3>
+
+            <p>
+                発射数：
+                <strong th:text="${bowgunRapidFireModifier.shotCount}">
+                </strong>
+            </p>
+
+            <p>
+                1発物理倍率：
+                <strong th:text="${bowgunRapidFireModifier.physicalMulPerShot}">
+                </strong>
+            </p>
+
+            <p>
+                1発属性倍率：
+                <strong th:text="${bowgunRapidFireModifier.elementMulPerShot}">
+                </strong>
+            </p>
+
+        </div>
+
+        <div th:if="${bowgunPhysicalDamageResult != null
+                     and selectedBowgunAmmo != null}">
+
+            <h3>ボウガン物理ダメージ計算途中値</h3>
+
+            <p>
+                補正後攻撃力：
+                <strong th:text="${bowgunPhysicalDamageResult.effectiveAttack}">
+                </strong>
+            </p>
+
+            <p>
+                肉質補正前・1hit物理値：
+                <strong th:text="${bowgunPhysicalDamageResult.physicalDamagePerHit}">
+                </strong>
+            </p>
+
+            <p>
+                1発最大物理値：
+                <strong th:text="${bowgunPhysicalDamageResult.maxPhysicalDamage}">
+                </strong>
+            </p>
+
+            <p>
+                弾1個消費あたり最大物理値：
+                <strong th:text="${bowgunPhysicalDamageResult.maxPhysicalDamagePerAmmo}">
+                </strong>
+            </p>
+
+        </div>
+
+        <div th:if="${bowgunElementDamageResult != null
+                     and selectedBowgunAmmo != null}">
+
+            <h3>ボウガン属性ダメージ計算途中値</h3>
+
+            <p>
+                補正後攻撃力：
+                <strong th:text="${bowgunElementDamageResult.effectiveAttack}">
+                </strong>
+            </p>
+
+            <p>
+                肉質補正前・1hit属性値：
+                <strong th:text="${bowgunElementDamageResult.elementDamagePerHit}">
+                </strong>
+            </p>
+
+            <p>
+                1発最大属性値：
+                <strong th:text="${bowgunElementDamageResult.maxElementDamage}">
+                </strong>
+            </p>
+
+            <p>
+                弾1個消費あたり最大属性値：
+                <strong th:text="${bowgunElementDamageResult.maxElementDamagePerAmmo}">
+                </strong>
+            </p>
+
+        </div>
+
+    </div>
+
+    <!-- ================================================== -->
+    <!-- 弓 -->
+    <!-- ================================================== -->
+
+    <div th:if="${weapon != null
+                 and weapon.weaponType == '弓'}">
+
+        <h2>弓</h2>
+
+        <h3>溜め段階</h3>
+
+        <p th:if="${bowCharges == null
+                   or #lists.isEmpty(bowCharges)}">
+            溜め段階データがありません。
+        </p>
+
+        <table border="1"
+               th:if="${bowCharges != null
+                       and !#lists.isEmpty(bowCharges)}">
+
+            <tr>
+                <th>選択</th>
+                <th>溜め段階</th>
+                <th>矢タイプ</th>
+                <th>矢Lv</th>
+                <th>使用条件</th>
+            </tr>
+
+            <tr th:each="charge : ${bowCharges}">
+
+                <td>
+
+                    <input type="radio"
+                           name="bowChargeChoice"
+                           th:value="${charge.bowChargeId}"
+                           th:checked="${selectedBowCharge != null
+                               and selectedBowCharge.bowChargeId == charge.bowChargeId}"
+                           onchange="selectBowCharge(this.value)">
+
+                </td>
+
+                <td>
+                    溜め<span th:text="${charge.chargeLevel}"></span>
+                </td>
+
+                <td th:text="${charge.shotType}"></td>
+
+                <td>
+                    Lv<span th:text="${charge.shotLevel}"></span>
+                </td>
+
+                <td th:text="${charge.initiallyAvailable
+                    ? '通常使用可能'
+                    : '弓溜め段階解放が必要'}">
+                </td>
+
+            </tr>
+
+        </table>
+
+        <div th:if="${selectedBowCharge != null}">
+
+            <p>
+                選択中：
+
+                溜め<span th:text="${selectedBowCharge.chargeLevel}">
+                </span>
+
+                /
+
+                <span th:text="${selectedBowCharge.shotType}">
+                </span>
+
+                Lv<span th:text="${selectedBowCharge.shotLevel}">
+                </span>
+            </p>
+
+        </div>
+
+        <div th:if="${selectedBowCharge != null
+                     and bowChargeModifier != null}">
+
+            <p>
+                溜め物理倍率：
+                <strong th:text="${bowChargeModifier.physicalMul}">
+                </strong>
+            </p>
+
+            <p>
+                溜め属性倍率：
+                <strong th:text="${bowChargeModifier.elementMul}">
+                </strong>
+            </p>
+
+        </div>
+
+        <div th:if="${selectedBowCharge != null
+                     and bowShotModifier != null}">
+
+            <p>
+                矢モーション値（1hit）：
+                <strong th:text="${bowShotModifier.motionValuePerHit}">
+                </strong>
+            </p>
+
+            <p>
+                最大ヒット数：
+                <strong th:text="${bowShotModifier.maxHitCount}">
+                </strong>
+            </p>
+
+        </div>
+
+        <h3>ビン</h3>
+
+        <table border="1"
+               th:if="${bowCoatings != null
+                       and !#lists.isEmpty(bowCoatings)}">
+
+            <tr>
+                <th>選択</th>
+                <th>ビン</th>
+                <th>強化</th>
+            </tr>
+
+            <tr>
+
+                <td>
+
+                    <input type="radio"
+                           name="bowCoatingChoice"
+                           value=""
+                           th:checked="${selectedBowCoating == null}"
+                           onchange="clearBowCoating()">
+
+                </td>
+
+                <td>ビンなし</td>
+                <td>-</td>
+
+            </tr>
+
+            <tr th:each="coating : ${bowCoatings}">
+
+                <td>
+
+                    <input type="radio"
+                           name="bowCoatingChoice"
+                           th:value="${coating.bowCoatingId}"
+                           th:checked="${selectedBowCoating != null
+                               and selectedBowCoating.bowCoatingId == coating.bowCoatingId}"
+                           onchange="selectBowCoating(this.value)">
+
+                </td>
+
+                <td th:text="${coating.coatingType}"></td>
+
+                <td th:text="${coating.isEnhanced
+                    ? '強化'
+                    : '通常'}">
+                </td>
+
+            </tr>
+
+        </table>
+
+        <div th:if="${selectedBowCoating != null
+                     and bowCoatingModifier != null}">
+
+            <p>
+                選択中ビン：
+                <strong th:text="${selectedBowCoating.coatingType}">
+                </strong>
+            </p>
+
+            <p>
+                ビン物理倍率：
+                <strong th:text="${bowCoatingModifier.physicalMul}">
+                </strong>
+            </p>
+
+            <p>
+                ビン状態異常倍率：
+                <strong th:text="${bowCoatingModifier.statusMul}">
+                </strong>
+            </p>
+
+        </div>
+
+        <div th:if="${bowPhysicalModifier != null
+                     and selectedBowCharge != null}">
+
+            <h3>弓の最終物理係数</h3>
+
+            <p>
+                1hitあたり物理係数：
+                <strong th:text="${bowPhysicalModifier.physicalRatePerHit}">
+                </strong>
+            </p>
+
+            <p>
+                最大ヒット時物理係数：
+                <strong th:text="${bowPhysicalModifier.maxPhysicalRate}">
+                </strong>
+            </p>
+
+            <p>
+                最大ヒット数：
+                <strong th:text="${bowPhysicalModifier.maxHitCount}">
+                </strong>
+            </p>
+
+        </div>
+
+        <div th:if="${bowPhysicalDamageResult != null
+                     and selectedBowCharge != null}">
+
+            <h3>弓の物理ダメージ計算途中値</h3>
+
+            <p>
+                条件付き補正後攻撃力：
+                <strong th:text="${bowPhysicalDamageResult.effectiveAttack}">
+                </strong>
+            </p>
+
+            <p>
+                肉質補正前・1hit物理値：
+                <strong th:text="${bowPhysicalDamageResult.physicalDamagePerHit}">
+                </strong>
+            </p>
+
+            <p>
+                肉質補正前・最大ヒット物理値：
+                <strong th:text="${bowPhysicalDamageResult.maxPhysicalDamage}">
+                </strong>
+            </p>
+
+        </div>
+
+        <div th:if="${bowElementDamageResult != null
+                     and selectedBowCharge != null}">
+
+            <h3>弓の属性ダメージ計算途中値</h3>
+
+            <p>
+                条件付き補正後属性値：
+                <strong th:text="${bowElementDamageResult.effectiveElement}">
+                </strong>
+            </p>
+
+            <p>
+                肉質補正前・1hit属性値：
+                <strong th:text="${bowElementDamageResult.elementDamagePerHit}">
+                </strong>
+            </p>
+
+            <p>
+                肉質補正前・最大ヒット属性値：
+                <strong th:text="${bowElementDamageResult.maxElementDamage}">
+                </strong>
+            </p>
+
+        </div>
+
+    </div>
+
+    <br>
+
+    <!-- ================================================== -->
+    <!-- 百竜装飾品 -->
+    <!-- ================================================== -->
+
+    <div th:if="${weapon != null}">
+
+        <h2>百竜装飾品</h2>
+
+        <table border="1">
+
+            <tr>
+                <th>百竜スロット</th>
+                <th>装飾品</th>
+                <th>百竜スキル</th>
+                <th>操作</th>
+            </tr>
+
+            <tr>
+
+                <td th:text="${weapon.rampageSlotSize != null
+                    ? weapon.rampageSlotSize
+                    : 0}">
+                </td>
+
+                <td th:text="${rampageDecoration != null
+                    ? rampageDecoration.decorationName
+                    : '未選択'}">
+                </td>
+
+                <td th:text="${rampageDecoration != null
+                    ? rampageDecoration.rampageSkillName
+                    : '-'}">
+                </td>
+
+                <td>
+
+                    <button type="button"
+                            th:if="${weapon.rampageSlotSize != null
+                                and weapon.rampageSlotSize > 0}"
+                            onclick="goRampageDecorationSelect()">
+
+                        百竜装飾品を選ぶ
+
+                    </button>
+
+                    <button type="button"
+                            th:if="${simulatorForm.rampageDecorationId != null}"
+                            onclick="removeDecoration('rampageDecorationId')">
+
+                        外す
+
+                    </button>
+
+                </td>
+
+            </tr>
+
+        </table>
+
+    </div>
+
+    <br>
+
+    <!-- ================================================== -->
+    <!-- 武器装飾品 -->
+    <!-- ================================================== -->
+
+    <div th:if="${weapon != null}">
+
+        <h2>武器スロット</h2>
+
+        <table border="1">
+
+            <tr>
+                <th>スロット</th>
+                <th>サイズ</th>
+                <th>装飾品</th>
+                <th>操作</th>
+            </tr>
+
+            <tr>
+
+                <td>1</td>
+
+                <td th:text="${weapon.slot1Size != null
+                    ? weapon.slot1Size
+                    : 0}">
+                </td>
+
+                <td>
+
+                    <span th:if="${weapon.slot1Size == null
+                                 or weapon.slot1Size == 0}">
+                        スロットなし
+                    </span>
+
+                    <span th:if="${weapon.slot1Size != null
+                                 and weapon.slot1Size > 0
+                                 and weaponDecoration1 == null}">
+                        未選択
+                    </span>
+
+                    <span th:if="${weaponDecoration1 != null}">
+
+                        <span th:text="${weaponDecoration1.skillName}">
+                        </span>
+
+                        Lv<span th:text="${weaponDecoration1.skillLevel}">
+                        </span>
+
+                    </span>
+
+                </td>
+
+                <td>
+
+                    <button type="button"
+                            th:if="${weapon.slot1Size != null
+                                   and weapon.slot1Size > 0}"
+                            th:data-target="'weaponDecoration1Id'"
+                            th:data-slot-size="${weapon.slot1Size}"
+                            onclick="goDecorationSelect(
+                                this.dataset.target,
+                                this.dataset.slotSize
+                            )">
+
+                        装飾品を選ぶ
+
+                    </button>
+
+                    <button type="button"
+                            th:if="${simulatorForm.weaponDecoration1Id != null}"
+                            onclick="removeDecoration('weaponDecoration1Id')">
+
+                        外す
+
+                    </button>
+
+                </td>
+
+            </tr>
+
+            <tr>
+
+                <td>2</td>
+
+                <td th:text="${weapon.slot2Size != null
+                    ? weapon.slot2Size
+                    : 0}">
+                </td>
+
+                <td>
+
+                    <span th:if="${weapon.slot2Size == null
+                                 or weapon.slot2Size == 0}">
+                        スロットなし
+                    </span>
+
+                    <span th:if="${weapon.slot2Size != null
+                                 and weapon.slot2Size > 0
+                                 and weaponDecoration2 == null}">
+                        未選択
+                    </span>
+
+                    <span th:if="${weaponDecoration2 != null}">
+
+                        <span th:text="${weaponDecoration2.skillName}">
+                        </span>
+
+                        Lv<span th:text="${weaponDecoration2.skillLevel}">
+                        </span>
+
+                    </span>
+
+                </td>
+
+                <td>
+
+                    <button type="button"
+                            th:if="${weapon.slot2Size != null
+                                   and weapon.slot2Size > 0}"
+                            th:data-target="'weaponDecoration2Id'"
+                            th:data-slot-size="${weapon.slot2Size}"
+                            onclick="goDecorationSelect(
+                                this.dataset.target,
+                                this.dataset.slotSize
+                            )">
+
+                        装飾品を選ぶ
+
+                    </button>
+
+                    <button type="button"
+                            th:if="${simulatorForm.weaponDecoration2Id != null}"
+                            onclick="removeDecoration('weaponDecoration2Id')">
+
+                        外す
+
+                    </button>
+
+                </td>
+
+            </tr>
+
+            <tr>
+
+                <td>3</td>
+
+                <td th:text="${weapon.slot3Size != null
+                    ? weapon.slot3Size
+                    : 0}">
+                </td>
+
+                <td>
+
+                    <span th:if="${weapon.slot3Size == null
+                                 or weapon.slot3Size == 0}">
+                        スロットなし
+                    </span>
+
+                    <span th:if="${weapon.slot3Size != null
+                                 and weapon.slot3Size > 0
+                                 and weaponDecoration3 == null}">
+                        未選択
+                    </span>
+
+                    <span th:if="${weaponDecoration3 != null}">
+
+                        <span th:text="${weaponDecoration3.skillName}">
+                        </span>
+
+                        Lv<span th:text="${weaponDecoration3.skillLevel}">
+                        </span>
+
+                    </span>
+
+                </td>
+
+                <td>
+
+                    <button type="button"
+                            th:if="${weapon.slot3Size != null
+                                   and weapon.slot3Size > 0}"
+                            th:data-target="'weaponDecoration3Id'"
+                            th:data-slot-size="${weapon.slot3Size}"
+                            onclick="goDecorationSelect(
+                                this.dataset.target,
+                                this.dataset.slotSize
+                            )">
+
+                        装飾品を選ぶ
+
+                    </button>
+
+                    <button type="button"
+                            th:if="${simulatorForm.weaponDecoration3Id != null}"
+                            onclick="removeDecoration('weaponDecoration3Id')">
+
+                        外す
+
+                    </button>
+
+                </td>
+
+            </tr>
+
+        </table>
+
+    </div>
+
+    <br>
+
+    <!-- ================================================== -->
+    <!-- 防具 -->
+    <!-- ================================================== -->
+
+    <h2>選択中の防具</h2>
+
+    <table border="1">
+
+        <tr>
+            <th>部位</th>
+            <th>防具名</th>
+            <th>選択</th>
+        </tr>
+
+        <tr>
+            <td>頭</td>
+            <td th:text="${headArmor != null
+                ? headArmor.armorName
+                : '未選択'}">
+            </td>
+            <td>
+                <button type="button"
+                        onclick="goArmorSelect('頭')">
+                    選ぶ
+                </button>
+            </td>
+        </tr>
+
+        <tr>
+            <td>胴</td>
+            <td th:text="${chestArmor != null
+                ? chestArmor.armorName
+                : '未選択'}">
+            </td>
+            <td>
+                <button type="button"
+                        onclick="goArmorSelect('胴')">
+                    選ぶ
+                </button>
+            </td>
+        </tr>
+
+        <tr>
+            <td>腕</td>
+            <td th:text="${armArmor != null
+                ? armArmor.armorName
+                : '未選択'}">
+            </td>
+            <td>
+                <button type="button"
+                        onclick="goArmorSelect('腕')">
+                    選ぶ
+                </button>
+            </td>
+        </tr>
+
+        <tr>
+            <td>腰</td>
+            <td th:text="${waistArmor != null
+                ? waistArmor.armorName
+                : '未選択'}">
+            </td>
+            <td>
+                <button type="button"
+                        onclick="goArmorSelect('腰')">
+                    選ぶ
+                </button>
+            </td>
+        </tr>
+
+        <tr>
+            <td>脚</td>
+            <td th:text="${legArmor != null
+                ? legArmor.armorName
+                : '未選択'}">
+            </td>
+            <td>
+                <button type="button"
+                        onclick="goArmorSelect('脚')">
+                    選ぶ
+                </button>
+            </td>
+        </tr>
+
+    </table>
+
+    <br>
+
+    <!-- ================================================== -->
+    <!-- 頭 -->
+    <!-- ================================================== -->
+
+    <h3>頭防具スロット</h3>
+
+    <p th:if="${headArmor == null}">
+        頭防具が選択されていません。
+    </p>
+
+    <table border="1"
+           th:if="${headArmor != null}">
+
+        <tr>
+            <th>スロット</th>
+            <th>サイズ</th>
+            <th>装飾品</th>
+            <th>操作</th>
+        </tr>
+
+        <tr>
+
+            <td>1</td>
+
+            <td th:text="${headArmor.slot1Size != null
+                ? headArmor.slot1Size
+                : 0}">
+            </td>
+
+            <td>
+
+                <span th:if="${headArmor.slot1Size == null
+                             or headArmor.slot1Size == 0}">
+                    スロットなし
+                </span>
+
+                <span th:if="${headArmor.slot1Size != null
+                             and headArmor.slot1Size > 0
+                             and headDecoration1 == null}">
+                    未選択
+                </span>
+
+                <span th:if="${headDecoration1 != null}">
+
+                    <span th:text="${headDecoration1.skillName}">
+                    </span>
+
+                    Lv<span th:text="${headDecoration1.skillLevel}">
+                    </span>
+
+                </span>
+
+            </td>
+
+            <td>
+
+                <button type="button"
+                        th:if="${headArmor.slot1Size != null
+                               and headArmor.slot1Size > 0}"
+                        th:data-target="'headDecoration1Id'"
+                        th:data-slot-size="${headArmor.slot1Size}"
+                        onclick="goDecorationSelect(
+                            this.dataset.target,
+                            this.dataset.slotSize
+                        )">
+
+                    装飾品を選ぶ
+
+                </button>
+
+                <button type="button"
+                        th:if="${simulatorForm.headDecoration1Id != null}"
+                        onclick="removeDecoration('headDecoration1Id')">
+
+                    外す
+
+                </button>
+
+            </td>
+
+        </tr>
+
+        <tr>
+
+            <td>2</td>
+
+            <td th:text="${headArmor.slot2Size != null
+                ? headArmor.slot2Size
+                : 0}">
+            </td>
+
+            <td>
+
+                <span th:if="${headArmor.slot2Size == null
+                             or headArmor.slot2Size == 0}">
+                    スロットなし
+                </span>
+
+                <span th:if="${headArmor.slot2Size != null
+                             and headArmor.slot2Size > 0
+                             and headDecoration2 == null}">
+                    未選択
+                </span>
+
+                <span th:if="${headDecoration2 != null}">
+
+                    <span th:text="${headDecoration2.skillName}">
+                    </span>
+
+                    Lv<span th:text="${headDecoration2.skillLevel}">
+                    </span>
+
+                </span>
+
+            </td>
+
+            <td>
+
+                <button type="button"
+                        th:if="${headArmor.slot2Size != null
+                               and headArmor.slot2Size > 0}"
+                        th:data-target="'headDecoration2Id'"
+                        th:data-slot-size="${headArmor.slot2Size}"
+                        onclick="goDecorationSelect(
+                            this.dataset.target,
+                            this.dataset.slotSize
+                        )">
+
+                    装飾品を選ぶ
+
+                </button>
+
+                <button type="button"
+                        th:if="${simulatorForm.headDecoration2Id != null}"
+                        onclick="removeDecoration('headDecoration2Id')">
+
+                    外す
+
+                </button>
+
+            </td>
+
+        </tr>
+
+        <tr>
+
+            <td>3</td>
+
+            <td th:text="${headArmor.slot3Size != null
+                ? headArmor.slot3Size
+                : 0}">
+            </td>
+
+            <td>
+
+                <span th:if="${headArmor.slot3Size == null
+                             or headArmor.slot3Size == 0}">
+                    スロットなし
+                </span>
+
+                <span th:if="${headArmor.slot3Size != null
+                             and headArmor.slot3Size > 0
+                             and headDecoration3 == null}">
+                    未選択
+                </span>
+
+                <span th:if="${headDecoration3 != null}">
+
+                    <span th:text="${headDecoration3.skillName}">
+                    </span>
+
+                    Lv<span th:text="${headDecoration3.skillLevel}">
+                    </span>
+
+                </span>
+
+            </td>
+
+            <td>
+
+                <button type="button"
+                        th:if="${headArmor.slot3Size != null
+                               and headArmor.slot3Size > 0}"
+                        th:data-target="'headDecoration3Id'"
+                        th:data-slot-size="${headArmor.slot3Size}"
+                        onclick="goDecorationSelect(
+                            this.dataset.target,
+                            this.dataset.slotSize
+                        )">
+
+                    装飾品を選ぶ
+
+                </button>
+
+                <button type="button"
+                        th:if="${simulatorForm.headDecoration3Id != null}"
+                        onclick="removeDecoration('headDecoration3Id')">
+
+                    外す
+
+                </button>
+
+            </td>
+
+        </tr>
+
+    </table>
+
+    <br>
+
+    <!-- ================================================== -->
+    <!-- 胴 -->
+    <!-- ================================================== -->
+
+    <h3>胴防具スロット</h3>
+
+    <p th:if="${chestArmor == null}">
+        胴防具が選択されていません。
+    </p>
+
+    <table border="1"
+           th:if="${chestArmor != null}">
+
+        <tr>
+            <th>スロット</th>
+            <th>サイズ</th>
+            <th>装飾品</th>
+            <th>操作</th>
+        </tr>
+
+        <tr>
+
+            <td>1</td>
+
+            <td th:text="${chestArmor.slot1Size != null
+                ? chestArmor.slot1Size
+                : 0}">
+            </td>
+
+            <td>
+
+                <span th:if="${chestArmor.slot1Size == null
+                             or chestArmor.slot1Size == 0}">
+                    スロットなし
+                </span>
+
+                <span th:if="${chestArmor.slot1Size != null
+                             and chestArmor.slot1Size > 0
+                             and chestDecoration1 == null}">
+                    未選択
+                </span>
+
+                <span th:if="${chestDecoration1 != null}">
+                    <span th:text="${chestDecoration1.skillName}"></span>
+                    Lv<span th:text="${chestDecoration1.skillLevel}"></span>
+                </span>
+
+            </td>
+
+            <td>
+
+                <button type="button"
+                        th:if="${chestArmor.slot1Size != null
+                               and chestArmor.slot1Size > 0}"
+                        th:data-target="'chestDecoration1Id'"
+                        th:data-slot-size="${chestArmor.slot1Size}"
+                        onclick="goDecorationSelect(
+                            this.dataset.target,
+                            this.dataset.slotSize
+                        )">
+                    装飾品を選ぶ
+                </button>
+
+                <button type="button"
+                        th:if="${simulatorForm.chestDecoration1Id != null}"
+                        onclick="removeDecoration('chestDecoration1Id')">
+                    外す
+                </button>
+
+            </td>
+
+        </tr>
+
+        <tr>
+
+            <td>2</td>
+
+            <td th:text="${chestArmor.slot2Size != null
+                ? chestArmor.slot2Size
+                : 0}">
+            </td>
+
+            <td>
+
+                <span th:if="${chestArmor.slot2Size == null
+                             or chestArmor.slot2Size == 0}">
+                    スロットなし
+                </span>
+
+                <span th:if="${chestArmor.slot2Size != null
+                             and chestArmor.slot2Size > 0
+                             and chestDecoration2 == null}">
+                    未選択
+                </span>
+
+                <span th:if="${chestDecoration2 != null}">
+                    <span th:text="${chestDecoration2.skillName}"></span>
+                    Lv<span th:text="${chestDecoration2.skillLevel}"></span>
+                </span>
+
+            </td>
+
+            <td>
+
+                <button type="button"
+                        th:if="${chestArmor.slot2Size != null
+                               and chestArmor.slot2Size > 0}"
+                        th:data-target="'chestDecoration2Id'"
+                        th:data-slot-size="${chestArmor.slot2Size}"
+                        onclick="goDecorationSelect(
+                            this.dataset.target,
+                            this.dataset.slotSize
+                        )">
+                    装飾品を選ぶ
+                </button>
+
+                <button type="button"
+                        th:if="${simulatorForm.chestDecoration2Id != null}"
+                        onclick="removeDecoration('chestDecoration2Id')">
+                    外す
+                </button>
+
+            </td>
+
+        </tr>
+
+        <tr>
+
+            <td>3</td>
+
+            <td th:text="${chestArmor.slot3Size != null
+                ? chestArmor.slot3Size
+                : 0}">
+            </td>
+
+            <td>
+
+                <span th:if="${chestArmor.slot3Size == null
+                             or chestArmor.slot3Size == 0}">
+                    スロットなし
+                </span>
+
+                <span th:if="${chestArmor.slot3Size != null
+                             and chestArmor.slot3Size > 0
+                             and chestDecoration3 == null}">
+                    未選択
+                </span>
+
+                <span th:if="${chestDecoration3 != null}">
+                    <span th:text="${chestDecoration3.skillName}"></span>
+                    Lv<span th:text="${chestDecoration3.skillLevel}"></span>
+                </span>
+
+            </td>
+
+            <td>
+
+                <button type="button"
+                        th:if="${chestArmor.slot3Size != null
+                               and chestArmor.slot3Size > 0}"
+                        th:data-target="'chestDecoration3Id'"
+                        th:data-slot-size="${chestArmor.slot3Size}"
+                        onclick="goDecorationSelect(
+                            this.dataset.target,
+                            this.dataset.slotSize
+                        )">
+                    装飾品を選ぶ
+                </button>
+
+                <button type="button"
+                        th:if="${simulatorForm.chestDecoration3Id != null}"
+                        onclick="removeDecoration('chestDecoration3Id')">
+                    外す
+                </button>
+
+            </td>
+
+        </tr>
+
+    </table>
+
+    <br>
+
+    <!-- ================================================== -->
+    <!-- 腕 -->
+    <!-- ================================================== -->
+
+    <h3>腕防具スロット</h3>
+
+    <p th:if="${armArmor == null}">
+        腕防具が選択されていません。
+    </p>
+
+    <table border="1"
+           th:if="${armArmor != null}">
+
+        <tr>
+            <th>スロット</th>
+            <th>サイズ</th>
+            <th>装飾品</th>
+            <th>操作</th>
+        </tr>
+
+        <tr>
+
+            <td>1</td>
+
+            <td th:text="${armArmor.slot1Size != null
+                ? armArmor.slot1Size
+                : 0}">
+            </td>
+
+            <td>
+
+                <span th:if="${armArmor.slot1Size == null
+                             or armArmor.slot1Size == 0}">
+                    スロットなし
+                </span>
+
+                <span th:if="${armArmor.slot1Size != null
+                             and armArmor.slot1Size > 0
+                             and armDecoration1 == null}">
+                    未選択
+                </span>
+
+                <span th:if="${armDecoration1 != null}">
+                    <span th:text="${armDecoration1.skillName}"></span>
+                    Lv<span th:text="${armDecoration1.skillLevel}"></span>
+                </span>
+
+            </td>
+
+            <td>
+
+                <button type="button"
+                        th:if="${armArmor.slot1Size != null
+                               and armArmor.slot1Size > 0}"
+                        th:data-target="'armDecoration1Id'"
+                        th:data-slot-size="${armArmor.slot1Size}"
+                        onclick="goDecorationSelect(
+                            this.dataset.target,
+                            this.dataset.slotSize
+                        )">
+                    装飾品を選ぶ
+                </button>
+
+                <button type="button"
+                        th:if="${simulatorForm.armDecoration1Id != null}"
+                        onclick="removeDecoration('armDecoration1Id')">
+                    外す
+                </button>
+
+            </td>
+
+        </tr>
+
+        <tr>
+
+            <td>2</td>
+
+            <td th:text="${armArmor.slot2Size != null
+                ? armArmor.slot2Size
+                : 0}">
+            </td>
+
+            <td>
+
+                <span th:if="${armArmor.slot2Size == null
+                             or armArmor.slot2Size == 0}">
+                    スロットなし
+                </span>
+
+                <span th:if="${armArmor.slot2Size != null
+                             and armArmor.slot2Size > 0
+                             and armDecoration2 == null}">
+                    未選択
+                </span>
+
+                <span th:if="${armDecoration2 != null}">
+                    <span th:text="${armDecoration2.skillName}"></span>
+                    Lv<span th:text="${armDecoration2.skillLevel}"></span>
+                </span>
+
+            </td>
+
+            <td>
+
+                <button type="button"
+                        th:if="${armArmor.slot2Size != null
+                               and armArmor.slot2Size > 0}"
+                        th:data-target="'armDecoration2Id'"
+                        th:data-slot-size="${armArmor.slot2Size}"
+                        onclick="goDecorationSelect(
+                            this.dataset.target,
+                            this.dataset.slotSize
+                        )">
+                    装飾品を選ぶ
+                </button>
+
+                <button type="button"
+                        th:if="${simulatorForm.armDecoration2Id != null}"
+                        onclick="removeDecoration('armDecoration2Id')">
+                    外す
+                </button>
+
+            </td>
+
+        </tr>
+
+        <tr>
+
+            <td>3</td>
+
+            <td th:text="${armArmor.slot3Size != null
+                ? armArmor.slot3Size
+                : 0}">
+            </td>
+
+            <td>
+
+                <span th:if="${armArmor.slot3Size == null
+                             or armArmor.slot3Size == 0}">
+                    スロットなし
+                </span>
+
+                <span th:if="${armArmor.slot3Size != null
+                             and armArmor.slot3Size > 0
+                             and armDecoration3 == null}">
+                    未選択
+                </span>
+
+                <span th:if="${armDecoration3 != null}">
+                    <span th:text="${armDecoration3.skillName}"></span>
+                    Lv<span th:text="${armDecoration3.skillLevel}"></span>
+                </span>
+
+            </td>
+
+            <td>
+
+                <button type="button"
+                        th:if="${armArmor.slot3Size != null
+                               and armArmor.slot3Size > 0}"
+                        th:data-target="'armDecoration3Id'"
+                        th:data-slot-size="${armArmor.slot3Size}"
+                        onclick="goDecorationSelect(
+                            this.dataset.target,
+                            this.dataset.slotSize
+                        )">
+                    装飾品を選ぶ
+                </button>
+
+                <button type="button"
+                        th:if="${simulatorForm.armDecoration3Id != null}"
+                        onclick="removeDecoration('armDecoration3Id')">
+                    外す
+                </button>
+
+            </td>
+
+        </tr>
+
+    </table>
+
+    <br>
+
+    <!-- ================================================== -->
+    <!-- 腰 -->
+    <!-- ================================================== -->
+
+    <h3>腰防具スロット</h3>
+
+    <p th:if="${waistArmor == null}">
+        腰防具が選択されていません。
+    </p>
+
+    <table border="1"
+           th:if="${waistArmor != null}">
+
+        <tr>
+            <th>スロット</th>
+            <th>サイズ</th>
+            <th>装飾品</th>
+            <th>操作</th>
+        </tr>
+
+        <tr>
+
+            <td>1</td>
+
+            <td th:text="${waistArmor.slot1Size != null
+                ? waistArmor.slot1Size
+                : 0}">
+            </td>
+
+            <td>
+
+                <span th:if="${waistArmor.slot1Size == null
+                             or waistArmor.slot1Size == 0}">
+                    スロットなし
+                </span>
+
+                <span th:if="${waistArmor.slot1Size != null
+                             and waistArmor.slot1Size > 0
+                             and waistDecoration1 == null}">
+                    未選択
+                </span>
+
+                <span th:if="${waistDecoration1 != null}">
+                    <span th:text="${waistDecoration1.skillName}"></span>
+                    Lv<span th:text="${waistDecoration1.skillLevel}"></span>
+                </span>
+
+            </td>
+
+            <td>
+
+                <button type="button"
+                        th:if="${waistArmor.slot1Size != null
+                               and waistArmor.slot1Size > 0}"
+                        th:data-target="'waistDecoration1Id'"
+                        th:data-slot-size="${waistArmor.slot1Size}"
+                        onclick="goDecorationSelect(
+                            this.dataset.target,
+                            this.dataset.slotSize
+                        )">
+                    装飾品を選ぶ
+                </button>
+
+                <button type="button"
+                        th:if="${simulatorForm.waistDecoration1Id != null}"
+                        onclick="removeDecoration('waistDecoration1Id')">
+                    外す
+                </button>
+
+            </td>
+
+        </tr>
+
+        <tr>
+
+            <td>2</td>
+
+            <td th:text="${waistArmor.slot2Size != null
+                ? waistArmor.slot2Size
+                : 0}">
+            </td>
+
+            <td>
+
+                <span th:if="${waistArmor.slot2Size == null
+                             or waistArmor.slot2Size == 0}">
+                    スロットなし
+                </span>
+
+                <span th:if="${waistArmor.slot2Size != null
+                             and waistArmor.slot2Size > 0
+                             and waistDecoration2 == null}">
+                    未選択
+                </span>
+
+                <span th:if="${waistDecoration2 != null}">
+                    <span th:text="${waistDecoration2.skillName}"></span>
+                    Lv<span th:text="${waistDecoration2.skillLevel}"></span>
+                </span>
+
+            </td>
+
+            <td>
+
+                <button type="button"
+                        th:if="${waistArmor.slot2Size != null
+                               and waistArmor.slot2Size > 0}"
+                        th:data-target="'waistDecoration2Id'"
+                        th:data-slot-size="${waistArmor.slot2Size}"
+                        onclick="goDecorationSelect(
+                            this.dataset.target,
+                            this.dataset.slotSize
+                        )">
+                    装飾品を選ぶ
+                </button>
+
+                <button type="button"
+                        th:if="${simulatorForm.waistDecoration2Id != null}"
+                        onclick="removeDecoration('waistDecoration2Id')">
+                    外す
+                </button>
+
+            </td>
+
+        </tr>
+
+        <tr>
+
+            <td>3</td>
+
+            <td th:text="${waistArmor.slot3Size != null
+                ? waistArmor.slot3Size
+                : 0}">
+            </td>
+
+            <td>
+
+                <span th:if="${waistArmor.slot3Size == null
+                             or waistArmor.slot3Size == 0}">
+                    スロットなし
+                </span>
+
+                <span th:if="${waistArmor.slot3Size != null
+                             and waistArmor.slot3Size > 0
+                             and waistDecoration3 == null}">
+                    未選択
+                </span>
+
+                <span th:if="${waistDecoration3 != null}">
+                    <span th:text="${waistDecoration3.skillName}"></span>
+                    Lv<span th:text="${waistDecoration3.skillLevel}"></span>
+                </span>
+
+            </td>
+
+            <td>
+
+                <button type="button"
+                        th:if="${waistArmor.slot3Size != null
+                               and waistArmor.slot3Size > 0}"
+                        th:data-target="'waistDecoration3Id'"
+                        th:data-slot-size="${waistArmor.slot3Size}"
+                        onclick="goDecorationSelect(
+                            this.dataset.target,
+                            this.dataset.slotSize
+                        )">
+                    装飾品を選ぶ
+                </button>
+
+                <button type="button"
+                        th:if="${simulatorForm.waistDecoration3Id != null}"
+                        onclick="removeDecoration('waistDecoration3Id')">
+                    外す
+                </button>
+
+            </td>
+
+        </tr>
+
+    </table>
+
+    <br>
+
+    <!-- ================================================== -->
+    <!-- 脚 -->
+    <!-- ================================================== -->
+
+    <h3>脚防具スロット</h3>
+
+    <p th:if="${legArmor == null}">
+        脚防具が選択されていません。
+    </p>
+
+    <table border="1"
+           th:if="${legArmor != null}">
+
+        <tr>
+            <th>スロット</th>
+            <th>サイズ</th>
+            <th>装飾品</th>
+            <th>操作</th>
+        </tr>
+
+        <tr>
+
+            <td>1</td>
+
+            <td th:text="${legArmor.slot1Size != null
+                ? legArmor.slot1Size
+                : 0}">
+            </td>
+
+            <td>
+
+                <span th:if="${legArmor.slot1Size == null
+                             or legArmor.slot1Size == 0}">
+                    スロットなし
+                </span>
+
+                <span th:if="${legArmor.slot1Size != null
+                             and legArmor.slot1Size > 0
+                             and legDecoration1 == null}">
+                    未選択
+                </span>
+
+                <span th:if="${legDecoration1 != null}">
+                    <span th:text="${legDecoration1.skillName}"></span>
+                    Lv<span th:text="${legDecoration1.skillLevel}"></span>
+                </span>
+
+            </td>
+
+            <td>
+
+                <button type="button"
+                        th:if="${legArmor.slot1Size != null
+                               and legArmor.slot1Size > 0}"
+                        th:data-target="'legDecoration1Id'"
+                        th:data-slot-size="${legArmor.slot1Size}"
+                        onclick="goDecorationSelect(
+                            this.dataset.target,
+                            this.dataset.slotSize
+                        )">
+                    装飾品を選ぶ
+                </button>
+
+                <button type="button"
+                        th:if="${simulatorForm.legDecoration1Id != null}"
+                        onclick="removeDecoration('legDecoration1Id')">
+                    外す
+                </button>
+
+            </td>
+
+        </tr>
+
+        <tr>
+
+            <td>2</td>
+
+            <td th:text="${legArmor.slot2Size != null
+                ? legArmor.slot2Size
+                : 0}">
+            </td>
+
+            <td>
+
+                <span th:if="${legArmor.slot2Size == null
+                             or legArmor.slot2Size == 0}">
+                    スロットなし
+                </span>
+
+                <span th:if="${legArmor.slot2Size != null
+                             and legArmor.slot2Size > 0
+                             and legDecoration2 == null}">
+                    未選択
+                </span>
+
+                <span th:if="${legDecoration2 != null}">
+                    <span th:text="${legDecoration2.skillName}"></span>
+                    Lv<span th:text="${legDecoration2.skillLevel}"></span>
+                </span>
+
+            </td>
+
+            <td>
+
+                <button type="button"
+                        th:if="${legArmor.slot2Size != null
+                               and legArmor.slot2Size > 0}"
+                        th:data-target="'legDecoration2Id'"
+                        th:data-slot-size="${legArmor.slot2Size}"
+                        onclick="goDecorationSelect(
+                            this.dataset.target,
+                            this.dataset.slotSize
+                        )">
+                    装飾品を選ぶ
+                </button>
+
+                <button type="button"
+                        th:if="${simulatorForm.legDecoration2Id != null}"
+                        onclick="removeDecoration('legDecoration2Id')">
+                    外す
+                </button>
+
+            </td>
+
+        </tr>
+
+        <tr>
+
+            <td>3</td>
+
+            <td th:text="${legArmor.slot3Size != null
+                ? legArmor.slot3Size
+                : 0}">
+            </td>
+
+            <td>
+
+                <span th:if="${legArmor.slot3Size == null
+                             or legArmor.slot3Size == 0}">
+                    スロットなし
+                </span>
+
+                <span th:if="${legArmor.slot3Size != null
+                             and legArmor.slot3Size > 0
+                             and legDecoration3 == null}">
+                    未選択
+                </span>
+
+                <span th:if="${legDecoration3 != null}">
+                    <span th:text="${legDecoration3.skillName}"></span>
+                    Lv<span th:text="${legDecoration3.skillLevel}"></span>
+                </span>
+
+            </td>
+
+            <td>
+
+                <button type="button"
+                        th:if="${legArmor.slot3Size != null
+                               and legArmor.slot3Size > 0}"
+                        th:data-target="'legDecoration3Id'"
+                        th:data-slot-size="${legArmor.slot3Size}"
+                        onclick="goDecorationSelect(
+                            this.dataset.target,
+                            this.dataset.slotSize
+                        )">
+                    装飾品を選ぶ
+                </button>
+
+                <button type="button"
+                        th:if="${simulatorForm.legDecoration3Id != null}"
+                        onclick="removeDecoration('legDecoration3Id')">
+                    外す
+                </button>
+
+            </td>
+
+        </tr>
+
+    </table>
+
+    <br>
+
+    <!-- ================================================== -->
+    <!-- 護石 -->
+    <!-- ================================================== -->
+
+    <h2>護石</h2>
+
+    <table border="1">
+
+        <tr>
+            <th>項目</th>
+            <th>内容</th>
+        </tr>
+
+        <tr>
+
+            <td>スキル1</td>
+
+            <td>
+
+                <span th:if="${talismanSkill1 == null}">
+                    なし
+                </span>
+
+                <span th:if="${talismanSkill1 != null}">
+
+                    <span th:text="${talismanSkill1.skillName}">
+                    </span>
+
+                    Lv<span th:text="${talismanSkill1.level}">
+                    </span>
+
+                </span>
+
+            </td>
+
+        </tr>
+
+        <tr>
+
+            <td>スキル2</td>
+
+            <td>
+
+                <span th:if="${talismanSkill2 == null}">
+                    なし
+                </span>
+
+                <span th:if="${talismanSkill2 != null}">
+
+                    <span th:text="${talismanSkill2.skillName}">
+                    </span>
+
+                    Lv<span th:text="${talismanSkill2.level}">
+                    </span>
+
+                </span>
+
+            </td>
+
+        </tr>
+
+        <tr>
+
+            <td>スロット</td>
+
+            <td>
+
+                <span th:text="${simulatorForm.talismanSlot1Size != null
+                    ? simulatorForm.talismanSlot1Size
+                    : 0}">
+                </span>
+
+                -
+
+                <span th:text="${simulatorForm.talismanSlot2Size != null
+                    ? simulatorForm.talismanSlot2Size
+                    : 0}">
+                </span>
+
+                -
+
+                <span th:text="${simulatorForm.talismanSlot3Size != null
+                    ? simulatorForm.talismanSlot3Size
+                    : 0}">
+                </span>
+
+            </td>
+
+        </tr>
+
+    </table>
+
+    <br>
+
+    <button type="button"
+            onclick="goTalisman()">
+        護石を編集
+    </button>
+
+    <h3>護石スロット</h3>
+
+    <table border="1">
+
+        <tr>
+            <th>スロット</th>
+            <th>サイズ</th>
+            <th>装飾品</th>
+            <th>操作</th>
+        </tr>
+
+        <tr>
+
+            <td>1</td>
+
+            <td th:text="${simulatorForm.talismanSlot1Size != null
+                ? simulatorForm.talismanSlot1Size
+                : 0}">
+            </td>
+
+            <td>
+
+                <span th:if="${simulatorForm.talismanSlot1Size == null
+                             or simulatorForm.talismanSlot1Size == 0}">
+                    スロットなし
+                </span>
+
+                <span th:if="${simulatorForm.talismanSlot1Size != null
+                             and simulatorForm.talismanSlot1Size > 0
+                             and talismanDecoration1 == null}">
+                    未選択
+                </span>
+
+                <span th:if="${talismanDecoration1 != null}">
+                    <span th:text="${talismanDecoration1.skillName}"></span>
+                    Lv<span th:text="${talismanDecoration1.skillLevel}"></span>
+                </span>
+
+            </td>
+
+            <td>
+
+                <button type="button"
+                        th:if="${simulatorForm.talismanSlot1Size != null
+                               and simulatorForm.talismanSlot1Size > 0}"
+                        th:data-target="'talismanDecoration1Id'"
+                        th:data-slot-size="${simulatorForm.talismanSlot1Size}"
+                        onclick="goDecorationSelect(
+                            this.dataset.target,
+                            this.dataset.slotSize
+                        )">
+                    装飾品を選ぶ
+                </button>
+
+                <button type="button"
+                        th:if="${simulatorForm.talismanDecoration1Id != null}"
+                        onclick="removeDecoration('talismanDecoration1Id')">
+                    外す
+                </button>
+
+            </td>
+
+        </tr>
+
+        <tr>
+
+            <td>2</td>
+
+            <td th:text="${simulatorForm.talismanSlot2Size != null
+                ? simulatorForm.talismanSlot2Size
+                : 0}">
+            </td>
+
+            <td>
+
+                <span th:if="${simulatorForm.talismanSlot2Size == null
+                             or simulatorForm.talismanSlot2Size == 0}">
+                    スロットなし
+                </span>
+
+                <span th:if="${simulatorForm.talismanSlot2Size != null
+                             and simulatorForm.talismanSlot2Size > 0
+                             and talismanDecoration2 == null}">
+                    未選択
+                </span>
+
+                <span th:if="${talismanDecoration2 != null}">
+                    <span th:text="${talismanDecoration2.skillName}"></span>
+                    Lv<span th:text="${talismanDecoration2.skillLevel}"></span>
+                </span>
+
+            </td>
+
+            <td>
+
+                <button type="button"
+                        th:if="${simulatorForm.talismanSlot2Size != null
+                               and simulatorForm.talismanSlot2Size > 0}"
+                        th:data-target="'talismanDecoration2Id'"
+                        th:data-slot-size="${simulatorForm.talismanSlot2Size}"
+                        onclick="goDecorationSelect(
+                            this.dataset.target,
+                            this.dataset.slotSize
+                        )">
+                    装飾品を選ぶ
+                </button>
+
+                <button type="button"
+                        th:if="${simulatorForm.talismanDecoration2Id != null}"
+                        onclick="removeDecoration('talismanDecoration2Id')">
+                    外す
+                </button>
+
+            </td>
+
+        </tr>
+
+        <tr>
+
+            <td>3</td>
+
+            <td th:text="${simulatorForm.talismanSlot3Size != null
+                ? simulatorForm.talismanSlot3Size
+                : 0}">
+            </td>
+
+            <td>
+
+                <span th:if="${simulatorForm.talismanSlot3Size == null
+                             or simulatorForm.talismanSlot3Size == 0}">
+                    スロットなし
+                </span>
+
+                <span th:if="${simulatorForm.talismanSlot3Size != null
+                             and simulatorForm.talismanSlot3Size > 0
+                             and talismanDecoration3 == null}">
+                    未選択
+                </span>
+
+                <span th:if="${talismanDecoration3 != null}">
+                    <span th:text="${talismanDecoration3.skillName}"></span>
+                    Lv<span th:text="${talismanDecoration3.skillLevel}"></span>
+                </span>
+
+            </td>
+
+            <td>
+
+                <button type="button"
+                        th:if="${simulatorForm.talismanSlot3Size != null
+                               and simulatorForm.talismanSlot3Size > 0}"
+                        th:data-target="'talismanDecoration3Id'"
+                        th:data-slot-size="${simulatorForm.talismanSlot3Size}"
+                        onclick="goDecorationSelect(
+                            this.dataset.target,
+                            this.dataset.slotSize
+                        )">
+                    装飾品を選ぶ
+                </button>
+
+                <button type="button"
+                        th:if="${simulatorForm.talismanDecoration3Id != null}"
+                        onclick="removeDecoration('talismanDecoration3Id')">
+                    外す
+                </button>
+
+            </td>
+
+        </tr>
+
+    </table>
+
+    <br>
+
+    <!-- ================================================== -->
+    <!-- 発動スキル -->
+    <!-- ================================================== -->
+
+    <h2>発動スキル合計</h2>
+
+    <p th:if="${skillTotals == null
+               or #lists.isEmpty(skillTotals)}">
+        発動スキルはありません。
+    </p>
+
+    <table border="1"
+           th:if="${skillTotals != null
+                   and !#lists.isEmpty(skillTotals)}">
+
+        <tr>
+            <th>スキル名</th>
+            <th>合計Lv</th>
+        </tr>
+
+        <tr th:each="skill : ${skillTotals}">
+            <td th:text="${skill.skillName}"></td>
+            <td th:text="${skill.level}"></td>
+        </tr>
+
+    </table>
+
+    <!-- ================================================== -->
+    <!-- 条件付きスキル -->
+    <!-- ================================================== -->
+
+    <div th:if="${skillStateSelections != null
+                 and !#lists.isEmpty(skillStateSelections)}">
+
+        <h2>条件付きスキル設定</h2>
+
+        <div th:each="selection : ${skillStateSelections}">
+
+            <h3>
+
+                <span th:text="${selection.skillName}">
+                </span>
+
+                Lv<span th:text="${selection.level}">
+                </span>
+
+            </h3>
+
+            <p th:if="${selection.conditionText != null
+                       and !selection.conditionText.isBlank()}">
+
+                条件：
+                <span th:text="${selection.conditionText}">
+                </span>
+
+            </p>
+
+            <div th:each="state : ${selection.states}">
+
+                <label>
+
+                    <input type="radio"
+                           th:name="${'skillState_' + selection.skillId}"
+                           th:value="${state.stateCode}"
+                           th:checked="${param['skillState_' + selection.skillId] != null
+                               ? param['skillState_' + selection.skillId][0] == state.stateCode
+                               : state.stateCode == 'INACTIVE'}"
+                           onchange="selectSkillState(
+                               this.name,
+                               this.value
+                           )">
+
+                    <span th:text="${state.stateName}">
+                    </span>
+
+                </label>
+
+                <br>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div th:if="${conditionalSkillModifierTotal != null}">
+
+        <h2>条件付きスキル補正合計</h2>
+
+        <table border="1">
+
+            <tr>
+                <th>項目</th>
+                <th>値</th>
+            </tr>
+
+            <tr>
+                <td>攻撃力加算</td>
+                <td th:text="${conditionalSkillModifierTotal.attackAdd}"></td>
+            </tr>
+
+            <tr>
+                <td>攻撃力倍率</td>
+                <td th:text="${conditionalSkillModifierTotal.attackMul}"></td>
+            </tr>
+
+            <tr>
+                <td>属性値加算</td>
+                <td th:text="${conditionalSkillModifierTotal.elementAdd}"></td>
+            </tr>
+
+            <tr>
+                <td>属性値倍率</td>
+                <td th:text="${conditionalSkillModifierTotal.elementMul}"></td>
+            </tr>
+
+            <tr>
+                <td>会心率加算</td>
+                <td th:text="${conditionalSkillModifierTotal.affinityAdd}"></td>
+            </tr>
+
+            <tr>
+                <td>会心ダメージ倍率</td>
+                <td th:text="${conditionalSkillModifierTotal.critDamageMul}"></td>
+            </tr>
+
+            <tr>
+                <td>物理ダメージ倍率</td>
+                <td th:text="${conditionalSkillModifierTotal.physicalDamageMul}"></td>
+            </tr>
+
+            <tr>
+                <td>属性ダメージ倍率</td>
+                <td th:text="${conditionalSkillModifierTotal.elementDamageMul}"></td>
+            </tr>
+
+            <tr>
+                <td>属性会心倍率</td>
+                <td th:text="${conditionalSkillModifierTotal.elementCritDamageMul}"></td>
+            </tr>
+
+        </table>
+
+    </div>
+
+    <!-- ================================================== -->
+    <!-- 弱点・会心 -->
+    <!-- ================================================== -->
+
+    <div th:if="${selectedHitzone != null
+                 and monsterWeakpointResult != null}">
+
+        <h2>弱点・会心判定</h2>
+
+        <table border="1">
+
+            <tr>
+                <th>項目</th>
+                <th>結果</th>
+            </tr>
+
+            <tr>
+
+                <td>物理弱点（45以上）</td>
+
+                <td th:text="${monsterWeakpointResult.physicalWeakpoint
+                    ? '○'
+                    : '-'}">
+                </td>
+
+            </tr>
+
+            <tr>
+
+                <td>主属性弱点（20以上）</td>
+
+                <td th:text="${monsterWeakpointResult.elementWeakpoint
+                    ? '○'
+                    : '-'}">
+                </td>
+
+            </tr>
+
+            <tr th:if="${monsterWeakpointResult.subElemental}">
+
+                <td>副属性弱点（20以上）</td>
+
+                <td th:text="${monsterWeakpointResult.subElementWeakpoint
+                    ? '○'
+                    : '-'}">
+                </td>
+
+            </tr>
+
+            <tr th:if="${criticalModifierResult != null}">
+
+                <td>最終会心率</td>
+
+                <td>
+                    <span th:text="${criticalModifierResult.finalAffinity}">
+                    </span>%
+                </td>
+
+            </tr>
+
+            <tr th:if="${criticalModifierResult != null}">
+
+                <td>プラス会心物理倍率</td>
+
+                <td th:text="${criticalModifierResult.positiveCriticalDamageMul}">
+                </td>
+
+            </tr>
+
+            <tr th:if="${criticalModifierResult != null}">
+
+                <td>会心撃【属性】倍率</td>
+
+                <td th:text="${criticalModifierResult.positiveElementCriticalDamageMul}">
+                </td>
+
+            </tr>
+
+        </table>
+
+    </div>
+
+    <!-- ================================================== -->
+    <!-- 物理肉質適用後 -->
+    <!-- ================================================== -->
+
+    <div th:if="${physicalHitzoneDamageResult != null}">
+
+        <h2>物理肉質適用後</h2>
+
+        <table border="1">
+
+            <tr>
+                <th>項目</th>
+                <th>値</th>
+            </tr>
+
+            <tr>
+                <td>使用物理肉質</td>
+                <td th:text="${physicalHitzoneDamageResult.physicalHitzone}">
+                </td>
+            </tr>
+
+            <tr>
+                <td>非会心・1hit</td>
+                <td th:text="${physicalHitzoneDamageResult.normalPhysicalDamagePerHit}">
+                </td>
+            </tr>
+
+            <tr>
+                <td>プラス会心・1hit</td>
+                <td th:text="${physicalHitzoneDamageResult.positiveCriticalPhysicalDamagePerHit}">
+                </td>
+            </tr>
+
+            <tr>
+                <td>マイナス会心・1hit</td>
+                <td th:text="${physicalHitzoneDamageResult.negativeCriticalPhysicalDamagePerHit}">
+                </td>
+            </tr>
+
+        </table>
+
+    </div>
+
+    <!-- ================================================== -->
+    <!-- 属性肉質適用後 -->
+    <!-- ================================================== -->
+
+    <div th:if="${elementHitzoneDamageResult != null}">
+
+        <h2>属性肉質適用後</h2>
+
+        <table border="1">
+
+            <tr>
+                <th>項目</th>
+                <th>値</th>
+            </tr>
+
+            <tr>
+                <td>使用属性肉質</td>
+                <td th:text="${elementHitzoneDamageResult.elementHitzone}">
+                </td>
+            </tr>
+
+            <tr>
+                <td>弱点特効【属性】倍率</td>
+                <td th:text="${elementHitzoneDamageResult.weakpointElementDamageMul}">
+                </td>
+            </tr>
+
+            <tr>
+                <td>非会心・1hit</td>
+                <td th:text="${elementHitzoneDamageResult.normalElementDamagePerHit}">
+                </td>
+            </tr>
+
+            <tr>
+                <td>プラス会心・1hit</td>
+                <td th:text="${elementHitzoneDamageResult.positiveCriticalElementDamagePerHit}">
+                </td>
+            </tr>
+
+        </table>
+
+    </div>
+
+    <!-- ================================================== -->
+    <!-- 最終ダメージ -->
+    <!-- ================================================== -->
+
+    <div th:if="${finalDamageResult != null}">
+
+        <h2>最終ダメージ</h2>
+
+        <p th:if="${selectedMonster != null
+                   and selectedHitzone != null}">
+
+            対象：
+
+            <strong th:text="${selectedMonster.monsterName}">
+            </strong>
+
+            /
+
+            <strong th:text="${selectedHitzone.partName}">
+            </strong>
+
+        </p>
+
+        <p th:if="${criticalModifierResult != null}">
+
+            最終会心率：
+
+            <strong th:text="${criticalModifierResult.finalAffinity}">
+            </strong>%
+
+        </p>
+
+        <table border="1">
+
+            <tr>
+                <th>パターン</th>
+                <th>物理</th>
+                <th>属性</th>
+                <th>合計</th>
+            </tr>
+
+            <tr>
+
+                <td>非会心</td>
+
+                <td th:text="${finalDamageResult.normalPhysicalDamage}">
+                </td>
+
+                <td th:text="${finalDamageResult.normalElementDamage}">
+                </td>
+
+                <td>
+
+                    <strong th:text="${finalDamageResult.normalTotalDamage}">
+                    </strong>
+
+                </td>
+
+            </tr>
+
+            <tr>
+
+                <td>プラス会心</td>
+
+                <td th:text="${finalDamageResult.positiveCriticalPhysicalDamage}">
+                </td>
+
+                <td th:text="${finalDamageResult.positiveCriticalElementDamage}">
+                </td>
+
+                <td>
+
+                    <strong th:text="${finalDamageResult.positiveCriticalTotalDamage}">
+                    </strong>
+
+                </td>
+
+            </tr>
+
+            <tr>
+
+                <td>マイナス会心</td>
+
+                <td th:text="${finalDamageResult.negativeCriticalPhysicalDamage}">
+                </td>
+
+                <td th:text="${finalDamageResult.negativeCriticalElementDamage}">
+                </td>
+
+                <td>
+
+                    <strong th:text="${finalDamageResult.negativeCriticalTotalDamage}">
+                    </strong>
+
+                </td>
+
+            </tr>
+
+        </table>
+
+    </div>
+
+    <br>
+
+    <!-- ================================================== -->
+    <!-- 最終防御力・属性耐性 -->
+    <!-- ================================================== -->
+
+    <div th:if="${defenseResistanceResult != null}">
+
+        <h2>最終防御力・属性耐性</h2>
+
+        <table border="1">
+
+            <tr>
+                <th>項目</th>
+                <th>最終値</th>
+            </tr>
+
+            <tr>
+                <td>防御力</td>
+                <td>
+                    <strong th:text="${defenseResistanceResult.finalDefense}">
+                    </strong>
+                </td>
+            </tr>
+
+            <tr>
+                <td>火耐性</td>
+                <td>
+                    <strong th:text="${defenseResistanceResult.finalFireRes}">
+                    </strong>
+                </td>
+            </tr>
+
+            <tr>
+                <td>水耐性</td>
+                <td>
+                    <strong th:text="${defenseResistanceResult.finalWaterRes}">
+                    </strong>
+                </td>
+            </tr>
+
+            <tr>
+                <td>雷耐性</td>
+                <td>
+                    <strong th:text="${defenseResistanceResult.finalThunderRes}">
+                    </strong>
+                </td>
+            </tr>
+
+            <tr>
+                <td>氷耐性</td>
+                <td>
+                    <strong th:text="${defenseResistanceResult.finalIceRes}">
+                    </strong>
+                </td>
+            </tr>
+
+            <tr>
+                <td>龍耐性</td>
+                <td>
+                    <strong th:text="${defenseResistanceResult.finalDragonRes}">
+                    </strong>
+                </td>
+            </tr>
+
+        </table>
+
+    </div>
+
+    <br>
+
+    <button type="button"
+            onclick="goWeaponSelect()">
+        武器を選び直す
+    </button>
+
+    <script>
+
+        function preparePresetSave() {
+
+            const form
+                    = document.getElementById(
+                            "presetSaveForm"
+                    );
+
+            if (!form) {
+                return false;
+            }
+
+            form.querySelectorAll(
+                    ".preset-state-hidden"
+            ).forEach(
+                    input => input.remove()
+            );
+
+            const params
+                    = new URLSearchParams(
+                            window.location.search
+                    );
+
+            const excludedNames
+                    = new Set([
+                        "presetName",
+                        "presetSaved",
+                        "presetError",
+                        "_csrf"
+                    ]);
+
+            for (const [name, value] of params.entries()) {
+
+                if (excludedNames.has(name)) {
+                    continue;
+                }
+
+                const input
+                        = document.createElement(
+                                "input"
+                        );
+
+                input.type
+                        = "hidden";
+
+                input.name
+                        = name;
+
+                input.value
+                        = value;
+
+                input.className
+                        = "preset-state-hidden";
+
+                form.appendChild(
+                        input
+                );
+            }
+
+            return true;
+        }
+
+
+        document.addEventListener(
+                "DOMContentLoaded",
+                function() {
+
+                    const url
+                            = new URL(
+                                    window.location.href
+                            );
+
+                    const hasPresetMessage
+                            = url.searchParams.has(
+                                    "presetSaved"
+                            )
+                            || url.searchParams.has(
+                                    "presetError"
+                            );
+
+                    if (!hasPresetMessage) {
+                        return;
+                    }
+
+                    url.searchParams.delete(
+                            "presetSaved"
+                    );
+
+                    url.searchParams.delete(
+                            "presetError"
+                    );
+
+                    window.history.replaceState(
+                            {},
+                            document.title,
+                            url.toString()
+                    );
+                }
+        );
+
+        function currentUrlFor(path) {
+
+            const url
+                    = new URL(
+                            window.location.href
+                    );
+
+            url.pathname
+                    = path;
+
+            return url;
+        }
+
+
+        function goWeaponSelect() {
+
+            const url
+                    = currentUrlFor(
+                            "/weapon-list"
+                    );
+
+            window.location.href
+                    = url.toString();
+        }
+
+
+        function goArmorSelect(part) {
+
+            const url
+                    = currentUrlFor(
+                            "/armor-list"
+                    );
+
+            url.searchParams.set(
+                    "part",
+                    part
+            );
+
+            window.location.href
+                    = url.toString();
+        }
+
+
+        function goDecorationSelect(
+                target,
+                slotSize) {
+
+            const url
+                    = currentUrlFor(
+                            "/decoration-select"
+                    );
+
+            url.searchParams.set(
+                    "target",
+                    target
+            );
+
+            url.searchParams.set(
+                    "slotSize",
+                    slotSize
+            );
+
+            window.location.href
+                    = url.toString();
+        }
+
+
+        function goRampageDecorationSelect() {
+
+            const url
+                    = currentUrlFor(
+                            "/rampage-decoration-select"
+                    );
+
+            window.location.href
+                    = url.toString();
+        }
+
+
+        function goTalisman() {
+
+            const url
+                    = currentUrlFor(
+                            "/talisman"
+                    );
+
+            window.location.href
+                    = url.toString();
+        }
+
+
+        function removeDecoration(
+                parameterName) {
+
+            const url
+                    = new URL(
+                            window.location.href
+                    );
+
+            url.searchParams.delete(
+                    parameterName
+            );
+
+            window.location.href
+                    = url.toString();
+        }
+
+
+        function selectWeaponAugment(
+                parameterName,
+                level) {
+
+            const url
+                    = new URL(
+                            window.location.href
+                    );
+
+
+            if (level) {
+
+                url.searchParams.set(
+                        parameterName,
+                        level
+                );
+
+            } else {
+
+                url.searchParams.delete(
+                        parameterName
+                );
+            }
+
+
+            window.location.href
+                    = url.toString();
+        }
+
+
+        function selectMonster(
+                monsterId) {
+
+            const url
+                    = new URL(
+                            window.location.href
+                    );
+
+
+            if (monsterId) {
+
+                url.searchParams.set(
+                        "monsterId",
+                        monsterId
+                );
+
+            } else {
+
+                url.searchParams.delete(
+                        "monsterId"
+                );
+            }
+
+
+            url.searchParams.delete(
+                    "hitzoneId"
+            );
+
+
+            window.location.href
+                    = url.toString();
+        }
+
+
+        function selectHitzone(
+                hitzoneId) {
+
+            const url
+                    = new URL(
+                            window.location.href
+                    );
+
+
+            if (hitzoneId) {
+
+                url.searchParams.set(
+                        "hitzoneId",
+                        hitzoneId
+                );
+
+            } else {
+
+                url.searchParams.delete(
+                        "hitzoneId"
+                );
+            }
+
+
+            window.location.href
+                    = url.toString();
+        }
+
+
+        function selectBowgunAmmo(
+                bowgunAmmoId) {
+
+            const url
+                    = new URL(
+                            window.location.href
+                    );
+
+            url.searchParams.set(
+                    "bowgunAmmoId",
+                    bowgunAmmoId
+            );
+
+            window.location.href
+                    = url.toString();
+        }
+
+
+        function selectBowCharge(
+                bowChargeId) {
+
+            const url
+                    = new URL(
+                            window.location.href
+                    );
+
+            url.searchParams.set(
+                    "bowChargeId",
+                    bowChargeId
+            );
+
+            window.location.href
+                    = url.toString();
+        }
+
+
+        function selectBowCoating(
+                bowCoatingId) {
+
+            const url
+                    = new URL(
+                            window.location.href
+                    );
+
+            url.searchParams.set(
+                    "bowCoatingId",
+                    bowCoatingId
+            );
+
+            window.location.href
+                    = url.toString();
+        }
+
+
+        function clearBowCoating() {
+
+            const url
+                    = new URL(
+                            window.location.href
+                    );
+
+            url.searchParams.delete(
+                    "bowCoatingId"
+            );
+
+            window.location.href
+                    = url.toString();
+        }
+
+
+        function selectSkillState(
+                parameterName,
+                stateCode) {
+
+            const url
+                    = new URL(
+                            window.location.href
+                    );
+
+            url.searchParams.set(
+                    parameterName,
+                    stateCode
+            );
+
+            window.location.href
+                    = url.toString();
+        }
+
+    </script>
+
+</body>
+</html>

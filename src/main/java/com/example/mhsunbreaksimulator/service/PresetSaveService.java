@@ -542,7 +542,8 @@ public class PresetSaveService {
                             : bowCoating.getCoatingType(),
                     bowCharge == null
                             ? null
-                            : bowCharge.getBowChargeId()
+                            : bowCharge.getBowChargeId(),
+                    simulatorForm.getBowAttackType()
             );
         }
 

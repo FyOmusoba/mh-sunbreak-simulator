@@ -20,12 +20,45 @@ public class PresetBowSettingService {
      * =====================================================
      * 弓設定保存
      * =====================================================
+     *
+     * 既存コード互換用。
+     *
+     * 攻撃種別が渡されない従来の呼び出しでは
+     * NORMALとして保存する。
      */
     @Transactional
     public PresetBowSetting create(
             Integer presetId,
             String coatingType,
             Integer bowChargeId) {
+
+        return create(
+                presetId,
+                coatingType,
+                bowChargeId,
+                "NORMAL"
+        );
+    }
+
+
+    /*
+     * =====================================================
+     * 弓設定保存
+     * =====================================================
+     *
+     * bowAttackType
+     *
+     * NORMAL
+     * DRAGON_PIERCER
+     *
+     * を保存する。
+     */
+    @Transactional
+    public PresetBowSetting create(
+            Integer presetId,
+            String coatingType,
+            Integer bowChargeId,
+            String bowAttackType) {
 
         PresetBowSetting presetBowSetting
                 = new PresetBowSetting();
@@ -40,6 +73,12 @@ public class PresetBowSettingService {
 
         presetBowSetting.setBowChargeId(
                 bowChargeId
+        );
+
+        presetBowSetting.setBowAttackType(
+                normalizeBowAttackType(
+                        bowAttackType
+                )
         );
 
         presetBowSettingMapper.insert(
@@ -78,5 +117,29 @@ public class PresetBowSettingService {
                 .deleteByPresetId(
                         presetId
                 );
+    }
+
+
+    /*
+     * =====================================================
+     * 弓攻撃種別正規化
+     * =====================================================
+     *
+     * 現在対応している値だけを許可する。
+     *
+     * 不正値・null・空文字は
+     * 従来互換のNORMALへ戻す。
+     */
+    private String normalizeBowAttackType(
+            String bowAttackType) {
+
+        if ("DRAGON_PIERCER".equals(
+                bowAttackType
+        )) {
+
+            return "DRAGON_PIERCER";
+        }
+
+        return "NORMAL";
     }
 }

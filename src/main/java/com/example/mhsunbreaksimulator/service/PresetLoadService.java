@@ -374,6 +374,22 @@ public class PresetLoadService {
         if (presetBowSetting != null) {
 
             /*
+             * NORMALはSimulatorFormのデフォルト値なので、
+             * 特殊攻撃であるDRAGON_PIERCERの場合だけ
+             * URLへ復元する。
+             */
+            if ("DRAGON_PIERCER".equals(
+                    presetBowSetting.getBowAttackType()
+            )) {
+
+                parameters.put(
+                        "bowAttackType",
+                        "DRAGON_PIERCER"
+                );
+            }
+
+
+            /*
              * 溜め段階は bow_charge_id を
              * そのまま保存しているため直接復元できる。
              */
