@@ -589,6 +589,127 @@ class PresetLoadServiceTest {
 
     /*
      * =====================================================
+     * 武器傀異錬成・0はURLへ復元しない
+     * =====================================================
+     */
+
+    @Test
+    void load_武器傀異錬成の0をURLパラメータへ復元しない() {
+
+        User user
+                = new User();
+
+        user.setUserId(
+                1
+        );
+
+        user.setUsername(
+                "testuser"
+        );
+
+
+        Preset preset
+                = new Preset();
+
+        preset.setPresetId(
+                31
+        );
+
+        preset.setUserId(
+                1
+        );
+
+        preset.setPresetName(
+                "斬れ味錬成テスト"
+        );
+
+        preset.setWeaponId(
+                64
+        );
+
+
+        PresetWeaponAugment weaponAugment
+                = new PresetWeaponAugment();
+
+        weaponAugment.setPresetId(
+                31
+        );
+
+        weaponAugment.setAttackLevel(
+                0
+        );
+
+        weaponAugment.setElementLevel(
+                0
+        );
+
+        weaponAugment.setAffinityLevel(
+                0
+        );
+
+        weaponAugment.setSharpnessLevel(
+                4
+        );
+
+
+        when(
+                userService.findByUsername(
+                        "testuser"
+                )
+        ).thenReturn(user);
+
+
+        when(
+                presetService.findByIdAndUserId(
+                        31,
+                        1
+                )
+        ).thenReturn(preset);
+
+
+        when(
+                presetWeaponAugmentService.findByPresetId(
+                        31
+                )
+        ).thenReturn(weaponAugment);
+
+
+        Map<String, String> result
+                = presetLoadService.load(
+                        "testuser",
+                        31
+                );
+
+
+        assertEquals(
+                "64",
+                result.get("weaponId")
+        );
+
+        assertEquals(
+                null,
+                result.get("weaponAugmentAttackLevel")
+        );
+
+        assertEquals(
+                null,
+                result.get("weaponAugmentElementLevel")
+        );
+
+        assertEquals(
+                null,
+                result.get("weaponAugmentAffinityLevel")
+        );
+
+        assertEquals(
+                "4",
+                result.get("weaponAugmentSharpnessLevel")
+        );
+    }
+
+
+    /*
+     * =====================================================
      * 他ユーザーのプリセット
      * =====================================================
      */

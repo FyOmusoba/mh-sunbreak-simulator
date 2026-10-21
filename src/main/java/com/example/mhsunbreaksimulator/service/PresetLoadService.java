@@ -186,25 +186,25 @@ public class PresetLoadService {
 
         if (presetWeaponAugment != null) {
 
-            putInteger(
+            putPositiveInteger(
                     parameters,
                     "weaponAugmentAttackLevel",
                     presetWeaponAugment.getAttackLevel()
             );
 
-            putInteger(
+            putPositiveInteger(
                     parameters,
                     "weaponAugmentElementLevel",
                     presetWeaponAugment.getElementLevel()
             );
 
-            putInteger(
+            putPositiveInteger(
                     parameters,
                     "weaponAugmentAffinityLevel",
                     presetWeaponAugment.getAffinityLevel()
             );
 
-            putInteger(
+            putPositiveInteger(
                     parameters,
                     "weaponAugmentSharpnessLevel",
                     presetWeaponAugment.getSharpnessLevel()
@@ -714,6 +714,34 @@ public class PresetLoadService {
 
 
         return null;
+    }
+
+
+    /*
+     * =====================================================
+     * 正のInteger → URLパラメータ追加
+     * =====================================================
+     */
+    private void putPositiveInteger(
+            Map<String, String> parameters,
+            String parameterName,
+            Integer value) {
+
+        if (parameters == null
+                || parameterName == null
+                || value == null
+                || value <= 0) {
+
+            return;
+        }
+
+
+        parameters.put(
+                parameterName,
+                String.valueOf(
+                        value
+                )
+        );
     }
 
 

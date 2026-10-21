@@ -591,6 +591,107 @@ class PresetSaveServiceTest {
 
     /*
      * =====================================================
+     * 武器傀異錬成・未選択項目は0保存
+     * =====================================================
+     */
+
+    @Test
+    void save_武器傀異錬成の未選択項目を0で保存できる() {
+
+        User user
+                = createUser();
+
+        Weapon weapon
+                = createWeapon(
+                        801,
+                        "弓"
+                );
+
+        Preset savedPreset
+                = createPreset(
+                        504,
+                        801
+                );
+
+
+        when(
+                userService.findByUsername(
+                        "testuser"
+                )
+        ).thenReturn(user);
+
+
+        when(
+                weaponService.findById(
+                        801
+                )
+        ).thenReturn(weapon);
+
+
+        when(
+                presetService.create(
+                        10,
+                        "弓傀異錬成テスト",
+                        801,
+                        null
+                )
+        ).thenReturn(savedPreset);
+
+
+        SimulatorForm simulatorForm
+                = new SimulatorForm();
+
+        simulatorForm.setWeaponId(
+                801
+        );
+
+        simulatorForm.setWeaponAugmentAttackLevel(
+                4
+        );
+
+        simulatorForm.setWeaponAugmentElementLevel(
+                8
+        );
+
+        simulatorForm.setWeaponAugmentAffinityLevel(
+                3
+        );
+
+        /*
+         * 弓では斬れ味強化を選択しないため、
+         * sharpnessLevel は null のまま。
+         */
+
+
+        Preset result
+                = presetSaveService.save(
+                        "testuser",
+                        "弓傀異錬成テスト",
+                        simulatorForm,
+                        Map.of()
+                );
+
+
+        assertSame(
+                savedPreset,
+                result
+        );
+
+
+        verify(
+                presetWeaponAugmentService
+        ).create(
+                504,
+                4,
+                8,
+                3,
+                0
+        );
+    }
+
+
+    /*
+     * =====================================================
      * プリセット名未入力
      * =====================================================
      */

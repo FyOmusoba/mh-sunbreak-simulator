@@ -241,10 +241,18 @@ public class PresetSaveService {
 
             presetWeaponAugmentService.create(
                     presetId,
-                    weaponAugmentAttackLevel,
-                    weaponAugmentElementLevel,
-                    weaponAugmentAffinityLevel,
-                    weaponAugmentSharpnessLevel
+                    weaponAugmentAttackLevel == null
+                            ? 0
+                            : weaponAugmentAttackLevel,
+                    weaponAugmentElementLevel == null
+                            ? 0
+                            : weaponAugmentElementLevel,
+                    weaponAugmentAffinityLevel == null
+                            ? 0
+                            : weaponAugmentAffinityLevel,
+                    weaponAugmentSharpnessLevel == null
+                            ? 0
+                            : weaponAugmentSharpnessLevel
             );
         }
 
