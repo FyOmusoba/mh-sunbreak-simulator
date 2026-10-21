@@ -385,6 +385,35 @@ public class TalismanController {
 
         /*
          * ==========================================
+         * 武器傀異錬成
+         * ==========================================
+         */
+        addAttributeIfNotNull(
+                redirectAttributes,
+                "weaponAugmentAttackLevel",
+                simulatorForm.getWeaponAugmentAttackLevel()
+        );
+
+        addAttributeIfNotNull(
+                redirectAttributes,
+                "weaponAugmentElementLevel",
+                simulatorForm.getWeaponAugmentElementLevel()
+        );
+
+        addAttributeIfNotNull(
+                redirectAttributes,
+                "weaponAugmentAffinityLevel",
+                simulatorForm.getWeaponAugmentAffinityLevel()
+        );
+
+        addAttributeIfNotNull(
+                redirectAttributes,
+                "weaponAugmentSharpnessLevel",
+                simulatorForm.getWeaponAugmentSharpnessLevel()
+        );
+
+        /*
+         * ==========================================
          * モンスター
          * ==========================================
          */

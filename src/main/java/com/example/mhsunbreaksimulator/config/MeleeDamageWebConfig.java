@@ -300,6 +300,18 @@ public class MeleeDamageWebConfig
 
         /*
          * =================================================
+         * 武器傀異錬成反映後の近接武器
+         * =================================================
+         */
+        Weapon damageWeapon
+                = createAugmentedWeaponForDamage(
+                        weapon,
+                        model
+                );
+
+
+        /*
+         * =================================================
          * 斬れ味
          * =================================================
          */
@@ -317,7 +329,7 @@ public class MeleeDamageWebConfig
          */
         MeleeDamageResult meleeDamageResult
                 = meleeDamageService.calculate(
-                        weapon,
+                        damageWeapon,
                         weaponTypeAttack,
                         sharpnessModifier,
                         conditionalSkillModifierTotal
@@ -423,6 +435,103 @@ public class MeleeDamageWebConfig
                 "finalDamageResult",
                 finalDamageResult
         );
+    }
+
+
+    /*
+     * =====================================================
+     * 武器傀異錬成反映後の近接計算用Weapon
+     * =====================================================
+     */
+    private Weapon createAugmentedWeaponForDamage(
+            Weapon weapon,
+            Map<String, Object> model) {
+
+        Weapon result
+                = new Weapon();
+
+        result.setWeaponId(
+                weapon.getWeaponId()
+        );
+
+        result.setWeaponName(
+                weapon.getWeaponName()
+        );
+
+        result.setWeaponType(
+                weapon.getWeaponType()
+        );
+
+        result.setElementType(
+                weapon.getElementType()
+        );
+
+        result.setSubElementType(
+                weapon.getSubElementType()
+        );
+
+        result.setAttack(
+                getIntegerModelValue(
+                        model,
+                        "augmentedWeaponAttack",
+                        weapon.getAttack()
+                )
+        );
+
+        result.setElementValue(
+                getIntegerModelValue(
+                        model,
+                        "augmentedWeaponElementValue",
+                        weapon.getElementValue()
+                )
+        );
+
+        result.setSubElementValue(
+                getIntegerModelValue(
+                        model,
+                        "augmentedWeaponSubElementValue",
+                        weapon.getSubElementValue()
+                )
+        );
+
+        result.setAffinity(
+                getIntegerModelValue(
+                        model,
+                        "augmentedWeaponAffinity",
+                        weapon.getAffinity()
+                )
+        );
+
+        result.setMaxSharpnessColor(
+                weapon.getMaxSharpnessColor()
+        );
+
+        return result;
+    }
+
+
+    private Integer getIntegerModelValue(
+            Map<String, Object> model,
+            String name,
+            Integer defaultValue) {
+
+        if (model == null
+                || name == null) {
+
+            return defaultValue;
+        }
+
+        Object value
+                = model.get(
+                        name
+                );
+
+        if (value instanceof Integer integerValue) {
+
+            return integerValue;
+        }
+
+        return defaultValue;
     }
 
 

@@ -1,6 +1,7 @@
 package com.example.mhsunbreaksimulator.controller;
 
 import java.security.Principal;
+import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 
@@ -220,12 +221,66 @@ public class PresetController {
 
         } catch (DataIntegrityViolationException e) {
 
+            String errorMessage
+                    = isDuplicatePresetNameViolation(e)
+                            ? "同じ名前のプリセットが既に存在します。"
+                            : "プリセットを保存できませんでした。入力内容またはデータベース制約を確認してください。";
+
+
             return buildSimulatorRedirect(
                     requestParams,
                     "presetError",
-                    "同じ名前のプリセットが既に存在します。"
+                    errorMessage
             );
         }
+    }
+
+
+    /*
+     * =====================================================
+     * プリセット名重複エラー判定
+     * =====================================================
+     *
+     * PostgreSQL の UNIQUE違反 SQLSTATE 23505 のうち、
+     * preset のプリセット名制約 uq_preset_name に
+     * 該当する場合だけ「同じ名前」と判定する。
+     *
+     * それ以外のDB制約違反を、
+     * 誤ってプリセット名重複として表示しないための処理。
+     */
+    private boolean isDuplicatePresetNameViolation(
+            DataIntegrityViolationException exception) {
+
+        Throwable cause
+                = exception;
+
+
+        while (cause != null) {
+
+            if (cause instanceof SQLException sqlException) {
+
+                String message
+                        = sqlException.getMessage();
+
+
+                if ("23505".equals(
+                        sqlException.getSQLState()
+                )
+                        && message != null
+                        && message.contains(
+                                "uq_preset_name"
+                        )) {
+
+                    return true;
+                }
+            }
+
+
+            cause = cause.getCause();
+        }
+
+
+        return false;
     }
 
 

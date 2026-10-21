@@ -200,41 +200,85 @@
                         </option>
 
                         <option value="5"
-                                th:if="${weapon.elementType == '火'
-                                    or weapon.elementType == '水'
-                                    or weapon.elementType == '雷'
-                                    or weapon.elementType == '氷'
-                                    or weapon.elementType == '龍'}"
+                                th:if="${(
+                                        weapon.elementType == '火'
+                                        or weapon.elementType == '水'
+                                        or weapon.elementType == '雷'
+                                        or weapon.elementType == '氷'
+                                        or weapon.elementType == '龍'
+                                    )
+                                    and not (
+                                        weapon.weaponType == '双剣'
+                                        and (
+                                            weapon.subElementType == '毒'
+                                            or weapon.subElementType == '麻痺'
+                                            or weapon.subElementType == '睡眠'
+                                            or weapon.subElementType == '爆破'
+                                        )
+                                    )}"
                                 th:selected="${simulatorForm.weaponAugmentElementLevel == 5}">
                             Lv5
                         </option>
 
                         <option value="6"
-                                th:if="${weapon.elementType == '火'
-                                    or weapon.elementType == '水'
-                                    or weapon.elementType == '雷'
-                                    or weapon.elementType == '氷'
-                                    or weapon.elementType == '龍'}"
+                                th:if="${(
+                                        weapon.elementType == '火'
+                                        or weapon.elementType == '水'
+                                        or weapon.elementType == '雷'
+                                        or weapon.elementType == '氷'
+                                        or weapon.elementType == '龍'
+                                    )
+                                    and not (
+                                        weapon.weaponType == '双剣'
+                                        and (
+                                            weapon.subElementType == '毒'
+                                            or weapon.subElementType == '麻痺'
+                                            or weapon.subElementType == '睡眠'
+                                            or weapon.subElementType == '爆破'
+                                        )
+                                    )}"
                                 th:selected="${simulatorForm.weaponAugmentElementLevel == 6}">
                             Lv6
                         </option>
 
                         <option value="7"
-                                th:if="${weapon.elementType == '火'
-                                    or weapon.elementType == '水'
-                                    or weapon.elementType == '雷'
-                                    or weapon.elementType == '氷'
-                                    or weapon.elementType == '龍'}"
+                                th:if="${(
+                                        weapon.elementType == '火'
+                                        or weapon.elementType == '水'
+                                        or weapon.elementType == '雷'
+                                        or weapon.elementType == '氷'
+                                        or weapon.elementType == '龍'
+                                    )
+                                    and not (
+                                        weapon.weaponType == '双剣'
+                                        and (
+                                            weapon.subElementType == '毒'
+                                            or weapon.subElementType == '麻痺'
+                                            or weapon.subElementType == '睡眠'
+                                            or weapon.subElementType == '爆破'
+                                        )
+                                    )}"
                                 th:selected="${simulatorForm.weaponAugmentElementLevel == 7}">
                             Lv7
                         </option>
 
                         <option value="8"
-                                th:if="${weapon.elementType == '火'
-                                    or weapon.elementType == '水'
-                                    or weapon.elementType == '雷'
-                                    or weapon.elementType == '氷'
-                                    or weapon.elementType == '龍'}"
+                                th:if="${(
+                                        weapon.elementType == '火'
+                                        or weapon.elementType == '水'
+                                        or weapon.elementType == '雷'
+                                        or weapon.elementType == '氷'
+                                        or weapon.elementType == '龍'
+                                    )
+                                    and not (
+                                        weapon.weaponType == '双剣'
+                                        and (
+                                            weapon.subElementType == '毒'
+                                            or weapon.subElementType == '麻痺'
+                                            or weapon.subElementType == '睡眠'
+                                            or weapon.subElementType == '爆破'
+                                        )
+                                    )}"
                                 th:selected="${simulatorForm.weaponAugmentElementLevel == 8}">
                             Lv8
                         </option>

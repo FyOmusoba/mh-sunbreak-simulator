@@ -4,7 +4,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.security.Principal;
+import java.sql.SQLException;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -14,6 +17,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.ui.Model;
 
 import com.example.mhsunbreaksimulator.controller.PresetController;
@@ -112,6 +116,156 @@ class PresetControllerTest {
                 "テスト装備",
                 simulatorForm,
                 requestParams
+        );
+    }
+
+
+    @Test
+    void savePreset_プリセット名重複なら専用エラーを表示する() {
+
+        when(principal.getName())
+                .thenReturn("testuser");
+
+
+        SimulatorForm simulatorForm
+                = new SimulatorForm();
+
+        simulatorForm.setWeaponId(
+                100
+        );
+
+
+        Map<String, String> requestParams
+                = new LinkedHashMap<>();
+
+        requestParams.put(
+                "weaponId",
+                "100"
+        );
+
+
+        SQLException sqlException
+                = new SQLException(
+                        "duplicate key value violates unique constraint \"uq_preset_name\"",
+                        "23505"
+                );
+
+
+        DataIntegrityViolationException exception
+                = new DataIntegrityViolationException(
+                        "duplicate preset name",
+                        sqlException
+                );
+
+
+        when(
+                presetSaveService.save(
+                        "testuser",
+                        "重複テスト",
+                        simulatorForm,
+                        requestParams
+                )
+        ).thenThrow(
+                exception
+        );
+
+
+        String result
+                = presetController.savePreset(
+                        principal,
+                        "重複テスト",
+                        simulatorForm,
+                        requestParams
+                );
+
+
+        String decodedResult
+                = URLDecoder.decode(
+                        result,
+                        StandardCharsets.UTF_8
+                );
+
+
+        assertEquals(
+                "redirect:/simulator"
+                        + "?weaponId=100"
+                        + "&presetError=同じ名前のプリセットが既に存在します。",
+                decodedResult
+        );
+    }
+
+
+    @Test
+    void savePreset_名前重複以外のDB制約違反は一般エラーを表示する() {
+
+        when(principal.getName())
+                .thenReturn("testuser");
+
+
+        SimulatorForm simulatorForm
+                = new SimulatorForm();
+
+        simulatorForm.setWeaponId(
+                100
+        );
+
+
+        Map<String, String> requestParams
+                = new LinkedHashMap<>();
+
+        requestParams.put(
+                "weaponId",
+                "100"
+        );
+
+
+        SQLException sqlException
+                = new SQLException(
+                        "null value violates not-null constraint",
+                        "23502"
+                );
+
+
+        DataIntegrityViolationException exception
+                = new DataIntegrityViolationException(
+                        "not null violation",
+                        sqlException
+                );
+
+
+        when(
+                presetSaveService.save(
+                        "testuser",
+                        "DB制約テスト",
+                        simulatorForm,
+                        requestParams
+                )
+        ).thenThrow(
+                exception
+        );
+
+
+        String result
+                = presetController.savePreset(
+                        principal,
+                        "DB制約テスト",
+                        simulatorForm,
+                        requestParams
+                );
+
+
+        String decodedResult
+                = URLDecoder.decode(
+                        result,
+                        StandardCharsets.UTF_8
+                );
+
+
+        assertEquals(
+                "redirect:/simulator"
+                        + "?weaponId=100"
+                        + "&presetError=プリセットを保存できませんでした。入力内容またはデータベース制約を確認してください。",
+                decodedResult
         );
     }
 
