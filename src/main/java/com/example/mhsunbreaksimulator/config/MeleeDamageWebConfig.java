@@ -21,6 +21,7 @@ import com.example.mhsunbreaksimulator.dto.MonsterHitzoneValueResult;
 import com.example.mhsunbreaksimulator.dto.PhysicalHitzoneDamageResult;
 import com.example.mhsunbreaksimulator.dto.SharpnessModifier;
 import com.example.mhsunbreaksimulator.dto.WeakpointSkillModifier;
+import com.example.mhsunbreaksimulator.dto.WeaponAugmentModifier;
 import com.example.mhsunbreaksimulator.entity.MonsterHitzone;
 import com.example.mhsunbreaksimulator.entity.Weapon;
 import com.example.mhsunbreaksimulator.entity.WeaponTypeAttack;
@@ -313,11 +314,47 @@ public class MeleeDamageWebConfig
         /*
          * =================================================
          * 斬れ味
+         * 武器傀異錬成反映
          * =================================================
          */
+
+        WeaponAugmentModifier weaponAugmentModifier
+                = null;
+
+
+        Object weaponAugmentObject
+                = model.get(
+                        "weaponAugmentModifier"
+                );
+
+
+        if (weaponAugmentObject
+                instanceof WeaponAugmentModifier value) {
+
+            weaponAugmentModifier
+                    = value;
+        }
+
+
+        Integer sharpnessAdd
+                = weaponAugmentModifier == null
+                        || weaponAugmentModifier.getSharpnessAdd() == null
+
+                                ? 0
+                                : weaponAugmentModifier.getSharpnessAdd();
+
+
+        String augmentedSharpnessColor
+                = sharpnessModifierService
+                        .calculateAugmentedSharpnessColor(
+                                weapon,
+                                sharpnessAdd
+                        );
+
+
         SharpnessModifier sharpnessModifier
                 = sharpnessModifierService.calculate(
-                        weapon.getMaxSharpnessColor()
+                        augmentedSharpnessColor
                 );
 
 
@@ -521,15 +558,18 @@ public class MeleeDamageWebConfig
             return defaultValue;
         }
 
+
         Object value
                 = model.get(
                         name
                 );
 
+
         if (value instanceof Integer integerValue) {
 
             return integerValue;
         }
+
 
         return defaultValue;
     }

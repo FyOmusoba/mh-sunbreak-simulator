@@ -7,6 +7,7 @@ import java.math.BigDecimal;
 import org.junit.jupiter.api.Test;
 
 import com.example.mhsunbreaksimulator.dto.SharpnessModifier;
+import com.example.mhsunbreaksimulator.entity.Weapon;
 import com.example.mhsunbreaksimulator.service.SharpnessModifierService;
 
 public class SharpnessModifierServiceTest {
@@ -14,6 +15,12 @@ public class SharpnessModifierServiceTest {
     private final SharpnessModifierService sharpnessModifierService
             = new SharpnessModifierService();
 
+
+    /*
+     * =====================================================
+     * 通常の斬れ味倍率
+     * =====================================================
+     */
 
     @Test
     void testPurpleSharpness() {
@@ -236,5 +243,196 @@ public class SharpnessModifierServiceTest {
                 BigDecimal.ONE,
                 result.getElementMultiplier()
         );
+    }
+
+
+    /*
+     * =====================================================
+     * 武器傀異錬成による斬れ味色変化
+     * =====================================================
+     *
+     * フルマーク改相当
+     *
+     * 最大斬れ味：白
+     * takumiVal1：20
+     * takumiVal2：30
+     *
+     * +20 → 白
+     * +30 → 紫
+     * +50 → 紫
+     * =====================================================
+     */
+
+    @Test
+    void testAugmentedSharpnessPlus20StaysWhite() {
+
+        Weapon weapon
+                = createFullMarkLikeWeapon();
+
+
+        String result
+                = sharpnessModifierService
+                        .calculateAugmentedSharpnessColor(
+                                weapon,
+                                20
+                        );
+
+
+        assertEquals(
+                "白",
+                result
+        );
+    }
+
+
+    @Test
+    void testAugmentedSharpnessPlus30BecomesPurple() {
+
+        Weapon weapon
+                = createFullMarkLikeWeapon();
+
+
+        String result
+                = sharpnessModifierService
+                        .calculateAugmentedSharpnessColor(
+                                weapon,
+                                30
+                        );
+
+
+        assertEquals(
+                "紫",
+                result
+        );
+    }
+
+
+    @Test
+    void testAugmentedSharpnessPlus50BecomesPurple() {
+
+        Weapon weapon
+                = createFullMarkLikeWeapon();
+
+
+        String result
+                = sharpnessModifierService
+                        .calculateAugmentedSharpnessColor(
+                                weapon,
+                                50
+                        );
+
+
+        assertEquals(
+                "紫",
+                result
+        );
+    }
+
+
+    @Test
+    void testAugmentedSharpnessAlreadyPurpleStaysPurple() {
+
+        Weapon weapon
+                = new Weapon();
+
+        weapon.setMaxSharpnessColor(
+                "紫"
+        );
+
+        weapon.setTakumiVal1(
+                50
+        );
+
+
+        String result
+                = sharpnessModifierService
+                        .calculateAugmentedSharpnessColor(
+                                weapon,
+                                50
+                        );
+
+
+        assertEquals(
+                "紫",
+                result
+        );
+    }
+
+
+    @Test
+    void testAugmentedSharpnessWithoutTakumiDataStaysCurrentColor() {
+
+        Weapon weapon
+                = new Weapon();
+
+        weapon.setMaxSharpnessColor(
+                "白"
+        );
+
+        weapon.setTakumiVal1(
+                0
+        );
+
+        weapon.setTakumiVal2(
+                0
+        );
+
+        weapon.setTakumiVal3(
+                0
+        );
+
+        weapon.setTakumiVal4(
+                0
+        );
+
+
+        String result
+                = sharpnessModifierService
+                        .calculateAugmentedSharpnessColor(
+                                weapon,
+                                50
+                        );
+
+
+        assertEquals(
+                "白",
+                result
+        );
+    }
+
+
+    /*
+     * =====================================================
+     * テスト用
+     * フルマーク改相当武器
+     * =====================================================
+     */
+    private Weapon createFullMarkLikeWeapon() {
+
+        Weapon weapon
+                = new Weapon();
+
+        weapon.setMaxSharpnessColor(
+                "白"
+        );
+
+        weapon.setTakumiVal1(
+                20
+        );
+
+        weapon.setTakumiVal2(
+                30
+        );
+
+        weapon.setTakumiVal3(
+                0
+        );
+
+        weapon.setTakumiVal4(
+                0
+        );
+
+
+        return weapon;
     }
 }
