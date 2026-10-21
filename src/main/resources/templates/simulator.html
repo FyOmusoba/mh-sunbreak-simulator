@@ -1,3435 +1,1963 @@
-<!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <title>装備シミュレーター</title>
-</head>
-<body>
+package com.example.mhsunbreaksimulator.config;
+
+import java.math.BigDecimal;	
+import java.util.Map;
+
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+
+import org.springframework.context.annotation.Configuration;
+import org.springframework.web.servlet.HandlerInterceptor;
+import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+
+import com.example.mhsunbreaksimulator.dto.BowChargeModifier;
+import com.example.mhsunbreaksimulator.dto.BowCoatingModifier;
+import com.example.mhsunbreaksimulator.dto.BowDragonPiercerModifier;
+import com.example.mhsunbreaksimulator.dto.BowElementDamageResult;
+import com.example.mhsunbreaksimulator.dto.BowPhysicalDamageResult;
+import com.example.mhsunbreaksimulator.dto.BowPhysicalModifier;
+import com.example.mhsunbreaksimulator.dto.BowgunAmmoModifier;
+import com.example.mhsunbreaksimulator.dto.BowgunElementDamageResult;
+import com.example.mhsunbreaksimulator.dto.BowgunPhysicalDamageResult;
+import com.example.mhsunbreaksimulator.dto.BowgunRapidFireModifier;
+import com.example.mhsunbreaksimulator.dto.BowgunSpecialDamageResult;
+import com.example.mhsunbreaksimulator.dto.BowgunSpecialFinalDamageResult;
+import com.example.mhsunbreaksimulator.dto.ConditionalSkillModifierTotal;
+import com.example.mhsunbreaksimulator.dto.CriticalModifierResult;
+import com.example.mhsunbreaksimulator.dto.ElementHitzoneDamageResult;
+import com.example.mhsunbreaksimulator.dto.FinalDamageResult;
+import com.example.mhsunbreaksimulator.dto.MonsterHitzoneValueResult;
+import com.example.mhsunbreaksimulator.dto.MonsterWeakpointResult;
+import com.example.mhsunbreaksimulator.dto.PhysicalHitzoneDamageResult;
+import com.example.mhsunbreaksimulator.dto.ShotSkillModifier;
+import com.example.mhsunbreaksimulator.dto.WeakpointSkillModifier;
+import com.example.mhsunbreaksimulator.entity.BowCharge;
+import com.example.mhsunbreaksimulator.entity.BowgunAmmo;
+import com.example.mhsunbreaksimulator.entity.MonsterHitzone;
+import com.example.mhsunbreaksimulator.entity.SkillEffectState;
+import com.example.mhsunbreaksimulator.entity.Weapon;
+import com.example.mhsunbreaksimulator.form.SimulatorForm;
+import com.example.mhsunbreaksimulator.service.BowDragonPiercerDamageService;
+import com.example.mhsunbreaksimulator.service.BowDragonPiercerModifierService;
+import com.example.mhsunbreaksimulator.service.BowPhysicalDamageService;
+import com.example.mhsunbreaksimulator.service.BowgunElementDamageService;
+import com.example.mhsunbreaksimulator.service.BowgunPhysicalDamageService;
+import com.example.mhsunbreaksimulator.service.BowgunSpecialDamageService;
+import com.example.mhsunbreaksimulator.service.BowgunSpecialFinalDamageService;
+import com.example.mhsunbreaksimulator.service.CriticalModifierService;
+import com.example.mhsunbreaksimulator.service.ElementHitzoneDamageService;
+import com.example.mhsunbreaksimulator.service.FinalDamageService;
+import com.example.mhsunbreaksimulator.service.MonsterWeakpointService;
+import com.example.mhsunbreaksimulator.service.PhysicalHitzoneDamageService;
+import com.example.mhsunbreaksimulator.service.ShotSkillModifierService;
+import com.example.mhsunbreaksimulator.service.WeakpointSkillModifierService;
+
+import lombok.RequiredArgsConstructor;
+
+@Configuration
+@RequiredArgsConstructor
+public class ShotDamageWebConfig
+        implements WebMvcConfigurer {
+
+    private static final int POWDER_MANTLE_SKILL_ID
+            = 74;
+
+
+    private final ShotSkillModifierService shotSkillModifierService;
+
+    private final BowPhysicalDamageService bowPhysicalDamageService;
+
+    private final BowDragonPiercerModifierService
+            bowDragonPiercerModifierService;
+
+    private final BowDragonPiercerDamageService
+            bowDragonPiercerDamageService;
+
+    private final BowgunPhysicalDamageService bowgunPhysicalDamageService;
+
+    private final BowgunElementDamageService bowgunElementDamageService;
+
+    private final BowgunSpecialDamageService bowgunSpecialDamageService;
+
+    private final BowgunSpecialFinalDamageService
+            bowgunSpecialFinalDamageService;
+
+    private final PhysicalHitzoneDamageService
+            physicalHitzoneDamageService;
+
+    private final ElementHitzoneDamageService
+            elementHitzoneDamageService;
+
+    private final FinalDamageService finalDamageService;
+
+    private final MonsterWeakpointService monsterWeakpointService;
+
+    private final WeakpointSkillModifierService
+            weakpointSkillModifierService;
+
+    private final CriticalModifierService criticalModifierService;
+
 
-    <h1>装備シミュレーター</h1>
+    @Override
+    public void addInterceptors(
+            InterceptorRegistry registry) {
 
-    <!-- ================================================== -->
-    <!-- プリセット保存                                     -->
-    <!-- ================================================== -->
+        registry.addInterceptor(
+                new HandlerInterceptor() {
 
-    <h2>プリセット保存</h2>
+                    @Override
+                    public void postHandle(
+                            HttpServletRequest request,
+                            HttpServletResponse response,
+                            Object handler,
+                            ModelAndView modelAndView) {
 
-    <p th:if="${param.presetSaved != null
-               and param.presetSaved[0] == 'true'}">
-        プリセットを保存しました。
-    </p>
-
-    <p th:if="${param.presetError != null}"
-       th:text="${param.presetError[0]}">
-    </p>
-
-    <form id="presetSaveForm"
-          th:action="@{/preset/save}"
-          method="post"
-          onsubmit="return preparePresetSave()">
-
-        <label for="presetName">
-            プリセット名：
-        </label>
-
-        <input type="text"
-               id="presetName"
-               name="presetName"
-               required
-               autocomplete="off">
-
-        <button type="submit"
-                th:disabled="${weapon == null}">
-            現在の装備を保存
-        </button>
-
-    </form>
-
-    <br>
-
-    <a th:href="@{/preset/list}">
-        プリセット一覧
-    </a>
-
-    <p th:if="${weapon == null}">
-        プリセットを保存するには武器を選択してください。
-    </p>
-
-    <br>
-
-    <!-- ================================================== -->
-    <!-- 武器 -->
-    <!-- ================================================== -->
-    <h2>選択中の武器</h2>
-
-    <p th:if="${weapon == null}">
-        武器が選択されていません。
-        <button type="button" onclick="goWeaponSelect()">武器を選ぶ</button>
-    </p>
-
-    <div th:if="${weapon != null}">
-        <table border="1">
-            <tr><th>武器名</th><td th:text="${weapon.weaponName}"></td></tr>
-            <tr><th>武器種</th><td th:text="${weapon.weaponType}"></td></tr>
-            <tr><th>攻撃力</th><td th:text="${weapon.attack}"></td></tr>
-            <tr><th>属性</th><td th:text="${weapon.elementType}"></td></tr>
-            <tr><th>属性値</th><td th:text="${weapon.elementValue}"></td></tr>
-            <tr><th>副属性</th><td th:text="${weapon.subElementType}"></td></tr>
-            <tr><th>会心率</th><td><span th:text="${weapon.affinity}"></span>%</td></tr>
-            <tr><th>攻撃属性</th><td th:text="${weapon.attackProperty}"></td></tr>
-        </table>
-
-        <br>
-
-        <button type="button" onclick="goWeaponSelect()">
-            武器を選び直す
-        </button>
-    </div>
-
-    <br>
-
-    <!-- ================================================== -->
-    <!-- 武器傀異錬成 -->
-    <!-- ================================================== -->
-
-    <div th:if="${weapon != null}">
-
-        <h2>武器傀異錬成</h2>
-
-        <table border="1">
-
-            <tr>
-                <th>項目</th>
-                <th>Lv</th>
-                <th>補正後</th>
-            </tr>
-
-
-            <!-- 攻撃力強化 -->
-            <tr>
-
-                <th>攻撃力強化</th>
-
-                <td>
-                    <select onchange="selectWeaponAugment(
-                        'weaponAugmentAttackLevel',
-                        this.value
-                    )">
-
-                        <option value=""
-                                th:selected="${simulatorForm.weaponAugmentAttackLevel == null}">
-                            なし
-                        </option>
-
-                        <option value="1"
-                                th:selected="${simulatorForm.weaponAugmentAttackLevel == 1}">
-                            Lv1
-                        </option>
-
-                        <option value="2"
-                                th:selected="${simulatorForm.weaponAugmentAttackLevel == 2}">
-                            Lv2
-                        </option>
-
-                        <option value="3"
-                                th:selected="${simulatorForm.weaponAugmentAttackLevel == 3}">
-                            Lv3
-                        </option>
-
-                        <option value="4"
-                                th:selected="${simulatorForm.weaponAugmentAttackLevel == 4}">
-                            Lv4
-                        </option>
-
-                    </select>
-                </td>
-
-                <td>
-                    <span th:text="${weapon.attack}"></span>
-                    →
-                    <strong th:text="${augmentedWeaponAttack}"></strong>
-                </td>
-
-            </tr>
-
-
-            <!-- 属性・状態異常強化 -->
-            <tr th:if="${weapon.weaponType != 'ライトボウガン'
-                        and weapon.weaponType != 'ヘビィボウガン'
-                        and (
-                            (weapon.elementType != null
-                                and weapon.elementType != ''
-                                and weapon.elementType != '無')
-                            or
-                            (weapon.subElementType != null
-                                and weapon.subElementType != ''
-                                and weapon.subElementType != '無')
-                        )}">
-
-                <th>属性・状態異常強化</th>
-
-                <td>
-                    <select onchange="selectWeaponAugment(
-                        'weaponAugmentElementLevel',
-                        this.value
-                    )">
-
-                        <option value=""
-                                th:selected="${simulatorForm.weaponAugmentElementLevel == null}">
-                            なし
-                        </option>
-
-                        <option value="1"
-                                th:selected="${simulatorForm.weaponAugmentElementLevel == 1}">
-                            Lv1
-                        </option>
-
-                        <option value="2"
-                                th:selected="${simulatorForm.weaponAugmentElementLevel == 2}">
-                            Lv2
-                        </option>
-
-                        <option value="3"
-                                th:selected="${simulatorForm.weaponAugmentElementLevel == 3}">
-                            Lv3
-                        </option>
-
-                        <option value="4"
-                                th:selected="${simulatorForm.weaponAugmentElementLevel == 4}">
-                            Lv4
-                        </option>
-
-                        <option value="5"
-                                th:if="${(
-                                        weapon.elementType == '火'
-                                        or weapon.elementType == '水'
-                                        or weapon.elementType == '雷'
-                                        or weapon.elementType == '氷'
-                                        or weapon.elementType == '龍'
-                                    )
-                                    and not (
-                                        weapon.weaponType == '双剣'
-                                        and (
-                                            weapon.subElementType == '毒'
-                                            or weapon.subElementType == '麻痺'
-                                            or weapon.subElementType == '睡眠'
-                                            or weapon.subElementType == '爆破'
-                                        )
-                                    )}"
-                                th:selected="${simulatorForm.weaponAugmentElementLevel == 5}">
-                            Lv5
-                        </option>
-
-                        <option value="6"
-                                th:if="${(
-                                        weapon.elementType == '火'
-                                        or weapon.elementType == '水'
-                                        or weapon.elementType == '雷'
-                                        or weapon.elementType == '氷'
-                                        or weapon.elementType == '龍'
-                                    )
-                                    and not (
-                                        weapon.weaponType == '双剣'
-                                        and (
-                                            weapon.subElementType == '毒'
-                                            or weapon.subElementType == '麻痺'
-                                            or weapon.subElementType == '睡眠'
-                                            or weapon.subElementType == '爆破'
-                                        )
-                                    )}"
-                                th:selected="${simulatorForm.weaponAugmentElementLevel == 6}">
-                            Lv6
-                        </option>
-
-                        <option value="7"
-                                th:if="${(
-                                        weapon.elementType == '火'
-                                        or weapon.elementType == '水'
-                                        or weapon.elementType == '雷'
-                                        or weapon.elementType == '氷'
-                                        or weapon.elementType == '龍'
-                                    )
-                                    and not (
-                                        weapon.weaponType == '双剣'
-                                        and (
-                                            weapon.subElementType == '毒'
-                                            or weapon.subElementType == '麻痺'
-                                            or weapon.subElementType == '睡眠'
-                                            or weapon.subElementType == '爆破'
-                                        )
-                                    )}"
-                                th:selected="${simulatorForm.weaponAugmentElementLevel == 7}">
-                            Lv7
-                        </option>
-
-                        <option value="8"
-                                th:if="${(
-                                        weapon.elementType == '火'
-                                        or weapon.elementType == '水'
-                                        or weapon.elementType == '雷'
-                                        or weapon.elementType == '氷'
-                                        or weapon.elementType == '龍'
-                                    )
-                                    and not (
-                                        weapon.weaponType == '双剣'
-                                        and (
-                                            weapon.subElementType == '毒'
-                                            or weapon.subElementType == '麻痺'
-                                            or weapon.subElementType == '睡眠'
-                                            or weapon.subElementType == '爆破'
-                                        )
-                                    )}"
-                                th:selected="${simulatorForm.weaponAugmentElementLevel == 8}">
-                            Lv8
-                        </option>
-
-                    </select>
-                </td>
-
-                <td>
-                    <span th:if="${weapon.elementValue != null}">
-                        主：
-                        <span th:text="${weapon.elementValue}"></span>
-                        →
-                        <strong th:text="${augmentedWeaponElementValue}"></strong>
-                    </span>
-
-                    <span th:if="${weapon.subElementValue != null}">
-                        ／ 副：
-                        <span th:text="${weapon.subElementValue}"></span>
-                        →
-                        <strong th:text="${augmentedWeaponSubElementValue}"></strong>
-                    </span>
-                </td>
-
-            </tr>
-
-
-            <!-- 会心率強化 -->
-            <tr>
-
-                <th>会心率強化</th>
-
-                <td>
-                    <select onchange="selectWeaponAugment(
-                        'weaponAugmentAffinityLevel',
-                        this.value
-                    )">
-
-                        <option value=""
-                                th:selected="${simulatorForm.weaponAugmentAffinityLevel == null}">
-                            なし
-                        </option>
-
-                        <option value="1"
-                                th:selected="${simulatorForm.weaponAugmentAffinityLevel == 1}">
-                            Lv1
-                        </option>
-
-                        <option value="2"
-                                th:selected="${simulatorForm.weaponAugmentAffinityLevel == 2}">
-                            Lv2
-                        </option>
-
-                        <option value="3"
-                                th:selected="${simulatorForm.weaponAugmentAffinityLevel == 3}">
-                            Lv3
-                        </option>
-
-                    </select>
-                </td>
-
-                <td>
-                    <span th:text="${weapon.affinity}"></span>%
-                    →
-                    <strong th:text="${augmentedWeaponAffinity}"></strong>%
-                </td>
-
-            </tr>
-
-
-            <!-- 斬れ味強化 -->
-            <tr th:if="${weapon.weaponType != '弓'
-                        and weapon.weaponType != 'ライトボウガン'
-                        and weapon.weaponType != 'ヘビィボウガン'}">
-
-                <th>斬れ味強化</th>
-
-                <td>
-                    <select onchange="selectWeaponAugment(
-                        'weaponAugmentSharpnessLevel',
-                        this.value
-                    )">
-
-                        <option value=""
-                                th:selected="${simulatorForm.weaponAugmentSharpnessLevel == null}">
-                            なし
-                        </option>
-
-                        <option value="1"
-                                th:selected="${simulatorForm.weaponAugmentSharpnessLevel == 1}">
-                            Lv1
-                        </option>
-
-                        <option value="2"
-                                th:selected="${simulatorForm.weaponAugmentSharpnessLevel == 2}">
-                            Lv2
-                        </option>
-
-                        <option value="3"
-                                th:selected="${simulatorForm.weaponAugmentSharpnessLevel == 3}">
-                            Lv3
-                        </option>
-
-                        <option value="4"
-                                th:selected="${simulatorForm.weaponAugmentSharpnessLevel == 4}">
-                            Lv4
-                        </option>
-
-                    </select>
-                </td>
-
-                <td>
-                    +
-                    <strong th:text="${weaponAugmentModifier.sharpnessAdd}"></strong>
-                </td>
-
-            </tr>
-
-        </table>
-
-    </div>
-
-    <br>
-
-    <!-- ================================================== -->
-    <!-- モンスター・部位肉質 -->
-    <!-- ================================================== -->
-    <h2>モンスター・部位肉質</h2>
-
-    <p>
-        <label for="monsterSelect">モンスター：</label>
-
-        <select id="monsterSelect"
-                onchange="selectMonster(this.value)">
-
-            <option value="">未選択</option>
-
-            <option th:each="monster : ${monsters}"
-                    th:value="${monster.monsterId}"
-                    th:text="${monster.monsterName}"
-                    th:selected="${selectedMonster != null
-                        and selectedMonster.monsterId == monster.monsterId}">
-            </option>
-
-        </select>
-    </p>
-
-    <p th:if="${selectedMonster != null}">
-        選択中モンスター：
-        <strong th:text="${selectedMonster.monsterName}"></strong>
-    </p>
-
-    <p th:if="${selectedMonster != null}">
-
-        <label for="hitzoneSelect">部位：</label>
-
-        <select id="hitzoneSelect"
-                onchange="selectHitzone(this.value)">
-
-            <option value="">未選択</option>
-
-            <option th:each="hitzone : ${monsterHitzones}"
-                    th:value="${hitzone.hitzoneId}"
-                    th:text="${hitzone.partName}"
-                    th:selected="${selectedHitzone != null
-                        and selectedHitzone.hitzoneId == hitzone.hitzoneId}">
-            </option>
-
-        </select>
-    </p>
-
-    <div th:if="${selectedHitzone != null}">
-
-        <h3>選択部位の肉質</h3>
-
-        <table border="1">
-
-            <tr>
-                <th>部位</th>
-                <th>斬</th>
-                <th>打</th>
-                <th>弾</th>
-                <th>火</th>
-                <th>水</th>
-                <th>雷</th>
-                <th>氷</th>
-                <th>龍</th>
-            </tr>
-
-            <tr>
-                <td th:text="${selectedHitzone.partName}"></td>
-                <td th:text="${selectedHitzone.sever}"></td>
-                <td th:text="${selectedHitzone.blunt}"></td>
-                <td th:text="${selectedHitzone.shot}"></td>
-                <td th:text="${selectedHitzone.fire}"></td>
-                <td th:text="${selectedHitzone.water}"></td>
-                <td th:text="${selectedHitzone.thunder}"></td>
-                <td th:text="${selectedHitzone.ice}"></td>
-                <td th:text="${selectedHitzone.dragon}"></td>
-            </tr>
-
-        </table>
-
-    </div>
-
-    <div th:if="${monsterHitzoneValueResult != null
-                 and selectedHitzone != null}">
-
-        <h3>今回使用する肉質</h3>
-
-        <p>
-            物理：
-            <strong th:text="${monsterHitzoneValueResult.physicalHitzone}">
-            </strong>
-
-            （
-            <span th:text="${monsterHitzoneValueResult.physicalHitzoneType}">
-            </span>
-            ）
-        </p>
-
-        <p th:if="${monsterHitzoneValueResult.elemental}">
-            主属性肉質：
-            <strong th:text="${monsterHitzoneValueResult.elementHitzone}">
-            </strong>
-        </p>
-
-        <p th:if="${monsterHitzoneValueResult.subElemental}">
-            副属性肉質：
-            <strong th:text="${monsterHitzoneValueResult.subElementHitzone}">
-            </strong>
-        </p>
-
-    </div>
-
-    <br>
-
-    <!-- ================================================== -->
-    <!-- ボウガン -->
-    <!-- ================================================== -->
-
-    <div th:if="${weapon != null
-                 and (weapon.weaponType == 'ライトボウガン'
-                      or weapon.weaponType == 'ヘビィボウガン')}">
-
-        <h2>ボウガン</h2>
-
-        <p th:if="${bowgunAmmos == null
-                   or #lists.isEmpty(bowgunAmmos)}">
-            使用可能な弾データがありません。
-        </p>
-
-        <table border="1"
-               th:if="${bowgunAmmos != null
-                       and !#lists.isEmpty(bowgunAmmos)}">
-
-            <tr>
-                <th>選択</th>
-                <th>弾</th>
-                <th>Lv</th>
-                <th>装填数</th>
-                <th>速射</th>
-                <th>移動射撃</th>
-                <th>移動リロード</th>
-                <th>単発自動装填</th>
-            </tr>
-
-            <tr th:each="ammo : ${bowgunAmmos}">
-
-                <td>
-
-                    <input type="radio"
-                           name="bowgunAmmoChoice"
-                           th:value="${ammo.bowgunAmmoId}"
-                           th:checked="${selectedBowgunAmmo != null
-                               and selectedBowgunAmmo.bowgunAmmoId == ammo.bowgunAmmoId}"
-                           onchange="selectBowgunAmmo(this.value)">
-
-                </td>
-
-                <td th:text="${ammo.ammoType}"></td>
-                <td th:text="${ammo.ammoLevel}"></td>
-                <td th:text="${ammo.capacity}"></td>
-                <td th:text="${ammo.rapidFire ? '○' : '-'}"></td>
-                <td th:text="${ammo.movingShot ? '○' : '-'}"></td>
-                <td th:text="${ammo.movingReload ? '○' : '-'}"></td>
-                <td th:text="${ammo.singleAuto ? '○' : '-'}"></td>
-
-            </tr>
-
-        </table>
-
-        <div th:if="${selectedBowgunAmmo != null}">
-
-            <p>
-                選択中：
-
-                <strong th:text="${selectedBowgunAmmo.ammoType}">
-                </strong>
-
-                Lv<span th:text="${selectedBowgunAmmo.ammoLevel}">
-                </span>
-            </p>
-
-        </div>
-
-        <div th:if="${selectedBowgunAmmo != null
-                     and bowgunAmmoModifier != null}">
-
-            <h3>ボウガン弾・計算用データ</h3>
-
-            <p>
-                1hit物理モーション値：
-                <strong th:text="${bowgunAmmoModifier.physicalMotionValuePerHit}">
-                </strong>
-            </p>
-
-            <p>
-                1hit属性モーション値：
-                <strong th:text="${bowgunAmmoModifier.elementMotionValuePerHit}">
-                </strong>
-            </p>
-
-            <p>
-                1hit固定ダメージ値：
-                <strong th:text="${bowgunAmmoModifier.fixedDamageValuePerHit}">
-                </strong>
-            </p>
-
-            <p>
-                最大ヒット数：
-                <strong th:text="${bowgunAmmoModifier.maxHitCount}">
-                </strong>
-            </p>
-
-        </div>
-
-        <div th:if="${selectedBowgunAmmo != null
-                     and bowgunRapidFireModifier != null
-                     and bowgunRapidFireModifier.rapidFire}">
-
-            <h3>速射補正</h3>
-
-            <p>
-                発射数：
-                <strong th:text="${bowgunRapidFireModifier.shotCount}">
-                </strong>
-            </p>
-
-            <p>
-                1発物理倍率：
-                <strong th:text="${bowgunRapidFireModifier.physicalMulPerShot}">
-                </strong>
-            </p>
-
-            <p>
-                1発属性倍率：
-                <strong th:text="${bowgunRapidFireModifier.elementMulPerShot}">
-                </strong>
-            </p>
-
-        </div>
-
-        <div th:if="${bowgunPhysicalDamageResult != null
-                     and selectedBowgunAmmo != null}">
-
-            <h3>ボウガン物理ダメージ計算途中値</h3>
-
-            <p>
-                補正後攻撃力：
-                <strong th:text="${bowgunPhysicalDamageResult.effectiveAttack}">
-                </strong>
-            </p>
-
-            <p>
-                肉質補正前・1hit物理値：
-                <strong th:text="${bowgunPhysicalDamageResult.physicalDamagePerHit}">
-                </strong>
-            </p>
-
-            <p>
-                1発最大物理値：
-                <strong th:text="${bowgunPhysicalDamageResult.maxPhysicalDamage}">
-                </strong>
-            </p>
-
-            <p>
-                弾1個消費あたり最大物理値：
-                <strong th:text="${bowgunPhysicalDamageResult.maxPhysicalDamagePerAmmo}">
-                </strong>
-            </p>
-
-        </div>
-
-        <div th:if="${bowgunElementDamageResult != null
-                     and selectedBowgunAmmo != null}">
-
-            <h3>ボウガン属性ダメージ計算途中値</h3>
-
-            <p>
-                補正後攻撃力：
-                <strong th:text="${bowgunElementDamageResult.effectiveAttack}">
-                </strong>
-            </p>
-
-            <p>
-                肉質補正前・1hit属性値：
-                <strong th:text="${bowgunElementDamageResult.elementDamagePerHit}">
-                </strong>
-            </p>
-
-            <p>
-                1発最大属性値：
-                <strong th:text="${bowgunElementDamageResult.maxElementDamage}">
-                </strong>
-            </p>
-
-            <p>
-                弾1個消費あたり最大属性値：
-                <strong th:text="${bowgunElementDamageResult.maxElementDamagePerAmmo}">
-                </strong>
-            </p>
-
-        </div>
-
-    </div>
-
-    <!-- ================================================== -->
-    <!-- 弓 -->
-    <!-- ================================================== -->
-
-    <div th:if="${weapon != null
-                 and weapon.weaponType == '弓'}">
-
-        <h2>弓</h2>
-
-        <h3>溜め段階</h3>
-
-        <p th:if="${bowCharges == null
-                   or #lists.isEmpty(bowCharges)}">
-            溜め段階データがありません。
-        </p>
-
-        <table border="1"
-               th:if="${bowCharges != null
-                       and !#lists.isEmpty(bowCharges)}">
-
-            <tr>
-                <th>選択</th>
-                <th>溜め段階</th>
-                <th>矢タイプ</th>
-                <th>矢Lv</th>
-                <th>使用条件</th>
-            </tr>
-
-            <tr th:each="charge : ${bowCharges}">
-
-                <td>
-
-                    <input type="radio"
-                           name="bowChargeChoice"
-                           th:value="${charge.bowChargeId}"
-                           th:checked="${selectedBowCharge != null
-                               and selectedBowCharge.bowChargeId == charge.bowChargeId}"
-                           onchange="selectBowCharge(this.value)">
-
-                </td>
-
-                <td>
-                    溜め<span th:text="${charge.chargeLevel}"></span>
-                </td>
-
-                <td th:text="${charge.shotType}"></td>
-
-                <td>
-                    Lv<span th:text="${charge.shotLevel}"></span>
-                </td>
-
-                <td th:text="${charge.initiallyAvailable
-                    ? '通常使用可能'
-                    : '弓溜め段階解放が必要'}">
-                </td>
-
-            </tr>
-
-        </table>
-
-        <div th:if="${selectedBowCharge != null}">
-
-            <p>
-                選択中：
-
-                溜め<span th:text="${selectedBowCharge.chargeLevel}">
-                </span>
-
-                /
-
-                <span th:text="${selectedBowCharge.shotType}">
-                </span>
-
-                Lv<span th:text="${selectedBowCharge.shotLevel}">
-                </span>
-            </p>
-
-        </div>
-
-        <div th:if="${selectedBowCharge != null
-                     and bowChargeModifier != null}">
-
-            <p>
-                溜め物理倍率：
-                <strong th:text="${bowChargeModifier.physicalMul}">
-                </strong>
-            </p>
-
-            <p>
-                溜め属性倍率：
-                <strong th:text="${bowChargeModifier.elementMul}">
-                </strong>
-            </p>
-
-        </div>
-
-        <div th:if="${selectedBowCharge != null
-                     and bowShotModifier != null}">
-
-            <p>
-                矢モーション値（1hit）：
-                <strong th:text="${bowShotModifier.motionValuePerHit}">
-                </strong>
-            </p>
-
-            <p>
-                最大ヒット数：
-                <strong th:text="${bowShotModifier.maxHitCount}">
-                </strong>
-            </p>
-
-        </div>
-
-        <h3>ビン</h3>
-
-        <table border="1"
-               th:if="${bowCoatings != null
-                       and !#lists.isEmpty(bowCoatings)}">
-
-            <tr>
-                <th>選択</th>
-                <th>ビン</th>
-                <th>強化</th>
-            </tr>
-
-            <tr>
-
-                <td>
-
-                    <input type="radio"
-                           name="bowCoatingChoice"
-                           value=""
-                           th:checked="${selectedBowCoating == null}"
-                           onchange="clearBowCoating()">
-
-                </td>
-
-                <td>ビンなし</td>
-                <td>-</td>
-
-            </tr>
-
-            <tr th:each="coating : ${bowCoatings}">
-
-                <td>
-
-                    <input type="radio"
-                           name="bowCoatingChoice"
-                           th:value="${coating.bowCoatingId}"
-                           th:checked="${selectedBowCoating != null
-                               and selectedBowCoating.bowCoatingId == coating.bowCoatingId}"
-                           onchange="selectBowCoating(this.value)">
-
-                </td>
-
-                <td th:text="${coating.coatingType}"></td>
-
-                <td th:text="${coating.isEnhanced
-                    ? '強化'
-                    : '通常'}">
-                </td>
-
-            </tr>
-
-        </table>
-
-        <div th:if="${selectedBowCoating != null
-                     and bowCoatingModifier != null}">
-
-            <p>
-                選択中ビン：
-                <strong th:text="${selectedBowCoating.coatingType}">
-                </strong>
-            </p>
-
-            <p>
-                ビン物理倍率：
-                <strong th:text="${bowCoatingModifier.physicalMul}">
-                </strong>
-            </p>
-
-            <p>
-                ビン状態異常倍率：
-                <strong th:text="${bowCoatingModifier.statusMul}">
-                </strong>
-            </p>
-
-        </div>
-
-        <div th:if="${bowPhysicalModifier != null
-                     and selectedBowCharge != null}">
-
-            <h3>弓の最終物理係数</h3>
-
-            <p>
-                1hitあたり物理係数：
-                <strong th:text="${bowPhysicalModifier.physicalRatePerHit}">
-                </strong>
-            </p>
-
-            <p>
-                最大ヒット時物理係数：
-                <strong th:text="${bowPhysicalModifier.maxPhysicalRate}">
-                </strong>
-            </p>
-
-            <p>
-                最大ヒット数：
-                <strong th:text="${bowPhysicalModifier.maxHitCount}">
-                </strong>
-            </p>
-
-        </div>
-
-        <div th:if="${bowPhysicalDamageResult != null
-                     and selectedBowCharge != null}">
-
-            <h3>弓の物理ダメージ計算途中値</h3>
-
-            <p>
-                条件付き補正後攻撃力：
-                <strong th:text="${bowPhysicalDamageResult.effectiveAttack}">
-                </strong>
-            </p>
-
-            <p>
-                肉質補正前・1hit物理値：
-                <strong th:text="${bowPhysicalDamageResult.physicalDamagePerHit}">
-                </strong>
-            </p>
-
-            <p>
-                肉質補正前・最大ヒット物理値：
-                <strong th:text="${bowPhysicalDamageResult.maxPhysicalDamage}">
-                </strong>
-            </p>
-
-        </div>
-
-        <div th:if="${bowElementDamageResult != null
-                     and selectedBowCharge != null}">
-
-            <h3>弓の属性ダメージ計算途中値</h3>
-
-            <p>
-                条件付き補正後属性値：
-                <strong th:text="${bowElementDamageResult.effectiveElement}">
-                </strong>
-            </p>
-
-            <p>
-                肉質補正前・1hit属性値：
-                <strong th:text="${bowElementDamageResult.elementDamagePerHit}">
-                </strong>
-            </p>
-
-            <p>
-                肉質補正前・最大ヒット属性値：
-                <strong th:text="${bowElementDamageResult.maxElementDamage}">
-                </strong>
-            </p>
-
-        </div>
-
-    </div>
-
-    <br>
-
-    <!-- ================================================== -->
-    <!-- 百竜装飾品 -->
-    <!-- ================================================== -->
-
-    <div th:if="${weapon != null}">
-
-        <h2>百竜装飾品</h2>
-
-        <table border="1">
-
-            <tr>
-                <th>百竜スロット</th>
-                <th>装飾品</th>
-                <th>百竜スキル</th>
-                <th>操作</th>
-            </tr>
-
-            <tr>
-
-                <td th:text="${weapon.rampageSlotSize != null
-                    ? weapon.rampageSlotSize
-                    : 0}">
-                </td>
-
-                <td th:text="${rampageDecoration != null
-                    ? rampageDecoration.decorationName
-                    : '未選択'}">
-                </td>
-
-                <td th:text="${rampageDecoration != null
-                    ? rampageDecoration.rampageSkillName
-                    : '-'}">
-                </td>
-
-                <td>
-
-                    <button type="button"
-                            th:if="${weapon.rampageSlotSize != null
-                                and weapon.rampageSlotSize > 0}"
-                            onclick="goRampageDecorationSelect()">
-
-                        百竜装飾品を選ぶ
-
-                    </button>
-
-                    <button type="button"
-                            th:if="${simulatorForm.rampageDecorationId != null}"
-                            onclick="removeDecoration('rampageDecorationId')">
-
-                        外す
-
-                    </button>
-
-                </td>
-
-            </tr>
-
-        </table>
-
-    </div>
-
-    <br>
-
-    <!-- ================================================== -->
-    <!-- 武器装飾品 -->
-    <!-- ================================================== -->
-
-    <div th:if="${weapon != null}">
-
-        <h2>武器スロット</h2>
-
-        <table border="1">
-
-            <tr>
-                <th>スロット</th>
-                <th>サイズ</th>
-                <th>装飾品</th>
-                <th>操作</th>
-            </tr>
-
-            <tr>
-
-                <td>1</td>
-
-                <td th:text="${weapon.slot1Size != null
-                    ? weapon.slot1Size
-                    : 0}">
-                </td>
-
-                <td>
-
-                    <span th:if="${weapon.slot1Size == null
-                                 or weapon.slot1Size == 0}">
-                        スロットなし
-                    </span>
-
-                    <span th:if="${weapon.slot1Size != null
-                                 and weapon.slot1Size > 0
-                                 and weaponDecoration1 == null}">
-                        未選択
-                    </span>
-
-                    <span th:if="${weaponDecoration1 != null}">
-
-                        <span th:text="${weaponDecoration1.skillName}">
-                        </span>
-
-                        Lv<span th:text="${weaponDecoration1.skillLevel}">
-                        </span>
-
-                    </span>
-
-                </td>
-
-                <td>
-
-                    <button type="button"
-                            th:if="${weapon.slot1Size != null
-                                   and weapon.slot1Size > 0}"
-                            th:data-target="'weaponDecoration1Id'"
-                            th:data-slot-size="${weapon.slot1Size}"
-                            onclick="goDecorationSelect(
-                                this.dataset.target,
-                                this.dataset.slotSize
-                            )">
-
-                        装飾品を選ぶ
-
-                    </button>
-
-                    <button type="button"
-                            th:if="${simulatorForm.weaponDecoration1Id != null}"
-                            onclick="removeDecoration('weaponDecoration1Id')">
-
-                        外す
-
-                    </button>
-
-                </td>
-
-            </tr>
-
-            <tr>
-
-                <td>2</td>
-
-                <td th:text="${weapon.slot2Size != null
-                    ? weapon.slot2Size
-                    : 0}">
-                </td>
-
-                <td>
-
-                    <span th:if="${weapon.slot2Size == null
-                                 or weapon.slot2Size == 0}">
-                        スロットなし
-                    </span>
-
-                    <span th:if="${weapon.slot2Size != null
-                                 and weapon.slot2Size > 0
-                                 and weaponDecoration2 == null}">
-                        未選択
-                    </span>
-
-                    <span th:if="${weaponDecoration2 != null}">
-
-                        <span th:text="${weaponDecoration2.skillName}">
-                        </span>
-
-                        Lv<span th:text="${weaponDecoration2.skillLevel}">
-                        </span>
-
-                    </span>
-
-                </td>
-
-                <td>
-
-                    <button type="button"
-                            th:if="${weapon.slot2Size != null
-                                   and weapon.slot2Size > 0}"
-                            th:data-target="'weaponDecoration2Id'"
-                            th:data-slot-size="${weapon.slot2Size}"
-                            onclick="goDecorationSelect(
-                                this.dataset.target,
-                                this.dataset.slotSize
-                            )">
-
-                        装飾品を選ぶ
-
-                    </button>
-
-                    <button type="button"
-                            th:if="${simulatorForm.weaponDecoration2Id != null}"
-                            onclick="removeDecoration('weaponDecoration2Id')">
-
-                        外す
-
-                    </button>
-
-                </td>
-
-            </tr>
-
-            <tr>
-
-                <td>3</td>
-
-                <td th:text="${weapon.slot3Size != null
-                    ? weapon.slot3Size
-                    : 0}">
-                </td>
-
-                <td>
-
-                    <span th:if="${weapon.slot3Size == null
-                                 or weapon.slot3Size == 0}">
-                        スロットなし
-                    </span>
-
-                    <span th:if="${weapon.slot3Size != null
-                                 and weapon.slot3Size > 0
-                                 and weaponDecoration3 == null}">
-                        未選択
-                    </span>
-
-                    <span th:if="${weaponDecoration3 != null}">
-
-                        <span th:text="${weaponDecoration3.skillName}">
-                        </span>
-
-                        Lv<span th:text="${weaponDecoration3.skillLevel}">
-                        </span>
-
-                    </span>
-
-                </td>
-
-                <td>
-
-                    <button type="button"
-                            th:if="${weapon.slot3Size != null
-                                   and weapon.slot3Size > 0}"
-                            th:data-target="'weaponDecoration3Id'"
-                            th:data-slot-size="${weapon.slot3Size}"
-                            onclick="goDecorationSelect(
-                                this.dataset.target,
-                                this.dataset.slotSize
-                            )">
-
-                        装飾品を選ぶ
-
-                    </button>
-
-                    <button type="button"
-                            th:if="${simulatorForm.weaponDecoration3Id != null}"
-                            onclick="removeDecoration('weaponDecoration3Id')">
-
-                        外す
-
-                    </button>
-
-                </td>
-
-            </tr>
-
-        </table>
-
-    </div>
-
-    <br>
-
-    <!-- ================================================== -->
-    <!-- 防具 -->
-    <!-- ================================================== -->
-
-    <h2>選択中の防具</h2>
-
-    <table border="1">
-
-        <tr>
-            <th>部位</th>
-            <th>防具名</th>
-            <th>選択</th>
-        </tr>
-
-        <tr>
-            <td>頭</td>
-            <td th:text="${headArmor != null
-                ? headArmor.armorName
-                : '未選択'}">
-            </td>
-            <td>
-                <button type="button"
-                        onclick="goArmorSelect('頭')">
-                    選ぶ
-                </button>
-            </td>
-        </tr>
-
-        <tr>
-            <td>胴</td>
-            <td th:text="${chestArmor != null
-                ? chestArmor.armorName
-                : '未選択'}">
-            </td>
-            <td>
-                <button type="button"
-                        onclick="goArmorSelect('胴')">
-                    選ぶ
-                </button>
-            </td>
-        </tr>
-
-        <tr>
-            <td>腕</td>
-            <td th:text="${armArmor != null
-                ? armArmor.armorName
-                : '未選択'}">
-            </td>
-            <td>
-                <button type="button"
-                        onclick="goArmorSelect('腕')">
-                    選ぶ
-                </button>
-            </td>
-        </tr>
-
-        <tr>
-            <td>腰</td>
-            <td th:text="${waistArmor != null
-                ? waistArmor.armorName
-                : '未選択'}">
-            </td>
-            <td>
-                <button type="button"
-                        onclick="goArmorSelect('腰')">
-                    選ぶ
-                </button>
-            </td>
-        </tr>
-
-        <tr>
-            <td>脚</td>
-            <td th:text="${legArmor != null
-                ? legArmor.armorName
-                : '未選択'}">
-            </td>
-            <td>
-                <button type="button"
-                        onclick="goArmorSelect('脚')">
-                    選ぶ
-                </button>
-            </td>
-        </tr>
-
-    </table>
-
-    <br>
-
-    <!-- ================================================== -->
-    <!-- 頭 -->
-    <!-- ================================================== -->
-
-    <h3>頭防具スロット</h3>
-
-    <p th:if="${headArmor == null}">
-        頭防具が選択されていません。
-    </p>
-
-    <table border="1"
-           th:if="${headArmor != null}">
-
-        <tr>
-            <th>スロット</th>
-            <th>サイズ</th>
-            <th>装飾品</th>
-            <th>操作</th>
-        </tr>
-
-        <tr>
-
-            <td>1</td>
-
-            <td th:text="${headArmor.slot1Size != null
-                ? headArmor.slot1Size
-                : 0}">
-            </td>
-
-            <td>
-
-                <span th:if="${headArmor.slot1Size == null
-                             or headArmor.slot1Size == 0}">
-                    スロットなし
-                </span>
-
-                <span th:if="${headArmor.slot1Size != null
-                             and headArmor.slot1Size > 0
-                             and headDecoration1 == null}">
-                    未選択
-                </span>
-
-                <span th:if="${headDecoration1 != null}">
-
-                    <span th:text="${headDecoration1.skillName}">
-                    </span>
-
-                    Lv<span th:text="${headDecoration1.skillLevel}">
-                    </span>
-
-                </span>
-
-            </td>
-
-            <td>
-
-                <button type="button"
-                        th:if="${headArmor.slot1Size != null
-                               and headArmor.slot1Size > 0}"
-                        th:data-target="'headDecoration1Id'"
-                        th:data-slot-size="${headArmor.slot1Size}"
-                        onclick="goDecorationSelect(
-                            this.dataset.target,
-                            this.dataset.slotSize
-                        )">
-
-                    装飾品を選ぶ
-
-                </button>
-
-                <button type="button"
-                        th:if="${simulatorForm.headDecoration1Id != null}"
-                        onclick="removeDecoration('headDecoration1Id')">
-
-                    外す
-
-                </button>
-
-            </td>
-
-        </tr>
-
-        <tr>
-
-            <td>2</td>
-
-            <td th:text="${headArmor.slot2Size != null
-                ? headArmor.slot2Size
-                : 0}">
-            </td>
-
-            <td>
-
-                <span th:if="${headArmor.slot2Size == null
-                             or headArmor.slot2Size == 0}">
-                    スロットなし
-                </span>
-
-                <span th:if="${headArmor.slot2Size != null
-                             and headArmor.slot2Size > 0
-                             and headDecoration2 == null}">
-                    未選択
-                </span>
-
-                <span th:if="${headDecoration2 != null}">
-
-                    <span th:text="${headDecoration2.skillName}">
-                    </span>
-
-                    Lv<span th:text="${headDecoration2.skillLevel}">
-                    </span>
-
-                </span>
-
-            </td>
-
-            <td>
-
-                <button type="button"
-                        th:if="${headArmor.slot2Size != null
-                               and headArmor.slot2Size > 0}"
-                        th:data-target="'headDecoration2Id'"
-                        th:data-slot-size="${headArmor.slot2Size}"
-                        onclick="goDecorationSelect(
-                            this.dataset.target,
-                            this.dataset.slotSize
-                        )">
-
-                    装飾品を選ぶ
-
-                </button>
-
-                <button type="button"
-                        th:if="${simulatorForm.headDecoration2Id != null}"
-                        onclick="removeDecoration('headDecoration2Id')">
-
-                    外す
-
-                </button>
-
-            </td>
-
-        </tr>
-
-        <tr>
-
-            <td>3</td>
-
-            <td th:text="${headArmor.slot3Size != null
-                ? headArmor.slot3Size
-                : 0}">
-            </td>
-
-            <td>
-
-                <span th:if="${headArmor.slot3Size == null
-                             or headArmor.slot3Size == 0}">
-                    スロットなし
-                </span>
-
-                <span th:if="${headArmor.slot3Size != null
-                             and headArmor.slot3Size > 0
-                             and headDecoration3 == null}">
-                    未選択
-                </span>
-
-                <span th:if="${headDecoration3 != null}">
-
-                    <span th:text="${headDecoration3.skillName}">
-                    </span>
-
-                    Lv<span th:text="${headDecoration3.skillLevel}">
-                    </span>
-
-                </span>
-
-            </td>
-
-            <td>
-
-                <button type="button"
-                        th:if="${headArmor.slot3Size != null
-                               and headArmor.slot3Size > 0}"
-                        th:data-target="'headDecoration3Id'"
-                        th:data-slot-size="${headArmor.slot3Size}"
-                        onclick="goDecorationSelect(
-                            this.dataset.target,
-                            this.dataset.slotSize
-                        )">
-
-                    装飾品を選ぶ
-
-                </button>
-
-                <button type="button"
-                        th:if="${simulatorForm.headDecoration3Id != null}"
-                        onclick="removeDecoration('headDecoration3Id')">
-
-                    外す
-
-                </button>
-
-            </td>
-
-        </tr>
-
-    </table>
-
-    <br>
-
-    <!-- ================================================== -->
-    <!-- 胴 -->
-    <!-- ================================================== -->
-
-    <h3>胴防具スロット</h3>
-
-    <p th:if="${chestArmor == null}">
-        胴防具が選択されていません。
-    </p>
-
-    <table border="1"
-           th:if="${chestArmor != null}">
-
-        <tr>
-            <th>スロット</th>
-            <th>サイズ</th>
-            <th>装飾品</th>
-            <th>操作</th>
-        </tr>
-
-        <tr>
-
-            <td>1</td>
-
-            <td th:text="${chestArmor.slot1Size != null
-                ? chestArmor.slot1Size
-                : 0}">
-            </td>
-
-            <td>
-
-                <span th:if="${chestArmor.slot1Size == null
-                             or chestArmor.slot1Size == 0}">
-                    スロットなし
-                </span>
-
-                <span th:if="${chestArmor.slot1Size != null
-                             and chestArmor.slot1Size > 0
-                             and chestDecoration1 == null}">
-                    未選択
-                </span>
-
-                <span th:if="${chestDecoration1 != null}">
-                    <span th:text="${chestDecoration1.skillName}"></span>
-                    Lv<span th:text="${chestDecoration1.skillLevel}"></span>
-                </span>
-
-            </td>
-
-            <td>
-
-                <button type="button"
-                        th:if="${chestArmor.slot1Size != null
-                               and chestArmor.slot1Size > 0}"
-                        th:data-target="'chestDecoration1Id'"
-                        th:data-slot-size="${chestArmor.slot1Size}"
-                        onclick="goDecorationSelect(
-                            this.dataset.target,
-                            this.dataset.slotSize
-                        )">
-                    装飾品を選ぶ
-                </button>
-
-                <button type="button"
-                        th:if="${simulatorForm.chestDecoration1Id != null}"
-                        onclick="removeDecoration('chestDecoration1Id')">
-                    外す
-                </button>
-
-            </td>
-
-        </tr>
-
-        <tr>
-
-            <td>2</td>
-
-            <td th:text="${chestArmor.slot2Size != null
-                ? chestArmor.slot2Size
-                : 0}">
-            </td>
-
-            <td>
-
-                <span th:if="${chestArmor.slot2Size == null
-                             or chestArmor.slot2Size == 0}">
-                    スロットなし
-                </span>
-
-                <span th:if="${chestArmor.slot2Size != null
-                             and chestArmor.slot2Size > 0
-                             and chestDecoration2 == null}">
-                    未選択
-                </span>
-
-                <span th:if="${chestDecoration2 != null}">
-                    <span th:text="${chestDecoration2.skillName}"></span>
-                    Lv<span th:text="${chestDecoration2.skillLevel}"></span>
-                </span>
-
-            </td>
-
-            <td>
-
-                <button type="button"
-                        th:if="${chestArmor.slot2Size != null
-                               and chestArmor.slot2Size > 0}"
-                        th:data-target="'chestDecoration2Id'"
-                        th:data-slot-size="${chestArmor.slot2Size}"
-                        onclick="goDecorationSelect(
-                            this.dataset.target,
-                            this.dataset.slotSize
-                        )">
-                    装飾品を選ぶ
-                </button>
-
-                <button type="button"
-                        th:if="${simulatorForm.chestDecoration2Id != null}"
-                        onclick="removeDecoration('chestDecoration2Id')">
-                    外す
-                </button>
-
-            </td>
-
-        </tr>
-
-        <tr>
-
-            <td>3</td>
-
-            <td th:text="${chestArmor.slot3Size != null
-                ? chestArmor.slot3Size
-                : 0}">
-            </td>
-
-            <td>
-
-                <span th:if="${chestArmor.slot3Size == null
-                             or chestArmor.slot3Size == 0}">
-                    スロットなし
-                </span>
-
-                <span th:if="${chestArmor.slot3Size != null
-                             and chestArmor.slot3Size > 0
-                             and chestDecoration3 == null}">
-                    未選択
-                </span>
-
-                <span th:if="${chestDecoration3 != null}">
-                    <span th:text="${chestDecoration3.skillName}"></span>
-                    Lv<span th:text="${chestDecoration3.skillLevel}"></span>
-                </span>
-
-            </td>
-
-            <td>
-
-                <button type="button"
-                        th:if="${chestArmor.slot3Size != null
-                               and chestArmor.slot3Size > 0}"
-                        th:data-target="'chestDecoration3Id'"
-                        th:data-slot-size="${chestArmor.slot3Size}"
-                        onclick="goDecorationSelect(
-                            this.dataset.target,
-                            this.dataset.slotSize
-                        )">
-                    装飾品を選ぶ
-                </button>
-
-                <button type="button"
-                        th:if="${simulatorForm.chestDecoration3Id != null}"
-                        onclick="removeDecoration('chestDecoration3Id')">
-                    外す
-                </button>
-
-            </td>
-
-        </tr>
-
-    </table>
-
-    <br>
-
-    <!-- ================================================== -->
-    <!-- 腕 -->
-    <!-- ================================================== -->
-
-    <h3>腕防具スロット</h3>
-
-    <p th:if="${armArmor == null}">
-        腕防具が選択されていません。
-    </p>
-
-    <table border="1"
-           th:if="${armArmor != null}">
-
-        <tr>
-            <th>スロット</th>
-            <th>サイズ</th>
-            <th>装飾品</th>
-            <th>操作</th>
-        </tr>
-
-        <tr>
-
-            <td>1</td>
-
-            <td th:text="${armArmor.slot1Size != null
-                ? armArmor.slot1Size
-                : 0}">
-            </td>
-
-            <td>
-
-                <span th:if="${armArmor.slot1Size == null
-                             or armArmor.slot1Size == 0}">
-                    スロットなし
-                </span>
-
-                <span th:if="${armArmor.slot1Size != null
-                             and armArmor.slot1Size > 0
-                             and armDecoration1 == null}">
-                    未選択
-                </span>
-
-                <span th:if="${armDecoration1 != null}">
-                    <span th:text="${armDecoration1.skillName}"></span>
-                    Lv<span th:text="${armDecoration1.skillLevel}"></span>
-                </span>
-
-            </td>
-
-            <td>
-
-                <button type="button"
-                        th:if="${armArmor.slot1Size != null
-                               and armArmor.slot1Size > 0}"
-                        th:data-target="'armDecoration1Id'"
-                        th:data-slot-size="${armArmor.slot1Size}"
-                        onclick="goDecorationSelect(
-                            this.dataset.target,
-                            this.dataset.slotSize
-                        )">
-                    装飾品を選ぶ
-                </button>
-
-                <button type="button"
-                        th:if="${simulatorForm.armDecoration1Id != null}"
-                        onclick="removeDecoration('armDecoration1Id')">
-                    外す
-                </button>
-
-            </td>
-
-        </tr>
-
-        <tr>
-
-            <td>2</td>
-
-            <td th:text="${armArmor.slot2Size != null
-                ? armArmor.slot2Size
-                : 0}">
-            </td>
-
-            <td>
-
-                <span th:if="${armArmor.slot2Size == null
-                             or armArmor.slot2Size == 0}">
-                    スロットなし
-                </span>
-
-                <span th:if="${armArmor.slot2Size != null
-                             and armArmor.slot2Size > 0
-                             and armDecoration2 == null}">
-                    未選択
-                </span>
-
-                <span th:if="${armDecoration2 != null}">
-                    <span th:text="${armDecoration2.skillName}"></span>
-                    Lv<span th:text="${armDecoration2.skillLevel}"></span>
-                </span>
-
-            </td>
-
-            <td>
-
-                <button type="button"
-                        th:if="${armArmor.slot2Size != null
-                               and armArmor.slot2Size > 0}"
-                        th:data-target="'armDecoration2Id'"
-                        th:data-slot-size="${armArmor.slot2Size}"
-                        onclick="goDecorationSelect(
-                            this.dataset.target,
-                            this.dataset.slotSize
-                        )">
-                    装飾品を選ぶ
-                </button>
-
-                <button type="button"
-                        th:if="${simulatorForm.armDecoration2Id != null}"
-                        onclick="removeDecoration('armDecoration2Id')">
-                    外す
-                </button>
-
-            </td>
-
-        </tr>
-
-        <tr>
-
-            <td>3</td>
-
-            <td th:text="${armArmor.slot3Size != null
-                ? armArmor.slot3Size
-                : 0}">
-            </td>
-
-            <td>
-
-                <span th:if="${armArmor.slot3Size == null
-                             or armArmor.slot3Size == 0}">
-                    スロットなし
-                </span>
-
-                <span th:if="${armArmor.slot3Size != null
-                             and armArmor.slot3Size > 0
-                             and armDecoration3 == null}">
-                    未選択
-                </span>
-
-                <span th:if="${armDecoration3 != null}">
-                    <span th:text="${armDecoration3.skillName}"></span>
-                    Lv<span th:text="${armDecoration3.skillLevel}"></span>
-                </span>
-
-            </td>
-
-            <td>
-
-                <button type="button"
-                        th:if="${armArmor.slot3Size != null
-                               and armArmor.slot3Size > 0}"
-                        th:data-target="'armDecoration3Id'"
-                        th:data-slot-size="${armArmor.slot3Size}"
-                        onclick="goDecorationSelect(
-                            this.dataset.target,
-                            this.dataset.slotSize
-                        )">
-                    装飾品を選ぶ
-                </button>
-
-                <button type="button"
-                        th:if="${simulatorForm.armDecoration3Id != null}"
-                        onclick="removeDecoration('armDecoration3Id')">
-                    外す
-                </button>
-
-            </td>
-
-        </tr>
-
-    </table>
-
-    <br>
-
-    <!-- ================================================== -->
-    <!-- 腰 -->
-    <!-- ================================================== -->
-
-    <h3>腰防具スロット</h3>
-
-    <p th:if="${waistArmor == null}">
-        腰防具が選択されていません。
-    </p>
-
-    <table border="1"
-           th:if="${waistArmor != null}">
-
-        <tr>
-            <th>スロット</th>
-            <th>サイズ</th>
-            <th>装飾品</th>
-            <th>操作</th>
-        </tr>
-
-        <tr>
-
-            <td>1</td>
-
-            <td th:text="${waistArmor.slot1Size != null
-                ? waistArmor.slot1Size
-                : 0}">
-            </td>
-
-            <td>
-
-                <span th:if="${waistArmor.slot1Size == null
-                             or waistArmor.slot1Size == 0}">
-                    スロットなし
-                </span>
-
-                <span th:if="${waistArmor.slot1Size != null
-                             and waistArmor.slot1Size > 0
-                             and waistDecoration1 == null}">
-                    未選択
-                </span>
-
-                <span th:if="${waistDecoration1 != null}">
-                    <span th:text="${waistDecoration1.skillName}"></span>
-                    Lv<span th:text="${waistDecoration1.skillLevel}"></span>
-                </span>
-
-            </td>
-
-            <td>
-
-                <button type="button"
-                        th:if="${waistArmor.slot1Size != null
-                               and waistArmor.slot1Size > 0}"
-                        th:data-target="'waistDecoration1Id'"
-                        th:data-slot-size="${waistArmor.slot1Size}"
-                        onclick="goDecorationSelect(
-                            this.dataset.target,
-                            this.dataset.slotSize
-                        )">
-                    装飾品を選ぶ
-                </button>
-
-                <button type="button"
-                        th:if="${simulatorForm.waistDecoration1Id != null}"
-                        onclick="removeDecoration('waistDecoration1Id')">
-                    外す
-                </button>
-
-            </td>
-
-        </tr>
-
-        <tr>
-
-            <td>2</td>
-
-            <td th:text="${waistArmor.slot2Size != null
-                ? waistArmor.slot2Size
-                : 0}">
-            </td>
-
-            <td>
-
-                <span th:if="${waistArmor.slot2Size == null
-                             or waistArmor.slot2Size == 0}">
-                    スロットなし
-                </span>
-
-                <span th:if="${waistArmor.slot2Size != null
-                             and waistArmor.slot2Size > 0
-                             and waistDecoration2 == null}">
-                    未選択
-                </span>
-
-                <span th:if="${waistDecoration2 != null}">
-                    <span th:text="${waistDecoration2.skillName}"></span>
-                    Lv<span th:text="${waistDecoration2.skillLevel}"></span>
-                </span>
-
-            </td>
-
-            <td>
-
-                <button type="button"
-                        th:if="${waistArmor.slot2Size != null
-                               and waistArmor.slot2Size > 0}"
-                        th:data-target="'waistDecoration2Id'"
-                        th:data-slot-size="${waistArmor.slot2Size}"
-                        onclick="goDecorationSelect(
-                            this.dataset.target,
-                            this.dataset.slotSize
-                        )">
-                    装飾品を選ぶ
-                </button>
-
-                <button type="button"
-                        th:if="${simulatorForm.waistDecoration2Id != null}"
-                        onclick="removeDecoration('waistDecoration2Id')">
-                    外す
-                </button>
-
-            </td>
-
-        </tr>
-
-        <tr>
-
-            <td>3</td>
-
-            <td th:text="${waistArmor.slot3Size != null
-                ? waistArmor.slot3Size
-                : 0}">
-            </td>
-
-            <td>
-
-                <span th:if="${waistArmor.slot3Size == null
-                             or waistArmor.slot3Size == 0}">
-                    スロットなし
-                </span>
-
-                <span th:if="${waistArmor.slot3Size != null
-                             and waistArmor.slot3Size > 0
-                             and waistDecoration3 == null}">
-                    未選択
-                </span>
-
-                <span th:if="${waistDecoration3 != null}">
-                    <span th:text="${waistDecoration3.skillName}"></span>
-                    Lv<span th:text="${waistDecoration3.skillLevel}"></span>
-                </span>
-
-            </td>
-
-            <td>
-
-                <button type="button"
-                        th:if="${waistArmor.slot3Size != null
-                               and waistArmor.slot3Size > 0}"
-                        th:data-target="'waistDecoration3Id'"
-                        th:data-slot-size="${waistArmor.slot3Size}"
-                        onclick="goDecorationSelect(
-                            this.dataset.target,
-                            this.dataset.slotSize
-                        )">
-                    装飾品を選ぶ
-                </button>
-
-                <button type="button"
-                        th:if="${simulatorForm.waistDecoration3Id != null}"
-                        onclick="removeDecoration('waistDecoration3Id')">
-                    外す
-                </button>
-
-            </td>
-
-        </tr>
-
-    </table>
-
-    <br>
-
-    <!-- ================================================== -->
-    <!-- 脚 -->
-    <!-- ================================================== -->
-
-    <h3>脚防具スロット</h3>
-
-    <p th:if="${legArmor == null}">
-        脚防具が選択されていません。
-    </p>
-
-    <table border="1"
-           th:if="${legArmor != null}">
-
-        <tr>
-            <th>スロット</th>
-            <th>サイズ</th>
-            <th>装飾品</th>
-            <th>操作</th>
-        </tr>
-
-        <tr>
-
-            <td>1</td>
-
-            <td th:text="${legArmor.slot1Size != null
-                ? legArmor.slot1Size
-                : 0}">
-            </td>
-
-            <td>
-
-                <span th:if="${legArmor.slot1Size == null
-                             or legArmor.slot1Size == 0}">
-                    スロットなし
-                </span>
-
-                <span th:if="${legArmor.slot1Size != null
-                             and legArmor.slot1Size > 0
-                             and legDecoration1 == null}">
-                    未選択
-                </span>
-
-                <span th:if="${legDecoration1 != null}">
-                    <span th:text="${legDecoration1.skillName}"></span>
-                    Lv<span th:text="${legDecoration1.skillLevel}"></span>
-                </span>
-
-            </td>
-
-            <td>
-
-                <button type="button"
-                        th:if="${legArmor.slot1Size != null
-                               and legArmor.slot1Size > 0}"
-                        th:data-target="'legDecoration1Id'"
-                        th:data-slot-size="${legArmor.slot1Size}"
-                        onclick="goDecorationSelect(
-                            this.dataset.target,
-                            this.dataset.slotSize
-                        )">
-                    装飾品を選ぶ
-                </button>
-
-                <button type="button"
-                        th:if="${simulatorForm.legDecoration1Id != null}"
-                        onclick="removeDecoration('legDecoration1Id')">
-                    外す
-                </button>
-
-            </td>
-
-        </tr>
-
-        <tr>
-
-            <td>2</td>
-
-            <td th:text="${legArmor.slot2Size != null
-                ? legArmor.slot2Size
-                : 0}">
-            </td>
-
-            <td>
-
-                <span th:if="${legArmor.slot2Size == null
-                             or legArmor.slot2Size == 0}">
-                    スロットなし
-                </span>
-
-                <span th:if="${legArmor.slot2Size != null
-                             and legArmor.slot2Size > 0
-                             and legDecoration2 == null}">
-                    未選択
-                </span>
-
-                <span th:if="${legDecoration2 != null}">
-                    <span th:text="${legDecoration2.skillName}"></span>
-                    Lv<span th:text="${legDecoration2.skillLevel}"></span>
-                </span>
-
-            </td>
-
-            <td>
-
-                <button type="button"
-                        th:if="${legArmor.slot2Size != null
-                               and legArmor.slot2Size > 0}"
-                        th:data-target="'legDecoration2Id'"
-                        th:data-slot-size="${legArmor.slot2Size}"
-                        onclick="goDecorationSelect(
-                            this.dataset.target,
-                            this.dataset.slotSize
-                        )">
-                    装飾品を選ぶ
-                </button>
-
-                <button type="button"
-                        th:if="${simulatorForm.legDecoration2Id != null}"
-                        onclick="removeDecoration('legDecoration2Id')">
-                    外す
-                </button>
-
-            </td>
-
-        </tr>
-
-        <tr>
-
-            <td>3</td>
-
-            <td th:text="${legArmor.slot3Size != null
-                ? legArmor.slot3Size
-                : 0}">
-            </td>
-
-            <td>
-
-                <span th:if="${legArmor.slot3Size == null
-                             or legArmor.slot3Size == 0}">
-                    スロットなし
-                </span>
-
-                <span th:if="${legArmor.slot3Size != null
-                             and legArmor.slot3Size > 0
-                             and legDecoration3 == null}">
-                    未選択
-                </span>
-
-                <span th:if="${legDecoration3 != null}">
-                    <span th:text="${legDecoration3.skillName}"></span>
-                    Lv<span th:text="${legDecoration3.skillLevel}"></span>
-                </span>
-
-            </td>
-
-            <td>
-
-                <button type="button"
-                        th:if="${legArmor.slot3Size != null
-                               and legArmor.slot3Size > 0}"
-                        th:data-target="'legDecoration3Id'"
-                        th:data-slot-size="${legArmor.slot3Size}"
-                        onclick="goDecorationSelect(
-                            this.dataset.target,
-                            this.dataset.slotSize
-                        )">
-                    装飾品を選ぶ
-                </button>
-
-                <button type="button"
-                        th:if="${simulatorForm.legDecoration3Id != null}"
-                        onclick="removeDecoration('legDecoration3Id')">
-                    外す
-                </button>
-
-            </td>
-
-        </tr>
-
-    </table>
-
-    <br>
-
-    <!-- ================================================== -->
-    <!-- 護石 -->
-    <!-- ================================================== -->
-
-    <h2>護石</h2>
-
-    <table border="1">
-
-        <tr>
-            <th>項目</th>
-            <th>内容</th>
-        </tr>
-
-        <tr>
-
-            <td>スキル1</td>
-
-            <td>
-
-                <span th:if="${talismanSkill1 == null}">
-                    なし
-                </span>
-
-                <span th:if="${talismanSkill1 != null}">
-
-                    <span th:text="${talismanSkill1.skillName}">
-                    </span>
-
-                    Lv<span th:text="${talismanSkill1.level}">
-                    </span>
-
-                </span>
-
-            </td>
-
-        </tr>
-
-        <tr>
-
-            <td>スキル2</td>
-
-            <td>
-
-                <span th:if="${talismanSkill2 == null}">
-                    なし
-                </span>
-
-                <span th:if="${talismanSkill2 != null}">
-
-                    <span th:text="${talismanSkill2.skillName}">
-                    </span>
-
-                    Lv<span th:text="${talismanSkill2.level}">
-                    </span>
-
-                </span>
-
-            </td>
-
-        </tr>
-
-        <tr>
-
-            <td>スロット</td>
-
-            <td>
-
-                <span th:text="${simulatorForm.talismanSlot1Size != null
-                    ? simulatorForm.talismanSlot1Size
-                    : 0}">
-                </span>
-
-                -
-
-                <span th:text="${simulatorForm.talismanSlot2Size != null
-                    ? simulatorForm.talismanSlot2Size
-                    : 0}">
-                </span>
-
-                -
-
-                <span th:text="${simulatorForm.talismanSlot3Size != null
-                    ? simulatorForm.talismanSlot3Size
-                    : 0}">
-                </span>
-
-            </td>
-
-        </tr>
-
-    </table>
-
-    <br>
-
-    <button type="button"
-            onclick="goTalisman()">
-        護石を編集
-    </button>
-
-    <h3>護石スロット</h3>
-
-    <table border="1">
-
-        <tr>
-            <th>スロット</th>
-            <th>サイズ</th>
-            <th>装飾品</th>
-            <th>操作</th>
-        </tr>
-
-        <tr>
-
-            <td>1</td>
-
-            <td th:text="${simulatorForm.talismanSlot1Size != null
-                ? simulatorForm.talismanSlot1Size
-                : 0}">
-            </td>
-
-            <td>
-
-                <span th:if="${simulatorForm.talismanSlot1Size == null
-                             or simulatorForm.talismanSlot1Size == 0}">
-                    スロットなし
-                </span>
-
-                <span th:if="${simulatorForm.talismanSlot1Size != null
-                             and simulatorForm.talismanSlot1Size > 0
-                             and talismanDecoration1 == null}">
-                    未選択
-                </span>
-
-                <span th:if="${talismanDecoration1 != null}">
-                    <span th:text="${talismanDecoration1.skillName}"></span>
-                    Lv<span th:text="${talismanDecoration1.skillLevel}"></span>
-                </span>
-
-            </td>
-
-            <td>
-
-                <button type="button"
-                        th:if="${simulatorForm.talismanSlot1Size != null
-                               and simulatorForm.talismanSlot1Size > 0}"
-                        th:data-target="'talismanDecoration1Id'"
-                        th:data-slot-size="${simulatorForm.talismanSlot1Size}"
-                        onclick="goDecorationSelect(
-                            this.dataset.target,
-                            this.dataset.slotSize
-                        )">
-                    装飾品を選ぶ
-                </button>
-
-                <button type="button"
-                        th:if="${simulatorForm.talismanDecoration1Id != null}"
-                        onclick="removeDecoration('talismanDecoration1Id')">
-                    外す
-                </button>
-
-            </td>
-
-        </tr>
-
-        <tr>
-
-            <td>2</td>
-
-            <td th:text="${simulatorForm.talismanSlot2Size != null
-                ? simulatorForm.talismanSlot2Size
-                : 0}">
-            </td>
-
-            <td>
-
-                <span th:if="${simulatorForm.talismanSlot2Size == null
-                             or simulatorForm.talismanSlot2Size == 0}">
-                    スロットなし
-                </span>
-
-                <span th:if="${simulatorForm.talismanSlot2Size != null
-                             and simulatorForm.talismanSlot2Size > 0
-                             and talismanDecoration2 == null}">
-                    未選択
-                </span>
-
-                <span th:if="${talismanDecoration2 != null}">
-                    <span th:text="${talismanDecoration2.skillName}"></span>
-                    Lv<span th:text="${talismanDecoration2.skillLevel}"></span>
-                </span>
-
-            </td>
-
-            <td>
-
-                <button type="button"
-                        th:if="${simulatorForm.talismanSlot2Size != null
-                               and simulatorForm.talismanSlot2Size > 0}"
-                        th:data-target="'talismanDecoration2Id'"
-                        th:data-slot-size="${simulatorForm.talismanSlot2Size}"
-                        onclick="goDecorationSelect(
-                            this.dataset.target,
-                            this.dataset.slotSize
-                        )">
-                    装飾品を選ぶ
-                </button>
-
-                <button type="button"
-                        th:if="${simulatorForm.talismanDecoration2Id != null}"
-                        onclick="removeDecoration('talismanDecoration2Id')">
-                    外す
-                </button>
-
-            </td>
-
-        </tr>
-
-        <tr>
-
-            <td>3</td>
-
-            <td th:text="${simulatorForm.talismanSlot3Size != null
-                ? simulatorForm.talismanSlot3Size
-                : 0}">
-            </td>
-
-            <td>
-
-                <span th:if="${simulatorForm.talismanSlot3Size == null
-                             or simulatorForm.talismanSlot3Size == 0}">
-                    スロットなし
-                </span>
-
-                <span th:if="${simulatorForm.talismanSlot3Size != null
-                             and simulatorForm.talismanSlot3Size > 0
-                             and talismanDecoration3 == null}">
-                    未選択
-                </span>
-
-                <span th:if="${talismanDecoration3 != null}">
-                    <span th:text="${talismanDecoration3.skillName}"></span>
-                    Lv<span th:text="${talismanDecoration3.skillLevel}"></span>
-                </span>
-
-            </td>
-
-            <td>
-
-                <button type="button"
-                        th:if="${simulatorForm.talismanSlot3Size != null
-                               and simulatorForm.talismanSlot3Size > 0}"
-                        th:data-target="'talismanDecoration3Id'"
-                        th:data-slot-size="${simulatorForm.talismanSlot3Size}"
-                        onclick="goDecorationSelect(
-                            this.dataset.target,
-                            this.dataset.slotSize
-                        )">
-                    装飾品を選ぶ
-                </button>
-
-                <button type="button"
-                        th:if="${simulatorForm.talismanDecoration3Id != null}"
-                        onclick="removeDecoration('talismanDecoration3Id')">
-                    外す
-                </button>
-
-            </td>
-
-        </tr>
-
-    </table>
-
-    <br>
-
-    <!-- ================================================== -->
-    <!-- 発動スキル -->
-    <!-- ================================================== -->
-
-    <h2>発動スキル合計</h2>
-
-    <p th:if="${skillTotals == null
-               or #lists.isEmpty(skillTotals)}">
-        発動スキルはありません。
-    </p>
-
-    <table border="1"
-           th:if="${skillTotals != null
-                   and !#lists.isEmpty(skillTotals)}">
-
-        <tr>
-            <th>スキル名</th>
-            <th>合計Lv</th>
-        </tr>
-
-        <tr th:each="skill : ${skillTotals}">
-            <td th:text="${skill.skillName}"></td>
-            <td th:text="${skill.level}"></td>
-        </tr>
-
-    </table>
-
-    <!-- ================================================== -->
-    <!-- 条件付きスキル -->
-    <!-- ================================================== -->
-
-    <div th:if="${skillStateSelections != null
-                 and !#lists.isEmpty(skillStateSelections)}">
-
-        <h2>条件付きスキル設定</h2>
-
-        <div th:each="selection : ${skillStateSelections}">
-
-            <h3>
-
-                <span th:text="${selection.skillName}">
-                </span>
-
-                Lv<span th:text="${selection.level}">
-                </span>
-
-            </h3>
-
-            <p th:if="${selection.conditionText != null
-                       and !selection.conditionText.isBlank()}">
-
-                条件：
-                <span th:text="${selection.conditionText}">
-                </span>
-
-            </p>
-
-            <div th:each="state : ${selection.states}">
-
-                <label>
-
-                    <input type="radio"
-                           th:name="${'skillState_' + selection.skillId}"
-                           th:value="${state.stateCode}"
-                           th:checked="${param['skillState_' + selection.skillId] != null
-                               ? param['skillState_' + selection.skillId][0] == state.stateCode
-                               : state.stateCode == 'INACTIVE'}"
-                           onchange="selectSkillState(
-                               this.name,
-                               this.value
-                           )">
-
-                    <span th:text="${state.stateName}">
-                    </span>
-
-                </label>
-
-                <br>
-
-            </div>
-
-        </div>
-
-    </div>
-
-    <div th:if="${conditionalSkillModifierTotal != null}">
-
-        <h2>条件付きスキル補正合計</h2>
-
-        <table border="1">
-
-            <tr>
-                <th>項目</th>
-                <th>値</th>
-            </tr>
-
-            <tr>
-                <td>攻撃力加算</td>
-                <td th:text="${conditionalSkillModifierTotal.attackAdd}"></td>
-            </tr>
-
-            <tr>
-                <td>攻撃力倍率</td>
-                <td th:text="${conditionalSkillModifierTotal.attackMul}"></td>
-            </tr>
-
-            <tr>
-                <td>属性値加算</td>
-                <td th:text="${conditionalSkillModifierTotal.elementAdd}"></td>
-            </tr>
-
-            <tr>
-                <td>属性値倍率</td>
-                <td th:text="${conditionalSkillModifierTotal.elementMul}"></td>
-            </tr>
-
-            <tr>
-                <td>会心率加算</td>
-                <td th:text="${conditionalSkillModifierTotal.affinityAdd}"></td>
-            </tr>
-
-            <tr>
-                <td>会心ダメージ倍率</td>
-                <td th:text="${conditionalSkillModifierTotal.critDamageMul}"></td>
-            </tr>
-
-            <tr>
-                <td>物理ダメージ倍率</td>
-                <td th:text="${conditionalSkillModifierTotal.physicalDamageMul}"></td>
-            </tr>
-
-            <tr>
-                <td>属性ダメージ倍率</td>
-                <td th:text="${conditionalSkillModifierTotal.elementDamageMul}"></td>
-            </tr>
-
-            <tr>
-                <td>属性会心倍率</td>
-                <td th:text="${conditionalSkillModifierTotal.elementCritDamageMul}"></td>
-            </tr>
-
-        </table>
-
-    </div>
-
-    <!-- ================================================== -->
-    <!-- 弱点・会心 -->
-    <!-- ================================================== -->
-
-    <div th:if="${selectedHitzone != null
-                 and monsterWeakpointResult != null}">
-
-        <h2>弱点・会心判定</h2>
-
-        <table border="1">
-
-            <tr>
-                <th>項目</th>
-                <th>結果</th>
-            </tr>
-
-            <tr>
-
-                <td>物理弱点（45以上）</td>
-
-                <td th:text="${monsterWeakpointResult.physicalWeakpoint
-                    ? '○'
-                    : '-'}">
-                </td>
-
-            </tr>
-
-            <tr>
-
-                <td>主属性弱点（20以上）</td>
-
-                <td th:text="${monsterWeakpointResult.elementWeakpoint
-                    ? '○'
-                    : '-'}">
-                </td>
-
-            </tr>
-
-            <tr th:if="${monsterWeakpointResult.subElemental}">
-
-                <td>副属性弱点（20以上）</td>
-
-                <td th:text="${monsterWeakpointResult.subElementWeakpoint
-                    ? '○'
-                    : '-'}">
-                </td>
-
-            </tr>
-
-            <tr th:if="${criticalModifierResult != null}">
-
-                <td>最終会心率</td>
-
-                <td>
-                    <span th:text="${criticalModifierResult.finalAffinity}">
-                    </span>%
-                </td>
-
-            </tr>
-
-            <tr th:if="${criticalModifierResult != null}">
-
-                <td>プラス会心物理倍率</td>
-
-                <td th:text="${criticalModifierResult.positiveCriticalDamageMul}">
-                </td>
-
-            </tr>
-
-            <tr th:if="${criticalModifierResult != null}">
-
-                <td>会心撃【属性】倍率</td>
-
-                <td th:text="${criticalModifierResult.positiveElementCriticalDamageMul}">
-                </td>
-
-            </tr>
-
-        </table>
-
-    </div>
-
-    <!-- ================================================== -->
-    <!-- 物理肉質適用後 -->
-    <!-- ================================================== -->
-
-    <div th:if="${physicalHitzoneDamageResult != null}">
-
-        <h2>物理肉質適用後</h2>
-
-        <table border="1">
-
-            <tr>
-                <th>項目</th>
-                <th>値</th>
-            </tr>
-
-            <tr>
-                <td>使用物理肉質</td>
-                <td th:text="${physicalHitzoneDamageResult.physicalHitzone}">
-                </td>
-            </tr>
-
-            <tr>
-                <td>非会心・1hit</td>
-                <td th:text="${physicalHitzoneDamageResult.normalPhysicalDamagePerHit}">
-                </td>
-            </tr>
-
-            <tr>
-                <td>プラス会心・1hit</td>
-                <td th:text="${physicalHitzoneDamageResult.positiveCriticalPhysicalDamagePerHit}">
-                </td>
-            </tr>
-
-            <tr>
-                <td>マイナス会心・1hit</td>
-                <td th:text="${physicalHitzoneDamageResult.negativeCriticalPhysicalDamagePerHit}">
-                </td>
-            </tr>
-
-        </table>
-
-    </div>
-
-    <!-- ================================================== -->
-    <!-- 属性肉質適用後 -->
-    <!-- ================================================== -->
-
-    <div th:if="${elementHitzoneDamageResult != null}">
-
-        <h2>属性肉質適用後</h2>
-
-        <table border="1">
-
-            <tr>
-                <th>項目</th>
-                <th>値</th>
-            </tr>
-
-            <tr>
-                <td>使用属性肉質</td>
-                <td th:text="${elementHitzoneDamageResult.elementHitzone}">
-                </td>
-            </tr>
-
-            <tr>
-                <td>弱点特効【属性】倍率</td>
-                <td th:text="${elementHitzoneDamageResult.weakpointElementDamageMul}">
-                </td>
-            </tr>
-
-            <tr>
-                <td>非会心・1hit</td>
-                <td th:text="${elementHitzoneDamageResult.normalElementDamagePerHit}">
-                </td>
-            </tr>
-
-            <tr>
-                <td>プラス会心・1hit</td>
-                <td th:text="${elementHitzoneDamageResult.positiveCriticalElementDamagePerHit}">
-                </td>
-            </tr>
-
-        </table>
-
-    </div>
-
-    <!-- ================================================== -->
-    <!-- 最終ダメージ -->
-    <!-- ================================================== -->
-
-    <div th:if="${finalDamageResult != null}">
-
-        <h2>最終ダメージ</h2>
-
-        <p th:if="${selectedMonster != null
-                   and selectedHitzone != null}">
-
-            対象：
-
-            <strong th:text="${selectedMonster.monsterName}">
-            </strong>
-
-            /
-
-            <strong th:text="${selectedHitzone.partName}">
-            </strong>
-
-        </p>
-
-        <p th:if="${criticalModifierResult != null}">
-
-            最終会心率：
-
-            <strong th:text="${criticalModifierResult.finalAffinity}">
-            </strong>%
-
-        </p>
-
-        <table border="1">
-
-            <tr>
-                <th>パターン</th>
-                <th>物理</th>
-                <th>属性</th>
-                <th>合計</th>
-            </tr>
-
-            <tr>
-
-                <td>非会心</td>
-
-                <td th:text="${finalDamageResult.normalPhysicalDamage}">
-                </td>
-
-                <td th:text="${finalDamageResult.normalElementDamage}">
-                </td>
-
-                <td>
-
-                    <strong th:text="${finalDamageResult.normalTotalDamage}">
-                    </strong>
-
-                </td>
-
-            </tr>
-
-            <tr>
-
-                <td>プラス会心</td>
-
-                <td th:text="${finalDamageResult.positiveCriticalPhysicalDamage}">
-                </td>
-
-                <td th:text="${finalDamageResult.positiveCriticalElementDamage}">
-                </td>
-
-                <td>
-
-                    <strong th:text="${finalDamageResult.positiveCriticalTotalDamage}">
-                    </strong>
-
-                </td>
-
-            </tr>
-
-            <tr>
-
-                <td>マイナス会心</td>
-
-                <td th:text="${finalDamageResult.negativeCriticalPhysicalDamage}">
-                </td>
-
-                <td th:text="${finalDamageResult.negativeCriticalElementDamage}">
-                </td>
-
-                <td>
-
-                    <strong th:text="${finalDamageResult.negativeCriticalTotalDamage}">
-                    </strong>
-
-                </td>
-
-            </tr>
-
-        </table>
-
-    </div>
-
-    <br>
-
-    <!-- ================================================== -->
-    <!-- 最終防御力・属性耐性 -->
-    <!-- ================================================== -->
-
-    <div th:if="${defenseResistanceResult != null}">
-
-        <h2>最終防御力・属性耐性</h2>
-
-        <table border="1">
-
-            <tr>
-                <th>項目</th>
-                <th>最終値</th>
-            </tr>
-
-            <tr>
-                <td>防御力</td>
-                <td>
-                    <strong th:text="${defenseResistanceResult.finalDefense}">
-                    </strong>
-                </td>
-            </tr>
-
-            <tr>
-                <td>火耐性</td>
-                <td>
-                    <strong th:text="${defenseResistanceResult.finalFireRes}">
-                    </strong>
-                </td>
-            </tr>
-
-            <tr>
-                <td>水耐性</td>
-                <td>
-                    <strong th:text="${defenseResistanceResult.finalWaterRes}">
-                    </strong>
-                </td>
-            </tr>
-
-            <tr>
-                <td>雷耐性</td>
-                <td>
-                    <strong th:text="${defenseResistanceResult.finalThunderRes}">
-                    </strong>
-                </td>
-            </tr>
-
-            <tr>
-                <td>氷耐性</td>
-                <td>
-                    <strong th:text="${defenseResistanceResult.finalIceRes}">
-                    </strong>
-                </td>
-            </tr>
-
-            <tr>
-                <td>龍耐性</td>
-                <td>
-                    <strong th:text="${defenseResistanceResult.finalDragonRes}">
-                    </strong>
-                </td>
-            </tr>
-
-        </table>
-
-    </div>
-
-    <br>
-
-    <button type="button"
-            onclick="goWeaponSelect()">
-        武器を選び直す
-    </button>
-
-    <script>
-
-        function preparePresetSave() {
-
-            const form
-                    = document.getElementById(
-                            "presetSaveForm"
-                    );
-
-            if (!form) {
-                return false;
-            }
-
-            form.querySelectorAll(
-                    ".preset-state-hidden"
-            ).forEach(
-                    input => input.remove()
-            );
-
-            const params
-                    = new URLSearchParams(
-                            window.location.search
-                    );
-
-            const excludedNames
-                    = new Set([
-                        "presetName",
-                        "presetSaved",
-                        "presetError",
-                        "_csrf"
-                    ]);
-
-            for (const [name, value] of params.entries()) {
-
-                if (excludedNames.has(name)) {
-                    continue;
-                }
-
-                const input
-                        = document.createElement(
-                                "input"
+                        applyShotSkillDamage(
+                                modelAndView
                         );
-
-                input.type
-                        = "hidden";
-
-                input.name
-                        = name;
-
-                input.value
-                        = value;
-
-                input.className
-                        = "preset-state-hidden";
-
-                form.appendChild(
-                        input
-                );
-            }
-
-            return true;
-        }
-
-
-        document.addEventListener(
-                "DOMContentLoaded",
-                function() {
-
-                    const url
-                            = new URL(
-                                    window.location.href
-                            );
-
-                    const hasPresetMessage
-                            = url.searchParams.has(
-                                    "presetSaved"
-                            )
-                            || url.searchParams.has(
-                                    "presetError"
-                            );
-
-                    if (!hasPresetMessage) {
-                        return;
                     }
-
-                    url.searchParams.delete(
-                            "presetSaved"
-                    );
-
-                    url.searchParams.delete(
-                            "presetError"
-                    );
-
-                    window.history.replaceState(
-                            {},
-                            document.title,
-                            url.toString()
-                    );
                 }
         );
+    }
 
-        function currentUrlFor(path) {
 
-            const url
-                    = new URL(
-                            window.location.href
-                    );
+    private void applyShotSkillDamage(
+            ModelAndView modelAndView) {
 
-            url.pathname
-                    = path;
+        if (modelAndView == null) {
 
-            return url;
+            return;
         }
 
 
-        function goWeaponSelect() {
+        if (!"simulator".equals(
+                modelAndView.getViewName()
+        )) {
 
-            const url
-                    = currentUrlFor(
-                            "/weapon-list"
-                    );
-
-            window.location.href
-                    = url.toString();
+            return;
         }
 
 
-        function goArmorSelect(part) {
-
-            const url
-                    = currentUrlFor(
-                            "/armor-list"
-                    );
-
-            url.searchParams.set(
-                    "part",
-                    part
-            );
-
-            window.location.href
-                    = url.toString();
-        }
+        Map<String, Object> model
+                = modelAndView.getModel();
 
 
-        function goDecorationSelect(
-                target,
-                slotSize) {
-
-            const url
-                    = currentUrlFor(
-                            "/decoration-select"
-                    );
-
-            url.searchParams.set(
-                    "target",
-                    target
-            );
-
-            url.searchParams.set(
-                    "slotSize",
-                    slotSize
-            );
-
-            window.location.href
-                    = url.toString();
-        }
-
-
-        function goRampageDecorationSelect() {
-
-            const url
-                    = currentUrlFor(
-                            "/rampage-decoration-select"
-                    );
-
-            window.location.href
-                    = url.toString();
-        }
-
-
-        function goTalisman() {
-
-            const url
-                    = currentUrlFor(
-                            "/talisman"
-                    );
-
-            window.location.href
-                    = url.toString();
-        }
-
-
-        function removeDecoration(
-                parameterName) {
-
-            const url
-                    = new URL(
-                            window.location.href
-                    );
-
-            url.searchParams.delete(
-                    parameterName
-            );
-
-            window.location.href
-                    = url.toString();
-        }
-
-
-        function selectWeaponAugment(
-                parameterName,
-                level) {
-
-            const url
-                    = new URL(
-                            window.location.href
-                    );
-
-
-            if (level) {
-
-                url.searchParams.set(
-                        parameterName,
-                        level
+        Object weaponObject
+                = model.get(
+                        "weapon"
                 );
 
-            } else {
 
-                url.searchParams.delete(
-                        parameterName
+        if (!(weaponObject
+                instanceof Weapon weapon)) {
+
+            return;
+        }
+
+
+        if (!isShotWeapon(
+                weapon.getWeaponType()
+        )) {
+
+            return;
+        }
+
+
+        Map<Integer, SkillEffectState> resolvedSkillEffects
+                = getResolvedSkillEffects(
+                        model.get(
+                                "resolvedSkillEffects"
+                        )
                 );
+
+
+        ConditionalSkillModifierTotal
+                conditionalSkillModifierTotal
+                = null;
+
+
+        Object conditionalObject
+                = model.get(
+                        "conditionalSkillModifierTotal"
+                );
+
+
+        if (conditionalObject
+                instanceof ConditionalSkillModifierTotal value) {
+
+            conditionalSkillModifierTotal
+                    = value;
+        }
+
+
+        /*
+         * =================================================
+         * 弓 / ボウガン
+         * =================================================
+         */
+        if ("弓".equals(
+                weapon.getWeaponType()
+        )) {
+
+            applyBow(
+                    model,
+                    weapon,
+                    resolvedSkillEffects,
+                    conditionalSkillModifierTotal
+            );
+
+        } else {
+
+            applyBowgun(
+                    model,
+                    weapon,
+                    resolvedSkillEffects,
+                    conditionalSkillModifierTotal
+            );
+
+
+            applyBowgunElementContext(
+                    model,
+                    weapon,
+                    resolvedSkillEffects,
+                    conditionalSkillModifierTotal
+            );
+        }
+
+
+        /*
+         * =================================================
+         * 通常ルート
+         * =================================================
+         */
+        recalculateFinalDamage(
+                model,
+                weapon
+        );
+
+
+        /*
+         * =================================================
+         * 粉塵纏用の補正後攻撃力
+         * =================================================
+         *
+         * 特殊弾では後段で
+         * bowgunPhysicalDamageResultをnullにするため、
+         * その前に確保する。
+         */
+        BigDecimal effectiveAttackForAdditionalDamage
+                = resolveEffectiveAttackForAdditionalDamage(
+                        model,
+                        weapon
+                );
+
+
+        /*
+         * =================================================
+         * ボウガン特殊弾
+         * =================================================
+         */
+        if ("ライトボウガン".equals(
+                weapon.getWeaponType()
+        )
+                || "ヘビィボウガン".equals(
+                        weapon.getWeaponType()
+                )) {
+
+            applyBowgunSpecialFinalDamage(
+                    model,
+                    weapon,
+                    resolvedSkillEffects,
+                    conditionalSkillModifierTotal
+            );
+        }
+
+
+        /*
+         * =================================================
+         * 鬼火纏
+         * 固定追加ダメージ
+         * =================================================
+         */
+        applyFixedAdditionalDamage(
+                model,
+                conditionalSkillModifierTotal
+        );
+
+
+        /*
+         * =================================================
+         * 粉塵纏
+         * 攻撃力参照固定追加ダメージ
+         * =================================================
+         */
+        applyAttackScaledAdditionalDamage(
+                model,
+                resolvedSkillEffects,
+                effectiveAttackForAdditionalDamage
+        );
+    }
+
+
+    /*
+     * =====================================================
+     * 固定追加ダメージ
+     * =====================================================
+     */
+    private void applyFixedAdditionalDamage(
+            Map<String, Object> model,
+            ConditionalSkillModifierTotal
+                    conditionalSkillModifierTotal) {
+
+        if (model == null
+                || conditionalSkillModifierTotal == null
+                || conditionalSkillModifierTotal
+                        .getFixedDamageAdd() == null) {
+
+            return;
+        }
+
+
+        Object finalDamageObject
+                = model.get(
+                        "finalDamageResult"
+                );
+
+
+        if (!(finalDamageObject
+                instanceof FinalDamageResult finalDamageResult)) {
+
+            return;
+        }
+
+
+        finalDamageResult
+                = finalDamageService.addFixedDamage(
+                        finalDamageResult,
+                        conditionalSkillModifierTotal
+                                .getFixedDamageAdd()
+                );
+
+
+        model.put(
+                "finalDamageResult",
+                finalDamageResult
+        );
+    }
+
+
+    /*
+     * =====================================================
+     * 粉塵纏
+     * 攻撃力参照固定追加ダメージ
+     * =====================================================
+     */
+    private void applyAttackScaledAdditionalDamage(
+            Map<String, Object> model,
+            Map<Integer, SkillEffectState> resolvedSkillEffects,
+            BigDecimal effectiveAttack) {
+
+        if (model == null
+                || resolvedSkillEffects == null
+                || resolvedSkillEffects.isEmpty()) {
+
+            return;
+        }
+
+
+        SkillEffectState powderMantleEffect
+                = resolvedSkillEffects.get(
+                        POWDER_MANTLE_SKILL_ID
+                );
+
+
+        if (powderMantleEffect == null) {
+
+            return;
+        }
+
+
+        /*
+         * RED
+         * → 0.30
+         *
+         * BLUE
+         * → 1.25
+         *
+         * INACTIVE
+         * → null
+         */
+        BigDecimal attackMultiplier
+                = powderMantleEffect
+                        .getAdditionalDamageAttackMul();
+
+
+        if (attackMultiplier == null) {
+
+            return;
+        }
+
+
+        Object finalDamageObject
+                = model.get(
+                        "finalDamageResult"
+                );
+
+
+        if (!(finalDamageObject
+                instanceof FinalDamageResult finalDamageResult)) {
+
+            return;
+        }
+
+
+        finalDamageResult
+                = finalDamageService
+                        .addAttackScaledFixedDamage(
+                                finalDamageResult,
+                                effectiveAttack,
+                                attackMultiplier
+                        );
+
+
+        model.put(
+                "finalDamageResult",
+                finalDamageResult
+        );
+    }
+
+
+    /*
+     * =====================================================
+     * 粉塵纏用
+     * 補正後攻撃力取得
+     * =====================================================
+     */
+    private BigDecimal resolveEffectiveAttackForAdditionalDamage(
+            Map<String, Object> model,
+            Weapon weapon) {
+
+        if (model == null
+                || weapon == null) {
+
+            return null;
+        }
+
+
+        if ("弓".equals(
+                weapon.getWeaponType()
+        )) {
+
+            Object resultObject
+                    = model.get(
+                            "bowPhysicalDamageResult"
+                    );
+
+
+            if (resultObject
+                    instanceof BowPhysicalDamageResult result) {
+
+                return result.getEffectiveAttack();
+            }
+        }
+
+
+        if ("ライトボウガン".equals(
+                weapon.getWeaponType()
+        )
+                || "ヘビィボウガン".equals(
+                        weapon.getWeaponType()
+                )) {
+
+            Object physicalResultObject
+                    = model.get(
+                            "bowgunPhysicalDamageResult"
+                    );
+
+
+            if (physicalResultObject
+                    instanceof BowgunPhysicalDamageResult physicalResult
+                    && physicalResult.getEffectiveAttack() != null
+                    && physicalResult.getEffectiveAttack().compareTo(
+                            BigDecimal.ZERO
+                    ) > 0) {
+
+                return physicalResult.getEffectiveAttack();
             }
 
 
-            window.location.href
-                    = url.toString();
-        }
-
-
-        function selectMonster(
-                monsterId) {
-
-            const url
-                    = new URL(
-                            window.location.href
+            /*
+             * 特殊弾では
+             * BowgunPhysicalDamageServiceが通常物理計算を行えず、
+             * effectiveAttackが0のままになる場合がある。
+             *
+             * その場合は特殊弾計算側で保持している
+             * effectiveAttackを使用する。
+             */
+            Object specialResultObject
+                    = model.get(
+                            "bowgunSpecialDamageResult"
                     );
 
 
-            if (monsterId) {
+            if (specialResultObject
+                    instanceof BowgunSpecialDamageResult specialResult
+                    && specialResult.getEffectiveAttack() != null
+                    && specialResult.getEffectiveAttack().compareTo(
+                            BigDecimal.ZERO
+                    ) > 0) {
 
-                url.searchParams.set(
-                        "monsterId",
-                        monsterId
+                return specialResult.getEffectiveAttack();
+            }
+        }
+
+
+        return null;
+    }
+
+
+    /*
+     * =====================================================
+     * 弓
+     * =====================================================
+     */
+    private void applyBow(
+            Map<String, Object> model,
+            Weapon weapon,
+            Map<Integer, SkillEffectState> resolvedSkillEffects,
+            ConditionalSkillModifierTotal
+                    conditionalSkillModifierTotal) {
+
+        Object bowChargeObject
+                = model.get(
+                        "selectedBowCharge"
                 );
 
-            } else {
 
-                url.searchParams.delete(
-                        "monsterId"
+        if (!(bowChargeObject
+                instanceof BowCharge selectedBowCharge)) {
+
+            return;
+        }
+
+
+        /*
+         * =================================================
+         * 竜の一矢
+         * =================================================
+         *
+         * bowAttackType=DRAGON_PIERCER の場合は、
+         * 通常矢ルートへ入れず、
+         * 竜の一矢専用計算へ切り替える。
+         */
+        if (isDragonPiercerSelected(
+                model
+        )) {
+
+            applyBowDragonPiercer(
+                    model,
+                    weapon,
+                    selectedBowCharge,
+                    conditionalSkillModifierTotal
+            );
+
+            return;
+        }
+
+
+        /*
+         * =================================================
+         * 通常矢
+         * =================================================
+         */
+        Object bowPhysicalModifierObject
+                = model.get(
+                        "bowPhysicalModifier"
                 );
+
+
+        if (!(bowPhysicalModifierObject
+                instanceof BowPhysicalModifier bowPhysicalModifier)) {
+
+            return;
+        }
+
+
+        ShotSkillModifier shotSkillModifier
+                = shotSkillModifierService.calculateBow(
+                        selectedBowCharge,
+                        resolvedSkillEffects
+                );
+
+
+        model.put(
+                "shotSkillModifier",
+                shotSkillModifier
+        );
+
+
+        BowPhysicalDamageResult bowPhysicalDamageResult
+                = bowPhysicalDamageService.calculate(
+                        weapon.getAttack(),
+                        bowPhysicalModifier,
+                        conditionalSkillModifierTotal,
+                        shotSkillModifier
+                );
+
+
+        model.put(
+                "bowPhysicalDamageResult",
+                bowPhysicalDamageResult
+        );
+
+
+        /*
+         * 通常矢選択時は
+         * 竜の一矢専用途中値を残さない。
+         */
+        model.put(
+                "bowDragonPiercerModifier",
+                null
+        );
+
+        model.put(
+                "bowDragonPiercerDamageResult",
+                null
+        );
+    }
+
+
+    /*
+     * =====================================================
+     * 弓
+     * 竜の一矢
+     * =====================================================
+     */
+    private void applyBowDragonPiercer(
+            Map<String, Object> model,
+            Weapon weapon,
+            BowCharge selectedBowCharge,
+            ConditionalSkillModifierTotal
+                    conditionalSkillModifierTotal) {
+
+        Object chargeModifierObject
+                = model.get(
+                        "bowChargeModifier"
+                );
+
+
+        if (!(chargeModifierObject
+                instanceof BowChargeModifier bowChargeModifier)) {
+
+            return;
+        }
+
+
+        Object coatingModifierObject
+                = model.get(
+                        "bowCoatingModifier"
+                );
+
+
+        if (!(coatingModifierObject
+                instanceof BowCoatingModifier bowCoatingModifier)) {
+
+            return;
+        }
+
+
+        /*
+         * =================================================
+         * 竜の一矢専用MV
+         * =================================================
+         *
+         * 溜め1 = 28
+         * 溜め2 = 30
+         * 溜め3 = 32
+         * 溜め4 = 34
+         *
+         * 最大7hit
+         */
+        BowDragonPiercerModifier dragonPiercerModifier
+                = bowDragonPiercerModifierService.calculate(
+                        selectedBowCharge.getChargeLevel()
+                );
+
+
+        model.put(
+                "bowDragonPiercerModifier",
+                dragonPiercerModifier
+        );
+
+
+        /*
+         * =================================================
+         * 竜の一矢物理ダメージ
+         * =================================================
+         *
+         * 通常矢用shotMulは使用しない。
+         *
+         * 特殊射撃強化は
+         * ConditionalSkillModifierTotal.specialShotMul
+         * として専用Service内で1回だけ適用する。
+         */
+        BowPhysicalDamageResult dragonPiercerDamageResult
+                = bowDragonPiercerDamageService.calculate(
+                        resolveWeaponAttackForDamage(
+                                model,
+                                weapon
+                        ),
+                        dragonPiercerModifier,
+                        bowChargeModifier,
+                        bowCoatingModifier,
+                        conditionalSkillModifierTotal
+                );
+
+
+        model.put(
+                "bowDragonPiercerDamageResult",
+                dragonPiercerDamageResult
+        );
+
+
+        /*
+         * 既存の肉質・会心・最終ダメージ計算は
+         * bowPhysicalDamageResultを参照するため、
+         * 竜の一矢結果へ差し替える。
+         */
+        model.put(
+                "bowPhysicalDamageResult",
+                dragonPiercerDamageResult
+        );
+
+
+        /*
+         * 竜の一矢には
+         * 通常弾・連射矢強化 / 貫通弾・貫通矢強化 /
+         * 散弾・拡散矢強化を適用しない。
+         */
+        model.put(
+                "shotSkillModifier",
+                null
+        );
+
+
+        /*
+         * =================================================
+         * 竜の一矢属性ダメージ
+         * 最大hit数補正
+         * =================================================
+         *
+         * 1hitあたり属性値はControllerで計算済みの
+         * BowElementDamageResultをそのまま使用できる。
+         *
+         * ただし最大hit数だけは通常矢の本数ではなく、
+         * 竜の一矢の最大7hitへ合わせる。
+         *
+         * 特殊射撃強化は属性には掛けない。
+         */
+        Object elementDamageObject
+                = model.get(
+                        "bowElementDamageResult"
+                );
+
+
+        if (elementDamageObject
+                instanceof BowElementDamageResult elementDamageResult
+                && elementDamageResult.getElementDamagePerHit() != null
+                && dragonPiercerModifier.getMaxHitCount() != null
+                && dragonPiercerModifier.getMaxHitCount() > 0) {
+
+            elementDamageResult.setMaxElementDamage(
+                    elementDamageResult
+                            .getElementDamagePerHit()
+                            .multiply(
+                                    BigDecimal.valueOf(
+                                            dragonPiercerModifier
+                                                    .getMaxHitCount()
+                                    )
+                            )
+            );
+        }
+    }
+
+
+    /*
+     * =====================================================
+     * 竜の一矢選択判定
+     * =====================================================
+     */
+    private boolean isDragonPiercerSelected(
+            Map<String, Object> model) {
+
+        if (model == null) {
+
+            return false;
+        }
+
+
+        Object formObject
+                = model.get(
+                        "simulatorForm"
+                );
+
+
+        if (!(formObject
+                instanceof SimulatorForm simulatorForm)) {
+
+            return false;
+        }
+
+
+        return "DRAGON_PIERCER".equals(
+                simulatorForm.getBowAttackType()
+        );
+    }
+
+
+    /*
+     * =====================================================
+     * 射撃ダメージ計算用攻撃力
+     * =====================================================
+     *
+     * 武器傀異錬成の攻撃力強化がModelへ存在する場合は
+     * その値を優先する。
+     *
+     * 存在しない場合は武器本来の攻撃力へフォールバック。
+     */
+    private Integer resolveWeaponAttackForDamage(
+            Map<String, Object> model,
+            Weapon weapon) {
+
+        if (weapon == null) {
+
+            return null;
+        }
+
+
+        if (model != null) {
+
+            Object augmentedAttackObject
+                    = model.get(
+                            "augmentedWeaponAttack"
+                    );
+
+
+            if (augmentedAttackObject
+                    instanceof Integer augmentedAttack) {
+
+                return augmentedAttack;
+            }
+        }
+
+
+        return weapon.getAttack();
+    }
+
+
+    /*
+     * =====================================================
+     * ボウガン
+     * =====================================================
+     */
+    private void applyBowgun(
+            Map<String, Object> model,
+            Weapon weapon,
+            Map<Integer, SkillEffectState> resolvedSkillEffects,
+            ConditionalSkillModifierTotal
+                    conditionalSkillModifierTotal) {
+
+        Object bowgunAmmoObject
+                = model.get(
+                        "selectedBowgunAmmo"
+                );
+
+
+        if (!(bowgunAmmoObject
+                instanceof BowgunAmmo selectedBowgunAmmo)) {
+
+            return;
+        }
+
+
+        Object ammoModifierObject
+                = model.get(
+                        "bowgunAmmoModifier"
+                );
+
+
+        if (!(ammoModifierObject
+                instanceof BowgunAmmoModifier bowgunAmmoModifier)) {
+
+            return;
+        }
+
+
+        BowgunRapidFireModifier rapidFireModifier
+                = null;
+
+
+        Object rapidFireObject
+                = model.get(
+                        "bowgunRapidFireModifier"
+                );
+
+
+        if (rapidFireObject
+                instanceof BowgunRapidFireModifier value) {
+
+            rapidFireModifier
+                    = value;
+        }
+
+
+        ShotSkillModifier shotSkillModifier
+                = shotSkillModifierService.calculateBowgun(
+                        selectedBowgunAmmo,
+                        resolvedSkillEffects
+                );
+
+
+        model.put(
+                "shotSkillModifier",
+                shotSkillModifier
+        );
+
+
+        /*
+         * 通常物理
+         */
+        BowgunPhysicalDamageResult bowgunPhysicalDamageResult
+                = bowgunPhysicalDamageService.calculate(
+                        weapon.getAttack(),
+                        bowgunAmmoModifier,
+                        conditionalSkillModifierTotal,
+                        rapidFireModifier,
+                        shotSkillModifier
+                );
+
+
+        model.put(
+                "bowgunPhysicalDamageResult",
+                bowgunPhysicalDamageResult
+        );
+
+
+        /*
+         * 通常属性
+         */
+        BowgunElementDamageResult bowgunElementDamageResult
+                = bowgunElementDamageService.calculate(
+                        weapon.getAttack(),
+                        bowgunAmmoModifier,
+                        conditionalSkillModifierTotal,
+                        rapidFireModifier,
+                        shotSkillModifier
+                );
+
+
+        model.put(
+                "bowgunElementDamageResult",
+                bowgunElementDamageResult
+        );
+
+
+        /*
+         * 特殊弾
+         */
+        BowgunSpecialDamageResult bowgunSpecialDamageResult
+                = bowgunSpecialDamageService.calculate(
+                        weapon.getAttack(),
+                        bowgunAmmoModifier,
+                        conditionalSkillModifierTotal,
+                        selectedBowgunAmmo.getAmmoType()
+                );
+
+
+        model.put(
+                "bowgunSpecialDamageResult",
+                bowgunSpecialDamageResult
+        );
+    }
+
+
+    /*
+     * =====================================================
+     * ボウガン特殊弾
+     * 最終ダメージ
+     * =====================================================
+     */
+    private void applyBowgunSpecialFinalDamage(
+            Map<String, Object> model,
+            Weapon weapon,
+            Map<Integer, SkillEffectState> resolvedSkillEffects,
+            ConditionalSkillModifierTotal
+                    conditionalSkillModifierTotal) {
+
+        Object ammoObject
+                = model.get(
+                        "selectedBowgunAmmo"
+                );
+
+
+        if (!(ammoObject
+                instanceof BowgunAmmo selectedBowgunAmmo)) {
+
+            model.put(
+                    "bowgunSpecialFinalDamageResult",
+                    null
+            );
+
+            return;
+        }
+
+
+        if (!isBowgunSpecialDamageAmmo(
+                selectedBowgunAmmo.getAmmoType()
+        )) {
+
+            model.put(
+                    "bowgunSpecialFinalDamageResult",
+                    null
+            );
+
+            return;
+        }
+
+
+        Object specialDamageObject
+                = model.get(
+                        "bowgunSpecialDamageResult"
+                );
+
+
+        if (!(specialDamageObject
+                instanceof BowgunSpecialDamageResult
+                        bowgunSpecialDamageResult)) {
+
+            model.put(
+                    "bowgunSpecialFinalDamageResult",
+                    null
+            );
+
+            return;
+        }
+
+
+        Object hitzoneObject
+                = model.get(
+                        "selectedHitzone"
+                );
+
+
+        if (!(hitzoneObject
+                instanceof MonsterHitzone selectedHitzone)) {
+
+            model.put(
+                    "bowgunSpecialFinalDamageResult",
+                    null
+            );
+
+            return;
+        }
+
+
+        BowgunSpecialFinalDamageResult
+                bowgunSpecialFinalDamageResult
+                = bowgunSpecialFinalDamageService.calculate(
+                        selectedBowgunAmmo,
+                        bowgunSpecialDamageResult,
+                        selectedHitzone,
+                        weapon.getAffinity(),
+                        conditionalSkillModifierTotal,
+                        resolvedSkillEffects
+                );
+
+
+        model.put(
+                "bowgunSpecialFinalDamageResult",
+                bowgunSpecialFinalDamageResult
+        );
+
+
+        FinalDamageResult specialFinalDamageResult
+                = convertSpecialFinalDamageResult(
+                        bowgunSpecialFinalDamageResult
+                );
+
+
+        model.put(
+                "finalDamageResult",
+                specialFinalDamageResult
+        );
+
+
+        hideNormalBowgunDamageBlocksForSpecialAmmo(
+                model
+        );
+    }
+
+
+    /*
+     * =====================================================
+     * 特殊弾選択中
+     * 通常弾用表示を非表示
+     * =====================================================
+     */
+    private void hideNormalBowgunDamageBlocksForSpecialAmmo(
+            Map<String, Object> model) {
+
+        model.put(
+                "bowgunAmmoModifier",
+                null
+        );
+
+        model.put(
+                "bowgunPhysicalDamageResult",
+                null
+        );
+
+        model.put(
+                "bowgunElementDamageResult",
+                null
+        );
+
+        model.put(
+                "physicalHitzoneDamageResult",
+                null
+        );
+
+        model.put(
+                "elementHitzoneDamageResult",
+                null
+        );
+
+        model.put(
+                "bowgunRapidFireModifier",
+                null
+        );
+    }
+
+
+    /*
+     * =====================================================
+     * 特殊弾
+     * FinalDamageResultへ変換
+     * =====================================================
+     */
+    private FinalDamageResult convertSpecialFinalDamageResult(
+            BowgunSpecialFinalDamageResult specialResult) {
+
+        FinalDamageResult result
+                = new FinalDamageResult();
+
+
+        if (specialResult == null) {
+
+            return result;
+        }
+
+
+        BigDecimal normalPhysicalBeforeRound
+                = safeBigDecimal(
+                        specialResult
+                                .getImpactNormalPhysicalDamage()
+                )
+                        .add(
+                                safeBigDecimal(
+                                        specialResult
+                                                .getSecondaryNormalPhysicalDamageTotal()
+                                )
+                        )
+                        .add(
+                                safeBigDecimal(
+                                        specialResult
+                                                .getSecondaryFixedDamageTotal()
+                                )
+                        )
+                        .add(
+                                safeBigDecimal(
+                                        specialResult
+                                                .getAdditionalFixedDamageTotal()
+                                )
+                        );
+
+
+        BigDecimal normalElementBeforeRound
+                = safeBigDecimal(
+                        specialResult
+                                .getSecondaryElementDamageTotal()
+                )
+                        .add(
+                                safeBigDecimal(
+                                        specialResult
+                                                .getAdditionalElementDamageTotal()
+                                )
+                        );
+
+
+        result.setNormalPhysicalDamageBeforeRound(
+                normalPhysicalBeforeRound
+        );
+
+        result.setNormalElementDamageBeforeRound(
+                normalElementBeforeRound
+        );
+
+
+        BigDecimal positivePhysicalBeforeRound
+                = safeBigDecimal(
+                        specialResult
+                                .getImpactPositiveCriticalPhysicalDamage()
+                )
+                        .add(
+                                safeBigDecimal(
+                                        specialResult
+                                                .getSecondaryPositiveCriticalPhysicalDamageTotal()
+                                )
+                        )
+                        .add(
+                                safeBigDecimal(
+                                        specialResult
+                                                .getSecondaryFixedDamageTotal()
+                                )
+                        )
+                        .add(
+                                safeBigDecimal(
+                                        specialResult
+                                                .getAdditionalFixedDamageTotal()
+                                )
+                        );
+
+
+        result.setPositiveCriticalPhysicalDamageBeforeRound(
+                positivePhysicalBeforeRound
+        );
+
+        result.setPositiveCriticalElementDamageBeforeRound(
+                normalElementBeforeRound
+        );
+
+
+        BigDecimal negativePhysicalBeforeRound
+                = safeBigDecimal(
+                        specialResult
+                                .getImpactNegativeCriticalPhysicalDamage()
+                )
+                        .add(
+                                safeBigDecimal(
+                                        specialResult
+                                                .getSecondaryNegativeCriticalPhysicalDamageTotal()
+                                )
+                        )
+                        .add(
+                                safeBigDecimal(
+                                        specialResult
+                                                .getSecondaryFixedDamageTotal()
+                                )
+                        )
+                        .add(
+                                safeBigDecimal(
+                                        specialResult
+                                                .getAdditionalFixedDamageTotal()
+                                )
+                        );
+
+
+        result.setNegativeCriticalPhysicalDamageBeforeRound(
+                negativePhysicalBeforeRound
+        );
+
+
+        result.setNormalPhysicalDamage(
+                safeInteger(
+                        specialResult
+                                .getNormalPhysicalDamage()
+                )
+        );
+
+        result.setNormalElementDamage(
+                safeInteger(
+                        specialResult
+                                .getNormalElementDamage()
+                )
+        );
+
+        result.setNormalTotalDamage(
+                safeInteger(
+                        specialResult
+                                .getNormalTotalDamage()
+                )
+        );
+
+
+        result.setPositiveCriticalPhysicalDamage(
+                safeInteger(
+                        specialResult
+                                .getPositiveCriticalPhysicalDamage()
+                )
+        );
+
+        result.setPositiveCriticalElementDamage(
+                safeInteger(
+                        specialResult
+                                .getPositiveCriticalElementDamage()
+                )
+        );
+
+        result.setPositiveCriticalTotalDamage(
+                safeInteger(
+                        specialResult
+                                .getPositiveCriticalTotalDamage()
+                )
+        );
+
+
+        result.setNegativeCriticalPhysicalDamage(
+                safeInteger(
+                        specialResult
+                                .getNegativeCriticalPhysicalDamage()
+                )
+        );
+
+        result.setNegativeCriticalElementDamage(
+                safeInteger(
+                        specialResult
+                                .getNegativeCriticalElementDamage()
+                )
+        );
+
+        result.setNegativeCriticalTotalDamage(
+                safeInteger(
+                        specialResult
+                                .getNegativeCriticalTotalDamage()
+                )
+        );
+
+
+        return result;
+    }
+
+
+    /*
+     * =====================================================
+     * ボウガン属性弾
+     * 属性コンテキスト
+     * =====================================================
+     */
+    private void applyBowgunElementContext(
+            Map<String, Object> model,
+            Weapon weapon,
+            Map<Integer, SkillEffectState> resolvedSkillEffects,
+            ConditionalSkillModifierTotal
+                    conditionalSkillModifierTotal) {
+
+        Object ammoObject
+                = model.get(
+                        "selectedBowgunAmmo"
+                );
+
+
+        if (!(ammoObject
+                instanceof BowgunAmmo selectedBowgunAmmo)) {
+
+            return;
+        }
+
+
+        String ammoElementType
+                = resolveBowgunAmmoElementType(
+                        selectedBowgunAmmo
+                                .getAmmoType()
+                );
+
+
+        if (ammoElementType == null) {
+
+            return;
+        }
+
+
+        Object selectedHitzoneObject
+                = model.get(
+                        "selectedHitzone"
+                );
+
+
+        if (!(selectedHitzoneObject
+                instanceof MonsterHitzone selectedHitzone)) {
+
+            return;
+        }
+
+
+        Object hitzoneValueObject
+                = model.get(
+                        "monsterHitzoneValueResult"
+                );
+
+
+        if (!(hitzoneValueObject
+                instanceof MonsterHitzoneValueResult
+                        hitzoneValueResult)) {
+
+            return;
+        }
+
+
+        hitzoneValueResult.setElementType(
+                ammoElementType
+        );
+
+        hitzoneValueResult.setElemental(
+                true
+        );
+
+        hitzoneValueResult.setElementHitzone(
+                resolveElementHitzone(
+                        ammoElementType,
+                        selectedHitzone
+                )
+        );
+
+
+        model.put(
+                "monsterHitzoneValueResult",
+                hitzoneValueResult
+        );
+
+
+        MonsterWeakpointResult monsterWeakpointResult
+                = monsterWeakpointService.calculate(
+                        hitzoneValueResult
+                );
+
+
+        model.put(
+                "monsterWeakpointResult",
+                monsterWeakpointResult
+        );
+
+
+        WeakpointSkillModifier weakpointSkillModifier
+                = weakpointSkillModifierService.calculate(
+                        monsterWeakpointResult,
+                        resolvedSkillEffects
+                );
+
+
+        model.put(
+                "weakpointSkillModifier",
+                weakpointSkillModifier
+        );
+
+
+        CriticalModifierResult criticalModifierResult
+                = criticalModifierService.calculate(
+                        weapon.getAffinity(),
+                        conditionalSkillModifierTotal,
+                        weakpointSkillModifier
+                );
+
+
+        model.put(
+                "criticalModifierResult",
+                criticalModifierResult
+        );
+    }
+
+
+    /*
+     * =====================================================
+     * ボウガン弾 → 属性
+     * =====================================================
+     */
+    private String resolveBowgunAmmoElementType(
+            String ammoType) {
+
+        if (ammoType == null) {
+
+            return null;
+        }
+
+
+        switch (ammoType) {
+
+        case "火炎弾":
+        case "貫通火炎弾":
+
+            return "火";
+
+
+        case "水冷弾":
+        case "貫通水冷弾":
+
+            return "水";
+
+
+        case "電撃弾":
+        case "貫通電撃弾":
+
+            return "雷";
+
+
+        case "氷結弾":
+        case "貫通氷結弾":
+
+            return "氷";
+
+
+        case "滅龍弾":
+        case "貫通滅龍弾":
+
+            return "龍";
+
+
+        default:
+
+            return null;
+        }
+    }
+
+
+    /*
+     * =====================================================
+     * 特殊弾判定
+     * =====================================================
+     */
+    private boolean isBowgunSpecialDamageAmmo(
+            String ammoType) {
+
+        if (ammoType == null) {
+
+            return false;
+        }
+
+
+        return "斬裂弾".equals(
+                ammoType
+        )
+                || "徹甲榴弾".equals(
+                        ammoType
+                )
+                || "拡散弾".equals(
+                        ammoType
+                )
+                || "竜撃弾".equals(
+                        ammoType
+                );
+    }
+
+
+    /*
+     * =====================================================
+     * 属性肉質
+     * =====================================================
+     */
+    private int resolveElementHitzone(
+            String elementType,
+            MonsterHitzone hitzone) {
+
+        if (elementType == null
+                || hitzone == null) {
+
+            return 0;
+        }
+
+
+        Integer value;
+
+
+        switch (elementType) {
+
+        case "火":
+
+            value = hitzone.getFire();
+
+            break;
+
+
+        case "水":
+
+            value = hitzone.getWater();
+
+            break;
+
+
+        case "雷":
+
+            value = hitzone.getThunder();
+
+            break;
+
+
+        case "氷":
+
+            value = hitzone.getIce();
+
+            break;
+
+
+        case "龍":
+
+            value = hitzone.getDragon();
+
+            break;
+
+
+        default:
+
+            value = 0;
+
+            break;
+        }
+
+
+        return value == null
+                ? 0
+                : value;
+    }
+
+
+    /*
+     * =====================================================
+     * 通常射撃
+     * 最終ダメージ再計算
+     * =====================================================
+     */
+    private void recalculateFinalDamage(
+            Map<String, Object> model,
+            Weapon weapon) {
+
+        MonsterHitzoneValueResult
+                monsterHitzoneValueResult
+                = null;
+
+
+        Object hitzoneObject
+                = model.get(
+                        "monsterHitzoneValueResult"
+                );
+
+
+        if (hitzoneObject
+                instanceof MonsterHitzoneValueResult value) {
+
+            monsterHitzoneValueResult
+                    = value;
+        }
+
+
+        if (monsterHitzoneValueResult == null) {
+
+            return;
+        }
+
+
+        CriticalModifierResult criticalModifierResult
+                = null;
+
+
+        Object criticalObject
+                = model.get(
+                        "criticalModifierResult"
+                );
+
+
+        if (criticalObject
+                instanceof CriticalModifierResult value) {
+
+            criticalModifierResult
+                    = value;
+        }
+
+
+        if (criticalModifierResult == null) {
+
+            return;
+        }
+
+
+        WeakpointSkillModifier weakpointSkillModifier
+                = null;
+
+
+        Object weakpointObject
+                = model.get(
+                        "weakpointSkillModifier"
+                );
+
+
+        if (weakpointObject
+                instanceof WeakpointSkillModifier value) {
+
+            weakpointSkillModifier
+                    = value;
+        }
+
+
+        /*
+         * =================================================
+         * 肉質前物理
+         * =================================================
+         */
+        BigDecimal physicalDamageBeforeHitzone
+                = null;
+
+
+        if ("弓".equals(
+                weapon.getWeaponType()
+        )) {
+
+            Object resultObject
+                    = model.get(
+                            "bowPhysicalDamageResult"
+                    );
+
+
+            if (resultObject
+                    instanceof BowPhysicalDamageResult result) {
+
+                physicalDamageBeforeHitzone
+                        = result.getPhysicalDamagePerHit();
+            }
+
+        } else if ("ライトボウガン".equals(
+                weapon.getWeaponType()
+        )
+                || "ヘビィボウガン".equals(
+                        weapon.getWeaponType()
+                )) {
+
+            Object resultObject
+                    = model.get(
+                            "bowgunPhysicalDamageResult"
+                    );
+
+
+            if (resultObject
+                    instanceof BowgunPhysicalDamageResult result) {
+
+                physicalDamageBeforeHitzone
+                        = result.getPhysicalDamagePerHit();
+            }
+        }
+
+
+        PhysicalHitzoneDamageResult
+                physicalHitzoneDamageResult
+                = null;
+
+
+        if (physicalDamageBeforeHitzone != null) {
+
+            physicalHitzoneDamageResult
+                    = physicalHitzoneDamageService.calculate(
+                            physicalDamageBeforeHitzone,
+                            monsterHitzoneValueResult
+                                    .getPhysicalHitzone(),
+                            criticalModifierResult
+                    );
+        }
+
+
+        model.put(
+                "physicalHitzoneDamageResult",
+                physicalHitzoneDamageResult
+        );
+
+
+        /*
+         * =================================================
+         * 肉質前属性
+         * =================================================
+         */
+        BigDecimal elementDamageBeforeHitzone
+                = null;
+
+
+        if ("弓".equals(
+                weapon.getWeaponType()
+        )) {
+
+            Object resultObject
+                    = model.get(
+                            "bowElementDamageResult"
+                    );
+
+
+            if (resultObject
+                    instanceof BowElementDamageResult result) {
+
+                elementDamageBeforeHitzone
+                        = result.getElementDamagePerHit();
+            }
+
+        } else {
+
+            Object resultObject
+                    = model.get(
+                            "bowgunElementDamageResult"
+                    );
+
+
+            if (resultObject
+                    instanceof BowgunElementDamageResult result) {
+
+                elementDamageBeforeHitzone
+                        = result.getElementDamagePerHit();
+            }
+        }
+
+
+        ElementHitzoneDamageResult
+                elementHitzoneDamageResult
+                = null;
+
+
+        if (elementDamageBeforeHitzone != null
+                && monsterHitzoneValueResult
+                        .isElemental()) {
+
+            BigDecimal weakpointElementDamageMul
+                    = BigDecimal.ONE;
+
+
+            if (weakpointSkillModifier != null
+                    && weakpointSkillModifier
+                            .getMainElementDamageMul() != null) {
+
+                weakpointElementDamageMul
+                        = weakpointSkillModifier
+                                .getMainElementDamageMul();
             }
 
 
-            url.searchParams.delete(
-                    "hitzoneId"
-            );
-
-
-            window.location.href
-                    = url.toString();
+            elementHitzoneDamageResult
+                    = elementHitzoneDamageService.calculate(
+                            elementDamageBeforeHitzone,
+                            monsterHitzoneValueResult
+                                    .getElementHitzone(),
+                            weakpointElementDamageMul,
+                            criticalModifierResult
+                    );
         }
 
 
-        function selectHitzone(
-                hitzoneId) {
+        model.put(
+                "elementHitzoneDamageResult",
+                elementHitzoneDamageResult
+        );
 
-            const url
-                    = new URL(
-                            window.location.href
+
+        /*
+         * =================================================
+         * 最終
+         * =================================================
+         */
+        FinalDamageResult finalDamageResult
+                = null;
+
+
+        if (physicalHitzoneDamageResult != null
+                || elementHitzoneDamageResult != null) {
+
+            finalDamageResult
+                    = finalDamageService.calculate(
+                            physicalHitzoneDamageResult,
+                            elementHitzoneDamageResult
                     );
+        }
 
 
-            if (hitzoneId) {
+        model.put(
+                "finalDamageResult",
+                finalDamageResult
+        );
+    }
 
-                url.searchParams.set(
-                        "hitzoneId",
-                        hitzoneId
-                );
 
-            } else {
+    /*
+     * =====================================================
+     * resolvedSkillEffects
+     * =====================================================
+     */
+    @SuppressWarnings("unchecked")
+    private Map<Integer, SkillEffectState>
+            getResolvedSkillEffects(
+                    Object value) {
 
-                url.searchParams.delete(
-                        "hitzoneId"
-                );
+        if (!(value instanceof Map<?, ?> map)) {
+
+            return Map.of();
+        }
+
+
+        for (Map.Entry<?, ?> entry
+                : map.entrySet()) {
+
+            if (!(entry.getKey()
+                    instanceof Integer)) {
+
+                return Map.of();
             }
 
 
-            window.location.href
-                    = url.toString();
+            if (!(entry.getValue()
+                    instanceof SkillEffectState)) {
+
+                return Map.of();
+            }
         }
 
 
-        function selectBowgunAmmo(
-                bowgunAmmoId) {
+        return (Map<Integer, SkillEffectState>) value;
+    }
 
-            const url
-                    = new URL(
-                            window.location.href
-                    );
 
-            url.searchParams.set(
-                    "bowgunAmmoId",
-                    bowgunAmmoId
-            );
+    private BigDecimal safeBigDecimal(
+            BigDecimal value) {
 
-            window.location.href
-                    = url.toString();
+        return value == null
+                ? BigDecimal.ZERO
+                : value;
+    }
+
+
+    private int safeInteger(
+            Integer value) {
+
+        return value == null
+                ? 0
+                : value;
+    }
+
+
+    /*
+     * =====================================================
+     * 射撃武器判定
+     * =====================================================
+     */
+    private boolean isShotWeapon(
+            String weaponType) {
+
+        if (weaponType == null) {
+
+            return false;
         }
 
 
-        function selectBowCharge(
-                bowChargeId) {
+        return "弓".equals(
+                weaponType
+        )
+                || "ライトボウガン".equals(
+                        weaponType
+                )
+                || "ヘビィボウガン".equals(
+                        weaponType
+                );
+    }
+}
 
-            const url
-                    = new URL(
-                            window.location.href
-                    );
-
-            url.searchParams.set(
-                    "bowChargeId",
-                    bowChargeId
-            );
-
-            window.location.href
-                    = url.toString();
-        }
-
-
-        function selectBowCoating(
-                bowCoatingId) {
-
-            const url
-                    = new URL(
-                            window.location.href
-                    );
-
-            url.searchParams.set(
-                    "bowCoatingId",
-                    bowCoatingId
-            );
-
-            window.location.href
-                    = url.toString();
-        }
-
-
-        function clearBowCoating() {
-
-            const url
-                    = new URL(
-                            window.location.href
-                    );
-
-            url.searchParams.delete(
-                    "bowCoatingId"
-            );
-
-            window.location.href
-                    = url.toString();
-        }
-
-
-        function selectSkillState(
-                parameterName,
-                stateCode) {
-
-            const url
-                    = new URL(
-                            window.location.href
-                    );
-
-            url.searchParams.set(
-                    parameterName,
-                    stateCode
-            );
-
-            window.location.href
-                    = url.toString();
-        }
-
-    </script>
-
-</body>
-</html>

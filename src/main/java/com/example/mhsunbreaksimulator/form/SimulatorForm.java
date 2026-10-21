@@ -34,6 +34,27 @@ public class SimulatorForm {
     // 斬れ味強化Lv
     private Integer weaponAugmentSharpnessLevel;
 
+    /*
+     * =====================================================
+     * 弓
+     * =====================================================
+     */
+
+    /*
+     * 弓の攻撃種別
+     *
+     * NORMAL
+     * → 通常矢
+     *
+     * DRAGON_PIERCER
+     * → 竜の一矢
+     *
+     * 既存URLとの互換性のため、
+     * パラメータ未指定時はNORMAL。
+     */
+    private String bowAttackType
+            = "NORMAL";
+
     // 弓の選択中溜め段階
     private Integer bowChargeId;
 
