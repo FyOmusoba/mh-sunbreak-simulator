@@ -61,6 +61,55 @@ public class SimulatorForm {
     // 弓の選択中ビン
     private Integer bowCoatingId;
 
+    /*
+     * =====================================================
+     * ボウガン
+     * =====================================================
+     */
+
+    /*
+     * ボウガンの攻撃種別
+     *
+     * NORMAL_AMMO
+     * → 通常の弾選択
+     *
+     * WYVERNBLAST
+     * → ライトボウガン・起爆竜弾
+     *
+     * 将来的に
+     *
+     * WYVERNHEART
+     * → ヘビィボウガン・機関竜弾
+     *
+     * WYVERNSNIPE
+     * → ヘビィボウガン・狙撃竜弾
+     *
+     * を追加する。
+     *
+     * 既存URLとの互換性のため、
+     * パラメータ未指定時はNORMAL_AMMO。
+     */
+    private String bowgunAttackType
+            = "NORMAL_AMMO";
+
+    /*
+     * 起爆竜弾の爆発段階
+     *
+     * SMALL
+     * → 小爆発
+     *
+     * MEDIUM
+     * → 中爆発
+     *
+     * LARGE
+     * → 大爆発
+     *
+     * 起爆竜弾選択時の初期値は
+     * LARGEとする。
+     */
+    private String wyvernblastExplosionSize
+            = "LARGE";
+
     // ボウガンの選択中弾
     private Integer bowgunAmmoId;
 
