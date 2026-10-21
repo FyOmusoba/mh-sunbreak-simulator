@@ -235,6 +235,70 @@ public class ShotDamageWebConfig
                     conditionalSkillModifierTotal
             );
         }
+
+
+        /*
+         * 通常射撃・特殊弾のどちらでも、
+         * 最後に固定追加ダメージを1回だけ加算する。
+         */
+        applyFixedAdditionalDamage(
+                model,
+                conditionalSkillModifierTotal
+        );
+    }
+
+
+    /*
+     * =====================================================
+     * 固定追加ダメージ
+     * =====================================================
+     *
+     * 鬼火纏の鬼火爆発など、
+     * 肉質・会心の影響を受けない固定ダメージを
+     * 現在の最終ダメージへ追加する。
+     *
+     * この処理は通常射撃計算・特殊弾差し替えの
+     * 両方が終わった後に1回だけ呼ぶ。
+     */
+    private void applyFixedAdditionalDamage(
+            Map<String, Object> model,
+            ConditionalSkillModifierTotal
+                    conditionalSkillModifierTotal) {
+
+        if (model == null
+                || conditionalSkillModifierTotal == null
+                || conditionalSkillModifierTotal
+                        .getFixedDamageAdd() == null) {
+
+            return;
+        }
+
+
+        Object finalDamageObject
+                = model.get(
+                        "finalDamageResult"
+                );
+
+
+        if (!(finalDamageObject
+                instanceof FinalDamageResult finalDamageResult)) {
+
+            return;
+        }
+
+
+        finalDamageResult
+                = finalDamageService.addFixedDamage(
+                        finalDamageResult,
+                        conditionalSkillModifierTotal
+                                .getFixedDamageAdd()
+                );
+
+
+        model.put(
+                "finalDamageResult",
+                finalDamageResult
+        );
     }
 
 

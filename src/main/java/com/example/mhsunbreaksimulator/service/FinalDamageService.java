@@ -16,31 +16,6 @@ public class FinalDamageService {
      * =====================================================
      * 最終ダメージ計算
      * =====================================================
-     *
-     * 物理ダメージ
-     * ＋
-     * 属性ダメージ
-     *
-     * を最終的な表示値へ変換する。
-     *
-     *
-     * 流れ：
-     *
-     * 1.
-     * 物理を四捨五入
-     *
-     * 2.
-     * 属性を四捨五入
-     *
-     * 3.
-     * 両方を加算
-     *
-     *
-     * 非会心
-     * プラス会心
-     * マイナス会心
-     *
-     * の3パターンをそれぞれ計算する。
      */
     public FinalDamageResult calculate(
             PhysicalHitzoneDamageResult physicalResult,
@@ -55,11 +30,6 @@ public class FinalDamageService {
          * 非会心
          * =================================================
          */
-
-
-        /*
-         * 四捨五入前の物理。
-         */
         BigDecimal normalPhysicalBeforeRound
                 = physicalResult == null
                         ? BigDecimal.ZERO
@@ -69,9 +39,6 @@ public class FinalDamageService {
                         );
 
 
-        /*
-         * 四捨五入前の属性。
-         */
         BigDecimal normalElementBeforeRound
                 = elementResult == null
                         ? BigDecimal.ZERO
@@ -90,10 +57,6 @@ public class FinalDamageService {
         );
 
 
-        /*
-         * 物理・属性を
-         * それぞれ個別に四捨五入する。
-         */
         int normalPhysicalDamage
                 = roundDamage(
                         normalPhysicalBeforeRound
@@ -115,9 +78,6 @@ public class FinalDamageService {
         );
 
 
-        /*
-         * 四捨五入後に合算。
-         */
         result.setNormalTotalDamage(
                 normalPhysicalDamage
                         + normalElementDamage
@@ -129,12 +89,6 @@ public class FinalDamageService {
          * プラス会心
          * =================================================
          */
-
-
-        /*
-         * 四捨五入前の
-         * プラス会心物理ダメージ。
-         */
         BigDecimal positiveCriticalPhysicalBeforeRound
                 = physicalResult == null
                         ? BigDecimal.ZERO
@@ -144,13 +98,6 @@ public class FinalDamageService {
                         );
 
 
-        /*
-         * 四捨五入前の
-         * プラス会心属性ダメージ。
-         *
-         * 会心撃【属性】がなければ、
-         * 通常属性ダメージと同じ値になる。
-         */
         BigDecimal positiveCriticalElementBeforeRound
                 = elementResult == null
                         ? BigDecimal.ZERO
@@ -169,10 +116,6 @@ public class FinalDamageService {
         );
 
 
-        /*
-         * 物理・属性を
-         * 個別に四捨五入。
-         */
         int positiveCriticalPhysicalDamage
                 = roundDamage(
                         positiveCriticalPhysicalBeforeRound
@@ -194,9 +137,6 @@ public class FinalDamageService {
         );
 
 
-        /*
-         * 四捨五入後に合算。
-         */
         result.setPositiveCriticalTotalDamage(
                 positiveCriticalPhysicalDamage
                         + positiveCriticalElementDamage
@@ -207,12 +147,6 @@ public class FinalDamageService {
          * =================================================
          * マイナス会心
          * =================================================
-         */
-
-
-        /*
-         * マイナス会心では
-         * 物理側のみ0.75倍された値を使用する。
          */
         BigDecimal negativeCriticalPhysicalBeforeRound
                 = physicalResult == null
@@ -234,10 +168,6 @@ public class FinalDamageService {
                 );
 
 
-        /*
-         * 属性部分はマイナス会心で減少しないため、
-         * 通常属性ダメージを使用する。
-         */
         int negativeCriticalElementDamage
                 = normalElementDamage;
 
@@ -263,17 +193,217 @@ public class FinalDamageService {
 
     /*
      * =====================================================
-     * ダメージ四捨五入
+     * 固定追加ダメージ
      * =====================================================
      *
-     * 55.49
-     * → 55
+     * 鬼火纏など。
      *
-     * 55.50
-     * → 56
+     * 肉質・会心の影響を受けない固定値を
+     * 最終ダメージへ加算する。
+     */
+    public FinalDamageResult addFixedDamage(
+            FinalDamageResult result,
+            BigDecimal fixedDamageAdd) {
+
+        if (result == null) {
+
+            return null;
+        }
+
+
+        BigDecimal fixedDamage
+                = safeDamage(
+                        fixedDamageAdd
+                );
+
+
+        if (fixedDamage.compareTo(
+                BigDecimal.ZERO
+        ) == 0) {
+
+            return result;
+        }
+
+
+        int roundedFixedDamage
+                = roundDamage(
+                        fixedDamage
+                );
+
+
+        /*
+         * 非会心
+         */
+        result.setNormalPhysicalDamageBeforeRound(
+                safeDamage(
+                        result.getNormalPhysicalDamageBeforeRound()
+                )
+                        .add(
+                                fixedDamage
+                        )
+        );
+
+
+        result.setNormalPhysicalDamage(
+                safeInteger(
+                        result.getNormalPhysicalDamage()
+                )
+                        + roundedFixedDamage
+        );
+
+
+        result.setNormalTotalDamage(
+                safeInteger(
+                        result.getNormalTotalDamage()
+                )
+                        + roundedFixedDamage
+        );
+
+
+        /*
+         * プラス会心
+         */
+        result.setPositiveCriticalPhysicalDamageBeforeRound(
+                safeDamage(
+                        result.getPositiveCriticalPhysicalDamageBeforeRound()
+                )
+                        .add(
+                                fixedDamage
+                        )
+        );
+
+
+        result.setPositiveCriticalPhysicalDamage(
+                safeInteger(
+                        result.getPositiveCriticalPhysicalDamage()
+                )
+                        + roundedFixedDamage
+        );
+
+
+        result.setPositiveCriticalTotalDamage(
+                safeInteger(
+                        result.getPositiveCriticalTotalDamage()
+                )
+                        + roundedFixedDamage
+        );
+
+
+        /*
+         * マイナス会心
+         */
+        result.setNegativeCriticalPhysicalDamageBeforeRound(
+                safeDamage(
+                        result.getNegativeCriticalPhysicalDamageBeforeRound()
+                )
+                        .add(
+                                fixedDamage
+                        )
+        );
+
+
+        result.setNegativeCriticalPhysicalDamage(
+                safeInteger(
+                        result.getNegativeCriticalPhysicalDamage()
+                )
+                        + roundedFixedDamage
+        );
+
+
+        result.setNegativeCriticalTotalDamage(
+                safeInteger(
+                        result.getNegativeCriticalTotalDamage()
+                )
+                        + roundedFixedDamage
+        );
+
+
+        return result;
+    }
+
+
+    /*
+     * =====================================================
+     * 攻撃力参照固定追加ダメージ
+     * =====================================================
      *
-     * 55.5525
-     * → 56
+     * 粉塵纏など。
+     *
+     * 補正後攻撃力
+     * ×
+     * 追加ダメージ倍率
+     *
+     * で固定追加ダメージを計算する。
+     *
+     *
+     * 例：
+     *
+     * 攻撃力350
+     *
+     * 赤粉塵
+     * 350 × 0.30
+     * = 105
+     *
+     * 青粉塵
+     * 350 × 1.25
+     * = 437.5
+     * → 438
+     *
+     *
+     * 計算した値は
+     * 肉質・会心の影響を受けない。
+     */
+    public FinalDamageResult addAttackScaledFixedDamage(
+            FinalDamageResult result,
+            BigDecimal effectiveAttack,
+            BigDecimal attackMultiplier) {
+
+        if (result == null) {
+
+            return null;
+        }
+
+
+        /*
+         * 状態未発動時は
+         * multiplierをnullで渡す。
+         */
+        if (effectiveAttack == null
+                || attackMultiplier == null) {
+
+            return result;
+        }
+
+
+        if (effectiveAttack.compareTo(
+                BigDecimal.ZERO
+        ) <= 0
+                || attackMultiplier.compareTo(
+                        BigDecimal.ZERO
+                ) <= 0) {
+
+            return result;
+        }
+
+
+        BigDecimal additionalDamage
+                = effectiveAttack
+                        .multiply(
+                                attackMultiplier
+                        );
+
+
+        return addFixedDamage(
+                result,
+                additionalDamage
+        );
+    }
+
+
+    /*
+     * =====================================================
+     * ダメージ四捨五入
+     * =====================================================
      */
     private int roundDamage(
             BigDecimal damage) {
@@ -295,7 +425,7 @@ public class FinalDamageService {
 
     /*
      * =====================================================
-     * null対策
+     * BigDecimal null対策
      * =====================================================
      */
     private BigDecimal safeDamage(
@@ -304,5 +434,19 @@ public class FinalDamageService {
         return damage == null
                 ? BigDecimal.ZERO
                 : damage;
+    }
+
+
+    /*
+     * =====================================================
+     * Integer null対策
+     * =====================================================
+     */
+    private int safeInteger(
+            Integer value) {
+
+        return value == null
+                ? 0
+                : value;
     }
 }

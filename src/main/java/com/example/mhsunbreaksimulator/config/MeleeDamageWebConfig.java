@@ -23,6 +23,7 @@ import com.example.mhsunbreaksimulator.dto.SharpnessModifier;
 import com.example.mhsunbreaksimulator.dto.WeakpointSkillModifier;
 import com.example.mhsunbreaksimulator.dto.WeaponAugmentModifier;
 import com.example.mhsunbreaksimulator.entity.MonsterHitzone;
+import com.example.mhsunbreaksimulator.entity.SkillEffectState;
 import com.example.mhsunbreaksimulator.entity.Weapon;
 import com.example.mhsunbreaksimulator.entity.WeaponTypeAttack;
 import com.example.mhsunbreaksimulator.service.ElementHitzoneDamageService;
@@ -38,6 +39,16 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class MeleeDamageWebConfig
         implements WebMvcConfigurer {
+
+    /*
+     * =====================================================
+     * スキルID
+     * =====================================================
+     */
+
+    private static final int POWDER_MANTLE_SKILL_ID
+            = 74;
+
 
     private final WeaponTypeAttackService weaponTypeAttackService;
 
@@ -167,11 +178,6 @@ public class MeleeDamageWebConfig
         }
 
 
-        /*
-         * selectedHitzoneが取得できた時点で
-         * nullではないが、
-         * 明示的に参照しておく。
-         */
         if (selectedHitzone == null) {
 
             return;
@@ -199,6 +205,32 @@ public class MeleeDamageWebConfig
             conditionalSkillModifierTotal
                     = value;
         }
+
+
+        /*
+         * =================================================
+         * 解決済みスキル効果
+         * =================================================
+         *
+         * 粉塵纏は、
+         * aggregate後のadditionalDamageAttackMulではなく
+         * 選択されたSkillEffectStateを直接使用する。
+         *
+         * INACTIVE
+         * → multiplier = null
+         *
+         * RED
+         * → 0.30
+         *
+         * BLUE
+         * → 1.25
+         */
+        Map<Integer, SkillEffectState> resolvedSkillEffects
+                = getResolvedSkillEffects(
+                        model.get(
+                                "resolvedSkillEffects"
+                        )
+                );
 
 
         /*
@@ -468,10 +500,135 @@ public class MeleeDamageWebConfig
                 );
 
 
+        /*
+         * =================================================
+         * 固定追加ダメージ
+         * 鬼火纏など
+         * =================================================
+         */
+        BigDecimal fixedDamageAdd
+                = conditionalSkillModifierTotal == null
+                        || conditionalSkillModifierTotal
+                                .getFixedDamageAdd() == null
+
+                                ? BigDecimal.ZERO
+                                : conditionalSkillModifierTotal
+                                        .getFixedDamageAdd();
+
+
+        finalDamageResult
+                = finalDamageService.addFixedDamage(
+                        finalDamageResult,
+                        fixedDamageAdd
+                );
+
+
+        /*
+         * =================================================
+         * 攻撃力参照固定追加ダメージ
+         * 粉塵纏
+         * =================================================
+         */
+        BigDecimal powderMantleAttackMultiplier
+                = resolvePowderMantleAttackMultiplier(
+                        resolvedSkillEffects
+                );
+
+
+        finalDamageResult
+                = finalDamageService
+                        .addAttackScaledFixedDamage(
+                                finalDamageResult,
+                                meleeDamageResult
+                                        .getEffectiveAttack(),
+                                powderMantleAttackMultiplier
+                        );
+
+
         model.put(
                 "finalDamageResult",
                 finalDamageResult
         );
+    }
+
+
+    /*
+     * =====================================================
+     * 粉塵纏
+     * 攻撃力参照倍率
+     * =====================================================
+     */
+    private BigDecimal resolvePowderMantleAttackMultiplier(
+            Map<Integer, SkillEffectState> resolvedSkillEffects) {
+
+        if (resolvedSkillEffects == null
+                || resolvedSkillEffects.isEmpty()) {
+
+            return null;
+        }
+
+
+        SkillEffectState powderMantleEffect
+                = resolvedSkillEffects.get(
+                        POWDER_MANTLE_SKILL_ID
+                );
+
+
+        if (powderMantleEffect == null) {
+
+            return null;
+        }
+
+
+        /*
+         * INACTIVEではDB値がnull。
+         *
+         * RED
+         * → 0.30
+         *
+         * BLUE
+         * → 1.25
+         */
+        return powderMantleEffect
+                .getAdditionalDamageAttackMul();
+    }
+
+
+    /*
+     * =====================================================
+     * resolvedSkillEffects
+     * =====================================================
+     */
+    @SuppressWarnings("unchecked")
+    private Map<Integer, SkillEffectState>
+            getResolvedSkillEffects(
+                    Object value) {
+
+        if (!(value instanceof Map<?, ?> map)) {
+
+            return Map.of();
+        }
+
+
+        for (Map.Entry<?, ?> entry
+                : map.entrySet()) {
+
+            if (!(entry.getKey()
+                    instanceof Integer)) {
+
+                return Map.of();
+            }
+
+
+            if (!(entry.getValue()
+                    instanceof SkillEffectState)) {
+
+                return Map.of();
+            }
+        }
+
+
+        return (Map<Integer, SkillEffectState>) value;
     }
 
 
