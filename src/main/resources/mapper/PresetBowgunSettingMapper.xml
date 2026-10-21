@@ -17,12 +17,16 @@
 
         INSERT INTO preset_bowgun_setting (
             preset_id,
+            bowgun_attack_type,
+            wyvernblast_explosion_size,
             ammo_type,
             ammo_level,
             custom_id
         )
         VALUES (
             #{presetId},
+            #{bowgunAttackType},
+            #{wyvernblastExplosionSize},
             #{ammoType},
             #{ammoLevel},
             #{customId}
@@ -41,6 +45,8 @@
 
         SELECT
             preset_id,
+            bowgun_attack_type,
+            wyvernblast_explosion_size,
             ammo_type,
             ammo_level,
             custom_id

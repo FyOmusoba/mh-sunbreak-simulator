@@ -20,10 +20,15 @@ public class PresetBowgunSettingService {
      * =====================================================
      * ボウガン設定保存
      * =====================================================
+     *
+     * 通常弾・起爆竜弾など、
+     * ボウガンの攻撃種別も含めて保存する。
      */
     @Transactional
     public PresetBowgunSetting create(
             Integer presetId,
+            String bowgunAttackType,
+            String wyvernblastExplosionSize,
             String ammoType,
             Integer ammoLevel,
             Integer customId) {
@@ -33,6 +38,14 @@ public class PresetBowgunSettingService {
 
         presetBowgunSetting.setPresetId(
                 presetId
+        );
+
+        presetBowgunSetting.setBowgunAttackType(
+                bowgunAttackType
+        );
+
+        presetBowgunSetting.setWyvernblastExplosionSize(
+                wyvernblastExplosionSize
         );
 
         presetBowgunSetting.setAmmoType(
@@ -52,6 +65,36 @@ public class PresetBowgunSettingService {
         );
 
         return presetBowgunSetting;
+    }
+
+
+    /*
+     * =====================================================
+     * 既存呼び出し互換
+     * =====================================================
+     *
+     * 以前の通常弾保存コード・既存テストを
+     * 壊さないため残しておく。
+     *
+     * 従来形式は
+     * bowgunAttackType = NORMAL_AMMO
+     * として保存する。
+     */
+    @Transactional
+    public PresetBowgunSetting create(
+            Integer presetId,
+            String ammoType,
+            Integer ammoLevel,
+            Integer customId) {
+
+        return create(
+                presetId,
+                "NORMAL_AMMO",
+                null,
+                ammoType,
+                ammoLevel,
+                customId
+        );
     }
 
 
