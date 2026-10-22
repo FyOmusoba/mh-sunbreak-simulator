@@ -1,6 +1,7 @@
 package com.example.mhsunbreaksimulator;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 import java.util.List;
@@ -455,6 +456,158 @@ class PresetLoadServiceTest {
         assertEquals(
                 "1104",
                 result.get("bowgunAmmoId")
+        );
+    }
+
+
+    /*
+     * =====================================================
+     * ライトボウガン・起爆竜弾
+     * =====================================================
+     */
+
+    @Test
+    void load_起爆竜弾プリセットをURLパラメータへ復元できる() {
+
+        User user
+                = new User();
+
+        user.setUserId(
+                1
+        );
+
+        user.setUsername(
+                "testuser"
+        );
+
+
+        Preset preset
+                = new Preset();
+
+        preset.setPresetId(
+                21
+        );
+
+        preset.setUserId(
+                1
+        );
+
+        preset.setPresetName(
+                "起爆竜弾テスト"
+        );
+
+        preset.setWeaponId(
+                916
+        );
+
+
+        PresetBowgunSetting bowgunSetting
+                = new PresetBowgunSetting();
+
+        bowgunSetting.setPresetId(
+                21
+        );
+
+        bowgunSetting.setBowgunAttackType(
+                "WYVERNBLAST"
+        );
+
+        bowgunSetting.setWyvernblastExplosionSize(
+                "MEDIUM"
+        );
+
+
+        when(
+                userService.findByUsername(
+                        "testuser"
+                )
+        ).thenReturn(user);
+
+
+        when(
+                presetService.findByIdAndUserId(
+                        21,
+                        1
+                )
+        ).thenReturn(preset);
+
+
+        when(
+                presetArmorService.findByPresetId(
+                        21
+                )
+        ).thenReturn(
+                List.of()
+        );
+
+
+        when(
+                presetDecorationService.findByPresetId(
+                        21
+                )
+        ).thenReturn(
+                List.of()
+        );
+
+
+        when(
+                presetSkillStateService.findByPresetId(
+                        21
+                )
+        ).thenReturn(
+                List.of()
+        );
+
+
+        when(
+                presetBowgunSettingService.findByPresetId(
+                        21
+                )
+        ).thenReturn(
+                bowgunSetting
+        );
+
+
+        Map<String, String> result
+                = presetLoadService.load(
+                        "testuser",
+                        21
+                );
+
+
+        assertEquals(
+                "916",
+                result.get(
+                        "weaponId"
+                )
+        );
+
+        assertEquals(
+                "WYVERNBLAST",
+                result.get(
+                        "bowgunAttackType"
+                )
+        );
+
+        assertEquals(
+                "MEDIUM",
+                result.get(
+                        "wyvernblastExplosionSize"
+                )
+        );
+
+        assertNull(
+                result.get(
+                        "bowgunAmmoId"
+                )
+        );
+
+
+        verify(
+                bowgunAmmoService,
+                never()
+        ).findByWeaponId(
+                anyInt()
         );
     }
 
