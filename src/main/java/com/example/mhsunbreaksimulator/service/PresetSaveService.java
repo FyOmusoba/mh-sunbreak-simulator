@@ -562,25 +562,61 @@ public class PresetSaveService {
                         weapon.getWeaponType()
                 )) {
 
-            BowgunAmmo bowgunAmmo
-                    = findValidBowgunAmmo(
-                            simulatorForm.getBowgunAmmoId(),
-                            weapon.getWeaponId()
+            /*
+             * 現時点で特殊攻撃を持つのは
+             * ライトボウガンの起爆竜弾のみ。
+             *
+             * ヘビィボウガンは将来
+             * 機関竜弾 / 狙撃竜弾へ対応するまでは
+             * NORMAL_AMMOとして扱う。
+             */
+            boolean wyvernblastSelected
+                    = "ライトボウガン".equals(
+                            weapon.getWeaponType()
+                    )
+                    && "WYVERNBLAST".equals(
+                            simulatorForm.getBowgunAttackType()
                     );
 
 
-            /*
-             * ammo_type / ammo_level は NOT NULL なので、
-             * 弾未選択の場合は行自体を作成しない。
-             */
-            if (bowgunAmmo != null) {
+            if (wyvernblastSelected) {
 
                 presetBowgunSettingService.create(
                         presetId,
-                        bowgunAmmo.getAmmoType(),
-                        bowgunAmmo.getAmmoLevel(),
+                        "WYVERNBLAST",
+                        normalizeWyvernblastExplosionSize(
+                                simulatorForm.getWyvernblastExplosionSize()
+                        ),
+                        null,
+                        null,
                         null
                 );
+
+            } else {
+
+                BowgunAmmo bowgunAmmo
+                        = findValidBowgunAmmo(
+                                simulatorForm.getBowgunAmmoId(),
+                                weapon.getWeaponId()
+                        );
+
+
+                /*
+                 * 通常弾は従来どおり、
+                 * 弾未選択ならボウガン設定行を作成しない。
+                 *
+                 * 既存の4引数create(...)を使用することで、
+                 * 既存テストとの互換性も維持する。
+                 */
+                if (bowgunAmmo != null) {
+
+                    presetBowgunSettingService.create(
+                            presetId,
+                            bowgunAmmo.getAmmoType(),
+                            bowgunAmmo.getAmmoLevel(),
+                            null
+                    );
+                }
             }
         }
 
@@ -952,6 +988,38 @@ public class PresetSaveService {
 
 
         return bowgunAmmo;
+    }
+
+
+    /*
+     * =====================================================
+     * 起爆竜弾・爆発段階正規化
+     * =====================================================
+     */
+    private String normalizeWyvernblastExplosionSize(
+            String explosionSize) {
+
+        if ("SMALL".equals(
+                explosionSize
+        )) {
+
+            return "SMALL";
+        }
+
+
+        if ("MEDIUM".equals(
+                explosionSize
+        )) {
+
+            return "MEDIUM";
+        }
+
+
+        /*
+         * null / 空文字 / 不正値も含め、
+         * デフォルトはLARGE。
+         */
+        return "LARGE";
     }
 
 
