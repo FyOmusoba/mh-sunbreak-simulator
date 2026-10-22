@@ -434,27 +434,55 @@ public class PresetLoadService {
         if (presetBowgunSetting != null) {
 
             /*
-             * ボウガン弾は
+             * 起爆竜弾は通常弾IDを使用しないため、
              *
-             * ammo_type
-             * ammo_level
+             * bowgunAttackType
+             * wyvernblastExplosionSize
              *
-             * で保存しているため、
-             * 現在の武器に対応する bowgun_ammo_id を探す。
+             * を直接URLパラメータへ復元する。
              */
-            Integer bowgunAmmoId
-                    = findBowgunAmmoId(
-                            preset.getWeaponId(),
-                            presetBowgunSetting.getAmmoType(),
-                            presetBowgunSetting.getAmmoLevel()
-                    );
+            if ("WYVERNBLAST".equals(
+                    presetBowgunSetting.getBowgunAttackType()
+            )) {
+
+                parameters.put(
+                        "bowgunAttackType",
+                        "WYVERNBLAST"
+                );
+
+                parameters.put(
+                        "wyvernblastExplosionSize",
+                        normalizeWyvernblastExplosionSize(
+                                presetBowgunSetting
+                                        .getWyvernblastExplosionSize()
+                        )
+                );
+
+            } else {
+
+                /*
+                 * 通常弾は従来どおり
+                 *
+                 * ammo_type
+                 * ammo_level
+                 *
+                 * から現在の武器に対応する
+                 * bowgun_ammo_id を探して復元する。
+                 */
+                Integer bowgunAmmoId
+                        = findBowgunAmmoId(
+                                preset.getWeaponId(),
+                                presetBowgunSetting.getAmmoType(),
+                                presetBowgunSetting.getAmmoLevel()
+                        );
 
 
-            putInteger(
-                    parameters,
-                    "bowgunAmmoId",
-                    bowgunAmmoId
-            );
+                putInteger(
+                        parameters,
+                        "bowgunAmmoId",
+                        bowgunAmmoId
+                );
+            }
         }
 
 
@@ -730,6 +758,38 @@ public class PresetLoadService {
 
 
         return null;
+    }
+
+
+    /*
+     * =====================================================
+     * 起爆竜弾・爆発段階正規化
+     * =====================================================
+     */
+    private String normalizeWyvernblastExplosionSize(
+            String explosionSize) {
+
+        if ("SMALL".equals(
+                explosionSize
+        )) {
+
+            return "SMALL";
+        }
+
+
+        if ("MEDIUM".equals(
+                explosionSize
+        )) {
+
+            return "MEDIUM";
+        }
+
+
+        /*
+         * null / 空文字 / 不正値も含め、
+         * デフォルトはLARGE。
+         */
+        return "LARGE";
     }
 
 
