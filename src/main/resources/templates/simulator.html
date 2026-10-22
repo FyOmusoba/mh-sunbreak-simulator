@@ -3,6 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <title>装備シミュレーター</title>
+
+    <link rel="stylesheet"
+          th:href="@{/css/style.css}">
 </head>
 <body>
 
@@ -58,6 +61,14 @@
     <br>
 
     <!-- ================================================== -->
+    <!-- 上部2カラム：武器 / モンスター -->
+    <!-- ================================================== -->
+
+    <div class="simulator-top-grid">
+
+        <section class="simulator-panel simulator-panel-weapon">
+
+    <!-- ================================================== -->
     <!-- 武器 -->
     <!-- ================================================== -->
     <h2>選択中の武器</h2>
@@ -86,7 +97,124 @@
         </button>
     </div>
 
-    <br>
+        </section>
+
+        <section class="simulator-panel simulator-panel-monster">
+
+    <!-- ================================================== -->
+    <!-- モンスター・部位肉質 -->
+    <!-- ================================================== -->
+    <h2>モンスター・部位肉質</h2>
+
+    <p>
+        <label for="monsterSelect">モンスター：</label>
+
+        <select id="monsterSelect"
+                onchange="selectMonster(this.value)">
+
+            <option value="">未選択</option>
+
+            <option th:each="monster : ${monsters}"
+                    th:value="${monster.monsterId}"
+                    th:text="${monster.monsterName}"
+                    th:selected="${selectedMonster != null
+                        and selectedMonster.monsterId == monster.monsterId}">
+            </option>
+
+        </select>
+    </p>
+
+    <p th:if="${selectedMonster != null}">
+        選択中モンスター：
+        <strong th:text="${selectedMonster.monsterName}"></strong>
+    </p>
+
+    <p th:if="${selectedMonster != null}">
+
+        <label for="hitzoneSelect">部位：</label>
+
+        <select id="hitzoneSelect"
+                onchange="selectHitzone(this.value)">
+
+            <option value="">未選択</option>
+
+            <option th:each="hitzone : ${monsterHitzones}"
+                    th:value="${hitzone.hitzoneId}"
+                    th:text="${hitzone.partName}"
+                    th:selected="${selectedHitzone != null
+                        and selectedHitzone.hitzoneId == hitzone.hitzoneId}">
+            </option>
+
+        </select>
+    </p>
+
+    <div th:if="${selectedHitzone != null}">
+
+        <h3>選択部位の肉質</h3>
+
+        <table border="1">
+
+            <tr>
+                <th>部位</th>
+                <th>斬</th>
+                <th>打</th>
+                <th>弾</th>
+                <th>火</th>
+                <th>水</th>
+                <th>雷</th>
+                <th>氷</th>
+                <th>龍</th>
+            </tr>
+
+            <tr>
+                <td th:text="${selectedHitzone.partName}"></td>
+                <td th:text="${selectedHitzone.sever}"></td>
+                <td th:text="${selectedHitzone.blunt}"></td>
+                <td th:text="${selectedHitzone.shot}"></td>
+                <td th:text="${selectedHitzone.fire}"></td>
+                <td th:text="${selectedHitzone.water}"></td>
+                <td th:text="${selectedHitzone.thunder}"></td>
+                <td th:text="${selectedHitzone.ice}"></td>
+                <td th:text="${selectedHitzone.dragon}"></td>
+            </tr>
+
+        </table>
+
+    </div>
+
+    <div th:if="${monsterHitzoneValueResult != null
+                 and selectedHitzone != null}">
+
+        <h3>今回使用する肉質</h3>
+
+        <p>
+            物理：
+            <strong th:text="${monsterHitzoneValueResult.physicalHitzone}">
+            </strong>
+
+            （
+            <span th:text="${monsterHitzoneValueResult.physicalHitzoneType}">
+            </span>
+            ）
+        </p>
+
+        <p th:if="${monsterHitzoneValueResult.elemental}">
+            主属性肉質：
+            <strong th:text="${monsterHitzoneValueResult.elementHitzone}">
+            </strong>
+        </p>
+
+        <p th:if="${monsterHitzoneValueResult.subElemental}">
+            副属性肉質：
+            <strong th:text="${monsterHitzoneValueResult.subElementHitzone}">
+            </strong>
+        </p>
+
+    </div>
+
+        </section>
+
+    </div>
 
     <!-- ================================================== -->
     <!-- 武器傀異錬成 -->
@@ -397,119 +525,6 @@
             </tr>
 
         </table>
-
-    </div>
-
-    <br>
-
-    <!-- ================================================== -->
-    <!-- モンスター・部位肉質 -->
-    <!-- ================================================== -->
-    <h2>モンスター・部位肉質</h2>
-
-    <p>
-        <label for="monsterSelect">モンスター：</label>
-
-        <select id="monsterSelect"
-                onchange="selectMonster(this.value)">
-
-            <option value="">未選択</option>
-
-            <option th:each="monster : ${monsters}"
-                    th:value="${monster.monsterId}"
-                    th:text="${monster.monsterName}"
-                    th:selected="${selectedMonster != null
-                        and selectedMonster.monsterId == monster.monsterId}">
-            </option>
-
-        </select>
-    </p>
-
-    <p th:if="${selectedMonster != null}">
-        選択中モンスター：
-        <strong th:text="${selectedMonster.monsterName}"></strong>
-    </p>
-
-    <p th:if="${selectedMonster != null}">
-
-        <label for="hitzoneSelect">部位：</label>
-
-        <select id="hitzoneSelect"
-                onchange="selectHitzone(this.value)">
-
-            <option value="">未選択</option>
-
-            <option th:each="hitzone : ${monsterHitzones}"
-                    th:value="${hitzone.hitzoneId}"
-                    th:text="${hitzone.partName}"
-                    th:selected="${selectedHitzone != null
-                        and selectedHitzone.hitzoneId == hitzone.hitzoneId}">
-            </option>
-
-        </select>
-    </p>
-
-    <div th:if="${selectedHitzone != null}">
-
-        <h3>選択部位の肉質</h3>
-
-        <table border="1">
-
-            <tr>
-                <th>部位</th>
-                <th>斬</th>
-                <th>打</th>
-                <th>弾</th>
-                <th>火</th>
-                <th>水</th>
-                <th>雷</th>
-                <th>氷</th>
-                <th>龍</th>
-            </tr>
-
-            <tr>
-                <td th:text="${selectedHitzone.partName}"></td>
-                <td th:text="${selectedHitzone.sever}"></td>
-                <td th:text="${selectedHitzone.blunt}"></td>
-                <td th:text="${selectedHitzone.shot}"></td>
-                <td th:text="${selectedHitzone.fire}"></td>
-                <td th:text="${selectedHitzone.water}"></td>
-                <td th:text="${selectedHitzone.thunder}"></td>
-                <td th:text="${selectedHitzone.ice}"></td>
-                <td th:text="${selectedHitzone.dragon}"></td>
-            </tr>
-
-        </table>
-
-    </div>
-
-    <div th:if="${monsterHitzoneValueResult != null
-                 and selectedHitzone != null}">
-
-        <h3>今回使用する肉質</h3>
-
-        <p>
-            物理：
-            <strong th:text="${monsterHitzoneValueResult.physicalHitzone}">
-            </strong>
-
-            （
-            <span th:text="${monsterHitzoneValueResult.physicalHitzoneType}">
-            </span>
-            ）
-        </p>
-
-        <p th:if="${monsterHitzoneValueResult.elemental}">
-            主属性肉質：
-            <strong th:text="${monsterHitzoneValueResult.elementHitzone}">
-            </strong>
-        </p>
-
-        <p th:if="${monsterHitzoneValueResult.subElemental}">
-            副属性肉質：
-            <strong th:text="${monsterHitzoneValueResult.subElementHitzone}">
-            </strong>
-        </p>
 
     </div>
 
@@ -1540,6 +1555,14 @@
     <br>
 
     <!-- ================================================== -->
+    <!-- 防具スロットグリッド -->
+    <!-- ================================================== -->
+
+    <div class="armor-slot-grid">
+
+        <section class="armor-slot-card">
+
+    <!-- ================================================== -->
     <!-- 頭 -->
     <!-- ================================================== -->
 
@@ -1749,6 +1772,10 @@
 
     <br>
 
+        </section>
+
+        <section class="armor-slot-card">
+
     <!-- ================================================== -->
     <!-- 胴 -->
     <!-- ================================================== -->
@@ -1931,6 +1958,10 @@
     </table>
 
     <br>
+
+        </section>
+
+        <section class="armor-slot-card">
 
     <!-- ================================================== -->
     <!-- 腕 -->
@@ -2115,6 +2146,10 @@
 
     <br>
 
+        </section>
+
+        <section class="armor-slot-card">
+
     <!-- ================================================== -->
     <!-- 腰 -->
     <!-- ================================================== -->
@@ -2298,6 +2333,10 @@
 
     <br>
 
+        </section>
+
+        <section class="armor-slot-card">
+
     <!-- ================================================== -->
     <!-- 脚 -->
     <!-- ================================================== -->
@@ -2480,6 +2519,18 @@
     </table>
 
     <br>
+
+        </section>
+
+    </div>
+
+    <!-- ================================================== -->
+    <!-- 護石 / 発動スキル サマリー -->
+    <!-- ================================================== -->
+
+    <div class="loadout-summary-grid">
+
+        <section class="loadout-summary-card">
 
     <!-- ================================================== -->
     <!-- 護石 -->
@@ -2754,6 +2805,10 @@
 
     <br>
 
+        </section>
+
+        <section class="loadout-summary-card">
+
     <!-- ================================================== -->
     <!-- 発動スキル -->
     <!-- ================================================== -->
@@ -2780,6 +2835,10 @@
         </tr>
 
     </table>
+
+        </section>
+
+    </div>
 
     <!-- ================================================== -->
     <!-- 条件付きスキル -->
@@ -2900,6 +2959,16 @@
     </div>
 
     <!-- ================================================== -->
+    <!-- ダメージ結果グリッド -->
+    <!-- ================================================== -->
+
+    <div class="damage-result-grid">
+
+        <section class="damage-result-card"
+                 th:if="${selectedHitzone != null
+                          and monsterWeakpointResult != null}">
+
+    <!-- ================================================== -->
     <!-- 弱点・会心 -->
     <!-- ================================================== -->
 
@@ -2981,6 +3050,11 @@
 
     </div>
 
+        </section>
+
+        <section class="damage-result-card"
+                 th:if="${physicalHitzoneDamageResult != null}">
+
     <!-- ================================================== -->
     <!-- 物理肉質適用後 -->
     <!-- ================================================== -->
@@ -3024,6 +3098,11 @@
 
     </div>
 
+        </section>
+
+        <section class="damage-result-card"
+                 th:if="${elementHitzoneDamageResult != null}">
+
     <!-- ================================================== -->
     <!-- 属性肉質適用後 -->
     <!-- ================================================== -->
@@ -3066,6 +3145,11 @@
         </table>
 
     </div>
+
+        </section>
+
+        <section class="damage-result-card damage-result-card-final"
+                 th:if="${finalDamageResult != null}">
 
     <!-- ================================================== -->
     <!-- 最終ダメージ -->
@@ -3170,6 +3254,10 @@
     </div>
 
     <br>
+
+        </section>
+
+    </div>
 
     <!-- ================================================== -->
     <!-- 最終防御力・属性耐性 -->

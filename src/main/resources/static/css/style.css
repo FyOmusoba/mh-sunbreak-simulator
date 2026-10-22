@@ -1,1 +1,845 @@
 @charset "UTF-8";
+
+/* =========================================================
+   Base
+   ========================================================= */
+
+:root {
+    --bg: #0f1115;
+    --bg-soft: #171a20;
+    --panel: #1d2129;
+    --panel-2: #242a33;
+
+    --text: #f2f4f7;
+    --text-sub: #aeb6c2;
+
+    --accent: #d6a84b;
+    --accent-hover: #edc66f;
+    --accent-soft: rgba(214, 168, 75, 0.14);
+
+    --border: #343b46;
+    --border-strong: #4a5360;
+
+    --danger: #e06c75;
+    --success: #72c28b;
+
+    --shadow: 0 10px 30px rgba(0, 0, 0, 0.24);
+    --radius: 10px;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    margin: 0 auto;
+    padding: 28px 34px 60px;
+    max-width: 1480px;
+
+    color: var(--text);
+    background:
+        radial-gradient(
+            circle at top left,
+            rgba(214, 168, 75, 0.08),
+            transparent 340px
+        ),
+        var(--bg);
+
+    font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        "Noto Sans JP",
+        "Yu Gothic UI",
+        "Yu Gothic",
+        sans-serif;
+
+    font-size: 15px;
+    line-height: 1.65;
+}
+
+
+/* =========================================================
+   Typography
+   ========================================================= */
+
+h1,
+h2,
+h3 {
+    line-height: 1.35;
+}
+
+h1 {
+    margin: 0 0 30px;
+    padding-bottom: 16px;
+
+    font-size: clamp(26px, 3vw, 38px);
+    letter-spacing: 0.04em;
+
+    border-bottom: 2px solid var(--accent);
+}
+
+h2 {
+    margin: 38px 0 18px;
+    padding: 11px 14px;
+
+    font-size: 22px;
+    letter-spacing: 0.03em;
+
+    background: linear-gradient(
+        90deg,
+        var(--accent-soft),
+        transparent
+    );
+
+    border-left: 4px solid var(--accent);
+    border-radius: 4px;
+}
+
+h3 {
+    margin: 24px 0 12px;
+    color: #e5c77f;
+    font-size: 17px;
+}
+
+p {
+    margin: 10px 0;
+}
+
+strong {
+    color: #f1c96b;
+}
+
+
+/* =========================================================
+   Links
+   ========================================================= */
+
+a {
+    color: #e6bc61;
+    text-decoration: none;
+    transition:
+        color 0.15s ease,
+        opacity 0.15s ease;
+}
+
+a:hover {
+    color: var(--accent-hover);
+    text-decoration: underline;
+}
+
+
+/* =========================================================
+   Forms
+   ========================================================= */
+
+form {
+    margin: 12px 0;
+}
+
+label {
+    color: var(--text-sub);
+    font-weight: 600;
+}
+
+input,
+select,
+textarea,
+button {
+    font: inherit;
+}
+
+input[type="text"],
+input[type="number"],
+input[type="password"],
+select,
+textarea {
+    min-height: 40px;
+    padding: 8px 11px;
+
+    color: var(--text);
+    background: var(--panel-2);
+
+    border: 1px solid var(--border);
+    border-radius: 7px;
+
+    outline: none;
+    transition:
+        border-color 0.15s ease,
+        box-shadow 0.15s ease,
+        background 0.15s ease;
+}
+
+input[type="text"]:focus,
+input[type="number"]:focus,
+input[type="password"]:focus,
+select:focus,
+textarea:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-soft);
+}
+
+select {
+    cursor: pointer;
+}
+
+button {
+    min-height: 40px;
+    padding: 8px 16px;
+
+    color: #17130b;
+    background: var(--accent);
+
+    border: 1px solid transparent;
+    border-radius: 7px;
+
+    font-weight: 700;
+    cursor: pointer;
+
+    transition:
+        background 0.15s ease,
+        transform 0.1s ease,
+        box-shadow 0.15s ease;
+}
+
+button:hover:not(:disabled) {
+    background: var(--accent-hover);
+    box-shadow: 0 4px 14px rgba(214, 168, 75, 0.2);
+}
+
+button:active:not(:disabled) {
+    transform: translateY(1px);
+}
+
+button:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+}
+
+
+/* =========================================================
+   Tables
+   ========================================================= */
+
+table {
+    width: 100%;
+    margin: 14px 0 24px;
+
+    border-collapse: separate;
+    border-spacing: 0;
+
+    color: var(--text);
+    background: var(--panel);
+
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+
+    box-shadow: var(--shadow);
+    overflow: hidden;
+}
+
+th,
+td {
+    padding: 10px 12px;
+    text-align: left;
+    vertical-align: middle;
+
+    border-right: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+}
+
+th:last-child,
+td:last-child {
+    border-right: none;
+}
+
+tr:last-child td {
+    border-bottom: none;
+}
+
+th {
+    color: #f4d58b;
+    background: #292f38;
+
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+tbody tr {
+    transition: background 0.12s ease;
+}
+
+tbody tr:hover {
+    background: rgba(255, 255, 255, 0.035);
+}
+
+
+/* =========================================================
+   Selection controls / radio / checkbox
+   ========================================================= */
+
+input[type="radio"],
+input[type="checkbox"] {
+    accent-color: var(--accent);
+    transform: scale(1.08);
+}
+
+
+/* =========================================================
+   Common content emphasis
+   ========================================================= */
+
+hr {
+    margin: 30px 0;
+    border: none;
+    border-top: 1px solid var(--border);
+}
+
+code {
+    padding: 2px 6px;
+
+    color: #f2d18a;
+    background: #20252d;
+
+    border: 1px solid var(--border);
+    border-radius: 5px;
+
+    font-family:
+        Consolas,
+        "Courier New",
+        monospace;
+}
+
+
+/* =========================================================
+   Scrollbar
+   ========================================================= */
+
+::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background: #11141a;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #3b424d;
+    border-radius: 999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #505967;
+}
+
+
+/* =========================================================
+   Responsive
+   ========================================================= */
+
+@media (max-width: 900px) {
+
+    body {
+        padding: 20px 18px 45px;
+    }
+
+    h1 {
+        margin-bottom: 24px;
+    }
+
+    h2 {
+        margin-top: 30px;
+        font-size: 20px;
+    }
+
+    table {
+        display: block;
+        width: 100%;
+        overflow-x: auto;
+
+        white-space: nowrap;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    input[type="text"],
+    input[type="number"],
+    input[type="password"],
+    select,
+    textarea {
+        max-width: 100%;
+    }
+}
+
+
+@media (max-width: 560px) {
+
+    body {
+        padding: 16px 12px 36px;
+        font-size: 14px;
+    }
+
+    h1 {
+        font-size: 25px;
+    }
+
+    h2 {
+        padding: 9px 11px;
+        font-size: 18px;
+    }
+
+    h3 {
+        font-size: 16px;
+    }
+
+    th,
+    td {
+        padding: 8px 9px;
+    }
+
+    button {
+        min-height: 38px;
+        padding: 7px 12px;
+    }
+}
+/* =========================================================
+   Simulator section layout
+   ========================================================= */
+
+/* ページ全体の横はみ出しを防ぐ */
+body {
+    overflow-x: hidden;
+}
+
+/* 直下の主要フォームをカード化 */
+body > form {
+    margin: 0 0 22px;
+    padding: 18px 20px;
+
+    background:
+        linear-gradient(
+            180deg,
+            rgba(255, 255, 255, 0.025),
+            rgba(255, 255, 255, 0.008)
+        ),
+        var(--panel);
+
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+
+    box-shadow: var(--shadow);
+}
+
+/* セクション見出しと次の内容の距離を揃える */
+body > h2 {
+    margin-top: 42px;
+    margin-bottom: 14px;
+}
+
+/* 大きな表は画面内に収まりやすくする */
+table {
+    max-width: 100%;
+}
+
+th {
+    white-space: normal;
+}
+
+/* 入力部品が親要素からはみ出さないようにする */
+input,
+select,
+textarea {
+    max-width: 100%;
+}
+
+/* ボタン同士が密着しすぎないようにする */
+button + button {
+    margin-left: 6px;
+}
+
+/* h2直後のテーブルを一体感のある配置にする */
+h2 + table,
+h3 + table {
+    margin-top: 8px;
+}
+
+/* セクション間に少し空気を入れる */
+body > table {
+    margin-bottom: 30px;
+}
+
+/* 注意・補足文を本文より少し弱くする */
+small {
+    color: var(--text-sub);
+}
+
+/* スクロール時に表の見出しが判別しやすい */
+thead th {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+}
+
+
+/* =========================================================
+   Desktop refinement
+   ========================================================= */
+
+@media (min-width: 901px) {
+
+    body > form {
+        padding: 20px 22px;
+    }
+
+    table {
+        font-size: 14px;
+    }
+
+    th,
+    td {
+        padding: 11px 13px;
+    }
+}
+
+
+/* =========================================================
+   Mobile refinement
+   ========================================================= */
+
+@media (max-width: 900px) {
+
+    body {
+        overflow-x: hidden;
+    }
+
+    body > form {
+        padding: 15px;
+    }
+
+    table {
+        display: block;
+        overflow-x: auto;
+    }
+
+    button {
+        max-width: 100%;
+    }
+}
+
+/* =========================================================
+   Legacy spacing cleanup
+   ========================================================= */
+
+/*
+ * 旧レイアウトで余白調整に使っていたbody直下の<br>は、
+ * CSSで余白を管理するため非表示にする。
+ */
+body > br {
+    display: none;
+}
+
+/* プリセット保存欄を横並びで見やすくする */
+#presetSaveForm {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+/* body直下のリンクを操作項目として少し見やすくする */
+body > a {
+    display: inline-block;
+    margin: 8px 0 12px;
+    font-weight: 700;
+}
+
+/* 「武器が選択されていません。」等の行内ボタン */
+p > button {
+    margin-left: 10px;
+}
+
+/* セクション間隔を少し詰める */
+body > h2 {
+    margin-top: 30px;
+}
+
+/* 最初のセクションだけ上側を少し広めに確保 */
+body > h1 + h2 {
+    margin-top: 36px;
+}
+
+@media (max-width: 560px) {
+
+    #presetSaveForm {
+        align-items: stretch;
+    }
+
+    #presetSaveForm label {
+        width: 100%;
+    }
+
+    #presetSaveForm input,
+    #presetSaveForm button {
+        width: 100%;
+    }
+
+    p > button {
+        display: block;
+        margin: 10px 0 0;
+    }
+}
+
+/* =========================================================
+   Simulator top grid
+   ========================================================= */
+
+.simulator-top-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 22px;
+    align-items: start;
+    margin: 30px 0;
+}
+
+.simulator-panel {
+    min-width: 0;
+    padding: 20px;
+
+    background:
+        linear-gradient(
+            180deg,
+            rgba(255, 255, 255, 0.025),
+            rgba(255, 255, 255, 0.008)
+        ),
+        var(--panel);
+
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+}
+
+.simulator-panel > h2 {
+    margin: 0 0 18px;
+}
+
+.simulator-panel table {
+    margin-bottom: 16px;
+    box-shadow: none;
+}
+
+.simulator-panel > :last-child {
+    margin-bottom: 0;
+}
+
+@media (max-width: 980px) {
+
+    .simulator-top-grid {
+        grid-template-columns: 1fr;
+        gap: 18px;
+    }
+}
+
+@media (max-width: 560px) {
+
+    .simulator-panel {
+        padding: 14px;
+    }
+}
+
+/* =========================================================
+   Armor slot grid
+   ========================================================= */
+
+.armor-slot-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 20px;
+    margin: 24px 0 34px;
+}
+
+.armor-slot-card {
+    min-width: 0;
+    padding: 18px;
+
+    background:
+        linear-gradient(
+            180deg,
+            rgba(255, 255, 255, 0.025),
+            rgba(255, 255, 255, 0.008)
+        ),
+        var(--panel);
+
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+}
+
+.armor-slot-card > h3 {
+    margin-top: 0;
+    padding-bottom: 10px;
+
+    border-bottom: 1px solid var(--border);
+}
+
+.armor-slot-card table {
+    margin: 10px 0 0;
+    box-shadow: none;
+}
+
+.armor-slot-card th,
+.armor-slot-card td {
+    padding: 9px 10px;
+}
+
+@media (min-width: 1250px) {
+
+    .armor-slot-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 900px) {
+
+    .armor-slot-grid {
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
+}
+
+@media (max-width: 560px) {
+
+    .armor-slot-card {
+        padding: 13px;
+    }
+}
+
+/* =========================================================
+   Loadout summary grid
+   ========================================================= */
+
+.loadout-summary-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 22px;
+    align-items: start;
+    margin: 30px 0 36px;
+}
+
+.loadout-summary-card {
+    min-width: 0;
+    padding: 20px;
+
+    background:
+        linear-gradient(
+            180deg,
+            rgba(255, 255, 255, 0.025),
+            rgba(255, 255, 255, 0.008)
+        ),
+        var(--panel);
+
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+}
+
+.loadout-summary-card > h2 {
+    margin: 0 0 18px;
+}
+
+.loadout-summary-card table {
+    margin: 10px 0 16px;
+    box-shadow: none;
+}
+
+.loadout-summary-card > :last-child {
+    margin-bottom: 0;
+}
+
+@media (max-width: 980px) {
+
+    .loadout-summary-grid {
+        grid-template-columns: 1fr;
+        gap: 18px;
+    }
+}
+
+@media (max-width: 560px) {
+
+    .loadout-summary-card {
+        padding: 14px;
+    }
+}
+
+/* =========================================================
+   Damage result grid
+   ========================================================= */
+
+.damage-result-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 22px;
+    align-items: start;
+    margin: 30px 0 36px;
+}
+
+.damage-result-card {
+    min-width: 0;
+    padding: 20px;
+
+    background:
+        linear-gradient(
+            180deg,
+            rgba(255, 255, 255, 0.025),
+            rgba(255, 255, 255, 0.008)
+        ),
+        var(--panel);
+
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+}
+
+.damage-result-card > div > h2,
+.damage-result-card > h2 {
+    margin: 0 0 18px;
+}
+
+.damage-result-card table {
+    margin: 10px 0 0;
+    box-shadow: none;
+}
+
+.damage-result-card-final {
+    border-color: rgba(214, 168, 75, 0.5);
+
+    background:
+        linear-gradient(
+            180deg,
+            rgba(214, 168, 75, 0.08),
+            rgba(255, 255, 255, 0.01)
+        ),
+        var(--panel);
+}
+
+.damage-result-card-final strong {
+    font-size: 1.08em;
+}
+
+@media (max-width: 980px) {
+
+    .damage-result-grid {
+        grid-template-columns: 1fr;
+        gap: 18px;
+    }
+}
+
+@media (max-width: 560px) {
+
+    .damage-result-card {
+        padding: 14px;
+    }
+}
