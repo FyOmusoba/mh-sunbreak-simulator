@@ -1,6 +1,7 @@
 package com.example.mhsunbreaksimulator;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 import java.util.Map;
@@ -596,6 +597,115 @@ class PresetSaveServiceTest {
                 "貫通弾",
                 2,
                 null
+        );
+    }
+
+
+    /*
+     * =====================================================
+     * ライトボウガン・起爆竜弾
+     * =====================================================
+     */
+
+    @Test
+    void save_起爆竜弾の攻撃種別と爆発段階を保存できる() {
+
+        User user
+                = createUser();
+
+        Weapon weapon
+                = createWeapon(
+                        916,
+                        "ライトボウガン"
+                );
+
+        Preset savedPreset
+                = createPreset(
+                        506,
+                        916
+                );
+
+
+        when(
+                userService.findByUsername(
+                        "testuser"
+                )
+        ).thenReturn(user);
+
+
+        when(
+                weaponService.findById(
+                        916
+                )
+        ).thenReturn(weapon);
+
+
+        when(
+                presetService.create(
+                        10,
+                        "起爆竜弾装備",
+                        916,
+                        null
+                )
+        ).thenReturn(savedPreset);
+
+
+        SimulatorForm simulatorForm
+                = new SimulatorForm();
+
+        simulatorForm.setWeaponId(
+                916
+        );
+
+        simulatorForm.setBowgunAttackType(
+                "WYVERNBLAST"
+        );
+
+        simulatorForm.setWyvernblastExplosionSize(
+                "MEDIUM"
+        );
+
+        /*
+         * URLに古い弾IDが残っていたとしても、
+         * 起爆竜弾では参照されないことも確認する。
+         */
+        simulatorForm.setBowgunAmmoId(
+                1104
+        );
+
+
+        Preset result
+                = presetSaveService.save(
+                        "testuser",
+                        "起爆竜弾装備",
+                        simulatorForm,
+                        Map.of()
+                );
+
+
+        assertSame(
+                savedPreset,
+                result
+        );
+
+
+        verify(
+                presetBowgunSettingService
+        ).create(
+                506,
+                "WYVERNBLAST",
+                "MEDIUM",
+                null,
+                null,
+                null
+        );
+
+
+        verify(
+                bowgunAmmoService,
+                never()
+        ).findById(
+                anyInt()
         );
     }
 
