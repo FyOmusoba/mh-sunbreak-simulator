@@ -5,26 +5,31 @@
    ========================================================= */
 
 :root {
-    --bg: #0f1115;
-    --bg-soft: #171a20;
-    --panel: #1d2129;
-    --panel-2: #242a33;
+    /* Sunbreak-inspired: 黒鉄 / 深紅 / くすみ金 / 羊皮紙 */
+    --bg: #0b0908;
+    --bg-soft: #15100e;
+    --panel: #1c1613;
+    --panel-2: #29201a;
 
-    --text: #f2f4f7;
-    --text-sub: #aeb6c2;
+    --text: #eee4cf;
+    --text-sub: #b9aa90;
 
-    --accent: #d6a84b;
-    --accent-hover: #edc66f;
-    --accent-soft: rgba(214, 168, 75, 0.14);
+    --accent: #8f2922;
+    --accent-hover: #b23a30;
+    --accent-soft: rgba(143, 41, 34, 0.20);
 
-    --border: #343b46;
-    --border-strong: #4a5360;
+    --gold: #c5a15b;
+    --gold-hover: #dfc27d;
+    --gold-soft: rgba(197, 161, 91, 0.14);
 
-    --danger: #e06c75;
-    --success: #72c28b;
+    --border: #4a3a2f;
+    --border-strong: #6c5540;
 
-    --shadow: 0 10px 30px rgba(0, 0, 0, 0.24);
-    --radius: 10px;
+    --danger: #d65f54;
+    --success: #7eaa78;
+
+    --shadow: 0 12px 34px rgba(0, 0, 0, 0.42);
+    --radius: 4px;
 }
 
 * {
@@ -44,10 +49,20 @@ body {
     background:
         radial-gradient(
             circle at top left,
-            rgba(214, 168, 75, 0.08),
-            transparent 340px
+            rgba(143, 41, 34, 0.20),
+            transparent 430px
         ),
-        var(--bg);
+        radial-gradient(
+            circle at top right,
+            rgba(197, 161, 91, 0.08),
+            transparent 360px
+        ),
+        linear-gradient(
+            180deg,
+            #120d0b 0%,
+            var(--bg) 36%,
+            #080706 100%
+        );
 
     font-family:
         -apple-system,
@@ -80,7 +95,8 @@ h1 {
     font-size: clamp(26px, 3vw, 38px);
     letter-spacing: 0.04em;
 
-    border-bottom: 2px solid var(--accent);
+    border-bottom: 1px solid var(--gold);
+    box-shadow: 0 1px 0 rgba(143, 41, 34, 0.65);
 }
 
 h2 {
@@ -90,19 +106,23 @@ h2 {
     font-size: 22px;
     letter-spacing: 0.03em;
 
+    color: #f1e5cb;
+
     background: linear-gradient(
         90deg,
-        var(--accent-soft),
+        rgba(143, 41, 34, 0.44),
+        rgba(73, 36, 30, 0.22) 52%,
         transparent
     );
 
-    border-left: 4px solid var(--accent);
-    border-radius: 4px;
+    border-left: 4px solid var(--gold);
+    border-bottom: 1px solid rgba(143, 41, 34, 0.65);
+    border-radius: 1px;
 }
 
 h3 {
     margin: 24px 0 12px;
-    color: #e5c77f;
+    color: var(--gold-hover);
     font-size: 17px;
 }
 
@@ -111,7 +131,7 @@ p {
 }
 
 strong {
-    color: #f1c96b;
+    color: var(--gold-hover);
 }
 
 
@@ -120,7 +140,7 @@ strong {
    ========================================================= */
 
 a {
-    color: #e6bc61;
+    color: var(--gold);
     text-decoration: none;
     transition:
         color 0.15s ease,
@@ -128,7 +148,7 @@ a {
 }
 
 a:hover {
-    color: var(--accent-hover);
+    color: var(--gold-hover);
     text-decoration: underline;
 }
 
@@ -143,7 +163,7 @@ form {
 
 label {
     color: var(--text-sub);
-    font-weight: 600;
+    font-weight: 600;	
 }
 
 input,
@@ -162,10 +182,16 @@ textarea {
     padding: 8px 11px;
 
     color: var(--text);
-    background: var(--panel-2);
+    background:
+        linear-gradient(
+            180deg,
+            rgba(197, 161, 91, 0.035),
+            transparent
+        ),
+        var(--panel-2);
 
-    border: 1px solid var(--border);
-    border-radius: 7px;
+    border: 1px solid var(--border-strong);
+    border-radius: 2px;
 
     outline: none;
     transition:
@@ -179,8 +205,10 @@ input[type="number"]:focus,
 input[type="password"]:focus,
 select:focus,
 textarea:focus {
-    border-color: var(--accent);
-    box-shadow: 0 0 0 3px var(--accent-soft);
+    border-color: var(--gold);
+    box-shadow:
+        0 0 0 2px rgba(197, 161, 91, 0.15),
+        inset 0 0 12px rgba(143, 41, 34, 0.10);
 }
 
 select {
@@ -191,11 +219,18 @@ button {
     min-height: 40px;
     padding: 8px 16px;
 
-    color: #17130b;
-    background: var(--accent);
+    color: #f5ead2;
+    background:
+        linear-gradient(
+            180deg,
+            #a1372d,
+            #7b211c
+        );
 
-    border: 1px solid transparent;
-    border-radius: 7px;
+    border: 1px solid #b18b4f;
+    border-radius: 2px;
+
+    text-shadow: 0 1px 1px rgba(0, 0, 0, 0.65);
 
     font-weight: 700;
     cursor: pointer;
@@ -207,8 +242,16 @@ button {
 }
 
 button:hover:not(:disabled) {
-    background: var(--accent-hover);
-    box-shadow: 0 4px 14px rgba(214, 168, 75, 0.2);
+    background:
+        linear-gradient(
+            180deg,
+            #bd493c,
+            #902a22
+        );
+    border-color: var(--gold-hover);
+    box-shadow:
+        0 5px 16px rgba(0, 0, 0, 0.34),
+        0 0 0 1px rgba(197, 161, 91, 0.12);
 }
 
 button:active:not(:disabled) {
@@ -262,8 +305,13 @@ tr:last-child td {
 }
 
 th {
-    color: #f4d58b;
-    background: #292f38;
+    color: #e5c77f;
+    background:
+        linear-gradient(
+            180deg,
+            #3a211b,
+            #241713
+        );
 
     font-weight: 700;
     white-space: nowrap;
@@ -274,7 +322,7 @@ tbody tr {
 }
 
 tbody tr:hover {
-    background: rgba(255, 255, 255, 0.035);
+    background: rgba(143, 41, 34, 0.13);
 }
 
 
@@ -284,7 +332,7 @@ tbody tr:hover {
 
 input[type="radio"],
 input[type="checkbox"] {
-    accent-color: var(--accent);
+    accent-color: var(--gold);
     transform: scale(1.08);
 }
 
@@ -302,8 +350,8 @@ hr {
 code {
     padding: 2px 6px;
 
-    color: #f2d18a;
-    background: #20252d;
+    color: var(--gold-hover);
+    background: #211813;
 
     border: 1px solid var(--border);
     border-radius: 5px;
@@ -325,16 +373,16 @@ code {
 }
 
 ::-webkit-scrollbar-track {
-    background: #11141a;
+    background: #0d0908;
 }
 
 ::-webkit-scrollbar-thumb {
-    background: #3b424d;
+    background: #584333;
     border-radius: 999px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-    background: #505967;
+    background: #806446;
 }
 
 
@@ -423,8 +471,8 @@ body > form {
     background:
         linear-gradient(
             180deg,
-            rgba(255, 255, 255, 0.025),
-            rgba(255, 255, 255, 0.008)
+            rgba(143, 41, 34, 0.11),
+            rgba(197, 161, 91, 0.025)
         ),
         var(--panel);
 
@@ -612,8 +660,8 @@ body > h1 + h2 {
     background:
         linear-gradient(
             180deg,
-            rgba(255, 255, 255, 0.025),
-            rgba(255, 255, 255, 0.008)
+            rgba(143, 41, 34, 0.11),
+            rgba(197, 161, 91, 0.025)
         ),
         var(--panel);
 
@@ -668,8 +716,8 @@ body > h1 + h2 {
     background:
         linear-gradient(
             180deg,
-            rgba(255, 255, 255, 0.025),
-            rgba(255, 255, 255, 0.008)
+            rgba(143, 41, 34, 0.11),
+            rgba(197, 161, 91, 0.025)
         ),
         var(--panel);
 
@@ -736,8 +784,8 @@ body > h1 + h2 {
     background:
         linear-gradient(
             180deg,
-            rgba(255, 255, 255, 0.025),
-            rgba(255, 255, 255, 0.008)
+            rgba(143, 41, 34, 0.11),
+            rgba(197, 161, 91, 0.025)
         ),
         var(--panel);
 
@@ -793,8 +841,8 @@ body > h1 + h2 {
     background:
         linear-gradient(
             180deg,
-            rgba(255, 255, 255, 0.025),
-            rgba(255, 255, 255, 0.008)
+            rgba(143, 41, 34, 0.11),
+            rgba(197, 161, 91, 0.025)
         ),
         var(--panel);
 
@@ -814,15 +862,19 @@ body > h1 + h2 {
 }
 
 .damage-result-card-final {
-    border-color: rgba(214, 168, 75, 0.5);
+    border-color: rgba(197, 161, 91, 0.78);
 
     background:
         linear-gradient(
             180deg,
-            rgba(214, 168, 75, 0.08),
-            rgba(255, 255, 255, 0.01)
+            rgba(197, 161, 91, 0.11),
+            rgba(143, 41, 34, 0.08)
         ),
         var(--panel);
+
+    box-shadow:
+        var(--shadow),
+        inset 0 1px 0 rgba(229, 199, 127, 0.16);
 }
 
 .damage-result-card-final strong {
@@ -843,3 +895,931 @@ body > h1 + h2 {
         padding: 14px;
     }
 }
+
+/* =========================================================
+   Sunbreak ornamental details
+   ========================================================= */
+
+/* 見出しに「装備画面」っぽい金属プレート感を追加 */
+h1 {
+    position: relative;
+    color: #f3e7ce;
+    text-shadow: 0 2px 3px rgba(0, 0, 0, 0.75);
+}
+
+h1::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: -2px;
+    width: min(280px, 42%);
+    height: 3px;
+
+    background: linear-gradient(
+        90deg,
+        var(--gold-hover),
+        var(--accent),
+        transparent
+    );
+}
+
+/* カード類の上辺に薄い金属光沢 */
+.simulator-panel,
+.armor-slot-card,
+.loadout-summary-card,
+.damage-result-card,
+body > form {
+    position: relative;
+}
+
+.simulator-panel::before,
+.armor-slot-card::before,
+.loadout-summary-card::before,
+.damage-result-card::before,
+body > form::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 12px;
+    right: 12px;
+    height: 1px;
+
+    background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(197, 161, 91, 0.48),
+        transparent
+    );
+}
+
+/* テーブル外周を少し重厚に */
+table {
+    border-color: var(--border-strong);
+}
+
+thead th {
+    border-bottom-color: #6f3a2e;
+}
+
+/* 選択肢・入力欄のプレースホルダーも羊皮紙系に */
+input::placeholder,
+textarea::placeholder {
+    color: #8f806b;
+}
+
+/* ボタンにごく軽い金属的ハイライト */
+button {
+    box-shadow:
+        inset 0 1px 0 rgba(255, 237, 201, 0.12),
+        inset 0 -1px 0 rgba(0, 0, 0, 0.28);
+}
+
+/* 最終結果は「報酬/決定」感を強める */
+.damage-result-card-final {
+    position: relative;
+}
+
+.damage-result-card-final::after {
+    content: "";
+    position: absolute;
+    inset: 5px;
+    pointer-events: none;
+
+    border: 1px solid rgba(197, 161, 91, 0.17);
+}
+
+/* =========================================================
+   Sunbreak UI enhancement v2
+   ========================================================= */
+
+/* ---------------------------------------------------------
+   Angular panel shapes
+   --------------------------------------------------------- */
+
+.simulator-panel,
+.armor-slot-card,
+.loadout-summary-card,
+.damage-result-card,
+body > form,
+table {
+    border-radius: 2px;
+}
+
+/* メインカードを少し角張らせる */
+.simulator-panel,
+.armor-slot-card,
+.loadout-summary-card,
+.damage-result-card,
+body > form {
+    clip-path: polygon(
+        0 10px,
+        10px 0,
+        calc(100% - 10px) 0,
+        100% 10px,
+        100% calc(100% - 10px),
+        calc(100% - 10px) 100%,
+        10px 100%,
+        0 calc(100% - 10px)
+    );
+}
+
+/* clip-path使用時にも枠が読めるよう内側ラインを追加 */
+.simulator-panel::after,
+.armor-slot-card::after,
+.loadout-summary-card::after,
+.damage-result-card::after,
+body > form::after {
+    content: "";
+    position: absolute;
+    inset: 4px;
+    pointer-events: none;
+
+    border: 1px solid rgba(197, 161, 91, 0.10);
+
+    clip-path: polygon(
+        0 7px,
+        7px 0,
+        calc(100% - 7px) 0,
+        100% 7px,
+        100% calc(100% - 7px),
+        calc(100% - 7px) 100%,
+        7px 100%,
+        0 calc(100% - 7px)
+    );
+}
+
+
+/* ---------------------------------------------------------
+   Section headings = equipment menu plates
+   --------------------------------------------------------- */
+
+h2 {
+    position: relative;
+    overflow: hidden;
+
+    padding: 10px 46px 10px 18px;
+
+    border-left: 5px solid var(--gold);
+    border-top: 1px solid rgba(197, 161, 91, 0.22);
+    border-bottom: 1px solid rgba(143, 41, 34, 0.9);
+
+    clip-path: polygon(
+        0 0,
+        calc(100% - 14px) 0,
+        100% 50%,
+        calc(100% - 14px) 100%,
+        0 100%
+    );
+}
+
+h2::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    right: 16px;
+    width: 34px;
+    height: 100%;
+
+    background:
+        linear-gradient(
+            135deg,
+            transparent 0 36%,
+            rgba(197, 161, 91, 0.20) 36% 42%,
+            transparent 42% 58%,
+            rgba(143, 41, 34, 0.28) 58% 64%,
+            transparent 64%
+        );
+
+    opacity: 0.9;
+}
+
+h3 {
+    position: relative;
+    padding-left: 16px;
+}
+
+h3::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0.42em;
+
+    width: 7px;
+    height: 7px;
+
+    background: var(--gold);
+
+    transform: rotate(45deg);
+    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.55);
+}
+
+
+/* ---------------------------------------------------------
+   Buttons = menu selection plates
+   --------------------------------------------------------- */
+
+button {
+    position: relative;
+    overflow: hidden;
+
+    padding-left: 18px;
+    padding-right: 18px;
+
+    letter-spacing: 0.03em;
+
+    clip-path: polygon(
+        7px 0,
+        100% 0,
+        100% calc(100% - 7px),
+        calc(100% - 7px) 100%,
+        0 100%,
+        0 7px
+    );
+}
+
+button::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -40%;
+    width: 32%;
+    height: 100%;
+
+    background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(255, 235, 192, 0.18),
+        transparent
+    );
+
+    transform: skewX(-18deg);
+    transition: left 0.28s ease;
+}
+
+button:hover:not(:disabled)::before {
+    left: 115%;
+}
+
+button:hover:not(:disabled) {
+    transform: translateY(-1px);
+}
+
+button:active:not(:disabled) {
+    transform: translateY(1px);
+}
+
+
+/* ---------------------------------------------------------
+   Tables = carved equipment list
+   --------------------------------------------------------- */
+
+th {
+    position: relative;
+
+    border-bottom-color: #744033;
+    text-shadow: 0 1px 1px rgba(0, 0, 0, 0.75);
+}
+
+tbody tr {
+    background:
+        linear-gradient(
+            90deg,
+            transparent,
+            rgba(197, 161, 91, 0.012),
+            transparent
+        );
+}
+
+tbody tr:hover {
+    background:
+        linear-gradient(
+            90deg,
+            rgba(143, 41, 34, 0.20),
+            rgba(197, 161, 91, 0.07),
+            rgba(143, 41, 34, 0.11)
+        );
+}
+
+
+/* ---------------------------------------------------------
+   Inputs = engraved slots
+   --------------------------------------------------------- */
+
+input[type="text"],
+input[type="number"],
+input[type="password"],
+select,
+textarea {
+    box-shadow:
+        inset 0 2px 5px rgba(0, 0, 0, 0.36),
+        inset 0 1px 0 rgba(255, 255, 255, 0.02);
+}
+
+select:hover,
+input[type="text"]:hover,
+input[type="number"]:hover,
+input[type="password"]:hover,
+textarea:hover {
+    border-color: #7c6349;
+}
+
+
+/* ---------------------------------------------------------
+   Important/final result emphasis
+   --------------------------------------------------------- */
+
+.damage-result-card-final {
+    border-width: 1px;
+}
+
+.damage-result-card-final > div > h2,
+.damage-result-card-final > h2 {
+    color: #f4ddb0;
+
+    background:
+        linear-gradient(
+            90deg,
+            rgba(143, 41, 34, 0.62),
+            rgba(197, 161, 91, 0.12),
+            transparent
+        );
+}
+
+.damage-result-card-final strong {
+    color: #f2cc79;
+    text-shadow:
+        0 1px 2px rgba(0, 0, 0, 0.85),
+        0 0 10px rgba(197, 161, 91, 0.12);
+}
+
+
+/* ---------------------------------------------------------
+   Main page title = quest-board style accent
+   --------------------------------------------------------- */
+
+h1 {
+    padding-left: 18px;
+}
+
+h1::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0.2em;
+    bottom: 0.45em;
+    width: 5px;
+
+    background:
+        linear-gradient(
+            180deg,
+            var(--gold-hover),
+            var(--accent),
+            var(--gold)
+        );
+
+    box-shadow:
+        0 0 0 1px rgba(0, 0, 0, 0.5),
+        4px 0 12px rgba(143, 41, 34, 0.22);
+}
+
+
+/* ---------------------------------------------------------
+   Responsive safety
+   --------------------------------------------------------- */
+
+@media (max-width: 560px) {
+
+    h2 {
+        padding-right: 34px;
+    }
+
+    .simulator-panel,
+    .armor-slot-card,
+    .loadout-summary-card,
+    .damage-result-card,
+    body > form {
+        clip-path: polygon(
+            0 7px,
+            7px 0,
+            calc(100% - 7px) 0,
+            100% 7px,
+            100% calc(100% - 7px),
+            calc(100% - 7px) 100%,
+            7px 100%,
+            0 calc(100% - 7px)
+        );
+    }
+}
+
+/* =========================================================
+   Sunbreak UI enhancement v3
+   "Quest board / smithy / equipment menu" atmosphere
+   ========================================================= */
+
+/* ---------------------------------------------------------
+   Global texture / atmosphere
+   --------------------------------------------------------- */
+
+body {
+    position: relative;
+    isolation: isolate;
+
+    background:
+        radial-gradient(
+            circle at 12% 8%,
+            rgba(143, 41, 34, 0.24),
+            transparent 360px
+        ),
+        radial-gradient(
+            circle at 88% 12%,
+            rgba(197, 161, 91, 0.08),
+            transparent 300px
+        ),
+        repeating-linear-gradient(
+            135deg,
+            rgba(255, 255, 255, 0.008) 0,
+            rgba(255, 255, 255, 0.008) 1px,
+            transparent 1px,
+            transparent 9px
+        ),
+        linear-gradient(
+            180deg,
+            #120d0b 0%,
+            #0c0908 40%,
+            #080706 100%
+        );
+}
+
+/* 背景に抽象的な紋章っぽい装飾を薄く置く */
+body::before {
+    content: "";
+    position: fixed;
+    z-index: -1;
+
+    right: -110px;
+    top: 110px;
+
+    width: 430px;
+    height: 430px;
+
+    pointer-events: none;
+    opacity: 0.12;
+
+    background:
+        radial-gradient(
+            circle,
+            transparent 0 28%,
+            rgba(197, 161, 91, 0.34) 28% 29%,
+            transparent 29% 42%,
+            rgba(143, 41, 34, 0.36) 42% 43%,
+            transparent 43%
+        ),
+        conic-gradient(
+            from 45deg,
+            transparent 0 11%,
+            rgba(197, 161, 91, 0.17) 11% 13%,
+            transparent 13% 24%,
+            rgba(143, 41, 34, 0.20) 24% 26%,
+            transparent 26% 37%,
+            rgba(197, 161, 91, 0.17) 37% 39%,
+            transparent 39% 50%,
+            rgba(143, 41, 34, 0.20) 50% 52%,
+            transparent 52% 63%,
+            rgba(197, 161, 91, 0.17) 63% 65%,
+            transparent 65% 76%,
+            rgba(143, 41, 34, 0.20) 76% 78%,
+            transparent 78% 89%,
+            rgba(197, 161, 91, 0.17) 89% 91%,
+            transparent 91%
+        );
+
+    transform: rotate(-9deg);
+}
+
+
+/* ---------------------------------------------------------
+   Main title = quest board plate
+   --------------------------------------------------------- */
+
+h1 {
+    margin-bottom: 34px;
+    padding:
+        14px 54px
+        16px 28px;
+
+    background:
+        linear-gradient(
+            90deg,
+            rgba(75, 25, 20, 0.78),
+            rgba(39, 25, 20, 0.76) 58%,
+            rgba(18, 13, 11, 0.25)
+        );
+
+    border-top: 1px solid rgba(197, 161, 91, 0.35);
+    border-right: 1px solid rgba(197, 161, 91, 0.10);
+    border-bottom: 1px solid rgba(197, 161, 91, 0.68);
+
+    clip-path: polygon(
+        0 0,
+        calc(100% - 28px) 0,
+        100% 50%,
+        calc(100% - 28px) 100%,
+        0 100%
+    );
+
+    box-shadow:
+        0 8px 28px rgba(0, 0, 0, 0.28),
+        inset 0 1px 0 rgba(255, 240, 205, 0.05);
+}
+
+h1::before {
+    top: 0;
+    bottom: 0;
+    width: 7px;
+
+    background:
+        linear-gradient(
+            180deg,
+            #e0c17f,
+            #8f2922 52%,
+            #c5a15b
+        );
+}
+
+h1::after {
+    left: 28px;
+    bottom: 7px;
+    width: min(330px, 45%);
+    height: 2px;
+
+    background:
+        linear-gradient(
+            90deg,
+            #e0c17f,
+            rgba(143, 41, 34, 0.95),
+            transparent
+        );
+}
+
+
+/* ---------------------------------------------------------
+   Section headings = quest/menu tab
+   --------------------------------------------------------- */
+
+h2 {
+    min-height: 48px;
+    display: flex;
+    align-items: center;
+
+    margin-top: 34px;
+
+    background:
+        linear-gradient(
+            90deg,
+            rgba(111, 31, 26, 0.88) 0%,
+            rgba(71, 28, 24, 0.84) 34%,
+            rgba(37, 25, 21, 0.74) 70%,
+            rgba(16, 13, 11, 0.16) 100%
+        );
+
+    box-shadow:
+        inset 0 1px 0 rgba(255, 240, 205, 0.05),
+        inset 0 -1px 0 rgba(0, 0, 0, 0.45);
+}
+
+h2::after {
+    content: "";
+    position: absolute;
+
+    left: 14px;
+    bottom: 4px;
+
+    width: 70px;
+    height: 2px;
+
+    background:
+        linear-gradient(
+            90deg,
+            var(--gold-hover),
+            transparent
+        );
+}
+
+
+/* ---------------------------------------------------------
+   Cards = forged metal / carved panel
+   --------------------------------------------------------- */
+
+.simulator-panel,
+.armor-slot-card,
+.loadout-summary-card,
+.damage-result-card,
+body > form {
+    background:
+        linear-gradient(
+            180deg,
+            rgba(151, 54, 42, 0.10),
+            rgba(197, 161, 91, 0.02) 22%,
+            rgba(0, 0, 0, 0.08) 100%
+        ),
+        repeating-linear-gradient(
+            0deg,
+            rgba(255, 255, 255, 0.008) 0,
+            rgba(255, 255, 255, 0.008) 1px,
+            transparent 1px,
+            transparent 5px
+        ),
+        #1a1411;
+
+    border-color: #5d4938;
+
+    box-shadow:
+        0 12px 30px rgba(0, 0, 0, 0.36),
+        inset 0 1px 0 rgba(224, 193, 127, 0.08),
+        inset 0 -1px 0 rgba(0, 0, 0, 0.42);
+}
+
+/* カードの上端に赤い鍛冶ライン */
+.simulator-panel,
+.armor-slot-card,
+.loadout-summary-card,
+.damage-result-card {
+    border-top-color: #7a342b;
+}
+
+
+/* ---------------------------------------------------------
+   Armor slot cards = equipment slots
+   --------------------------------------------------------- */
+
+.armor-slot-card > h3 {
+    margin-bottom: 14px;
+
+    color: #e2c477;
+    letter-spacing: 0.05em;
+
+    border-bottom:
+        1px solid rgba(197, 161, 91, 0.20);
+}
+
+
+/* ---------------------------------------------------------
+   Loadout / result cards = stronger menu framing
+   --------------------------------------------------------- */
+
+.loadout-summary-card,
+.damage-result-card {
+    border-left-color: rgba(197, 161, 91, 0.58);
+}
+
+.damage-result-card-final {
+    border-color: #b99452;
+
+    background:
+        linear-gradient(
+            180deg,
+            rgba(143, 41, 34, 0.20),
+            rgba(197, 161, 91, 0.08) 35%,
+            rgba(17, 13, 11, 0.92)
+        );
+
+    box-shadow:
+        0 12px 34px rgba(0, 0, 0, 0.44),
+        inset 0 0 0 1px rgba(224, 193, 127, 0.08),
+        0 0 24px rgba(143, 41, 34, 0.10);
+}
+
+
+/* ---------------------------------------------------------
+   Tables = equipment/stat panels
+   --------------------------------------------------------- */
+
+table {
+    background:
+        linear-gradient(
+            180deg,
+            rgba(48, 34, 27, 0.98),
+            rgba(26, 20, 17, 0.98)
+        );
+
+    box-shadow:
+        0 10px 24px rgba(0, 0, 0, 0.30),
+        inset 0 1px 0 rgba(224, 193, 127, 0.05);
+}
+
+th {
+    color: #e6ca84;
+
+    background:
+        linear-gradient(
+            180deg,
+            #4b251e,
+            #2f1b17
+        );
+
+    border-right-color: #5e4032;
+    border-bottom-color: #754438;
+}
+
+td {
+    border-right-color: #3d3028;
+    border-bottom-color: #352a23;
+}
+
+tbody tr:nth-child(even) {
+    background:
+        rgba(255, 255, 255, 0.012);
+}
+
+tbody tr:hover td {
+    color: #f2e6cf;
+}
+
+
+/* ---------------------------------------------------------
+   Buttons = carved red menu buttons
+   --------------------------------------------------------- */
+
+button {
+    min-width: 88px;
+
+    color: #f3e5cb;
+
+    background:
+        linear-gradient(
+            180deg,
+            #a33a30 0%,
+            #81251f 58%,
+            #681b17 100%
+        );
+
+    border-top-color: #d0ad68;
+    border-left-color: #aa884d;
+    border-right-color: #6d4a2d;
+    border-bottom-color: #4d2c20;
+
+    box-shadow:
+        inset 0 1px 0 rgba(255, 232, 188, 0.17),
+        inset 0 -2px 0 rgba(0, 0, 0, 0.25),
+        0 3px 0 rgba(0, 0, 0, 0.20);
+}
+
+button:hover:not(:disabled) {
+    color: #fff4d8;
+
+    background:
+        linear-gradient(
+            180deg,
+            #c45244,
+            #9e3027 58%,
+            #7e211c
+        );
+
+    border-top-color: #ead08d;
+
+    box-shadow:
+        inset 0 1px 0 rgba(255, 244, 215, 0.22),
+        0 5px 14px rgba(0, 0, 0, 0.35),
+        0 0 18px rgba(143, 41, 34, 0.14);
+}
+
+
+/* ---------------------------------------------------------
+   Forms = equipment controls
+   --------------------------------------------------------- */
+
+label {
+    color: #c9baa0;
+}
+
+input[type="text"],
+input[type="number"],
+input[type="password"],
+select,
+textarea {
+    color: #eee2ca;
+
+    background:
+        linear-gradient(
+            180deg,
+            #2d221c,
+            #211813
+        );
+
+    border-color: #644e3b;
+}
+
+select:focus,
+input[type="text"]:focus,
+input[type="number"]:focus,
+input[type="password"]:focus,
+textarea:focus {
+    border-color: #d0ad68;
+
+    box-shadow:
+        0 0 0 1px rgba(197, 161, 91, 0.24),
+        inset 0 0 12px rgba(143, 41, 34, 0.12),
+        0 0 14px rgba(197, 161, 91, 0.06);
+}
+
+
+/* ---------------------------------------------------------
+   Links = menu text
+   --------------------------------------------------------- */
+
+body > a {
+    padding: 5px 10px 5px 14px;
+
+    color: #d7b96f;
+
+    border-left: 3px solid #8f2922;
+
+    background:
+        linear-gradient(
+            90deg,
+            rgba(143, 41, 34, 0.12),
+            transparent
+        );
+}
+
+body > a:hover {
+    color: #f0d48d;
+    border-left-color: #c5a15b;
+}
+
+
+/* ---------------------------------------------------------
+   Strong / highlighted text
+   --------------------------------------------------------- */
+
+strong {
+    color: #edce83;
+
+    text-shadow:
+        0 1px 1px rgba(0, 0, 0, 0.85),
+        0 0 8px rgba(197, 161, 91, 0.08);
+}
+
+
+/* ---------------------------------------------------------
+   Scrollbar = iron / brass
+   --------------------------------------------------------- */
+
+::-webkit-scrollbar-track {
+    background: #0a0706;
+}
+
+::-webkit-scrollbar-thumb {
+    background:
+        linear-gradient(
+            180deg,
+            #6f5540,
+            #3d2c23
+        );
+
+    border: 1px solid #201712;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background:
+        linear-gradient(
+            180deg,
+            #97754d,
+            #59402f
+        );
+}
+
+
+/* ---------------------------------------------------------
+   Responsive polish
+   --------------------------------------------------------- */
+
+@media (max-width: 900px) {
+
+    body::before {
+        opacity: 0.07;
+        right: -210px;
+    }
+
+    h1 {
+        padding-right: 36px;
+    }
+}
+
+@media (max-width: 560px) {
+
+    h1 {
+        padding:
+            12px 28px
+            14px 20px;
+    }
+
+    h2 {
+        min-height: 42px;
+    }
+
+    button {
+        min-width: 0;
+    }
+}
+
